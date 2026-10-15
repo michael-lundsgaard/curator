@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Curator.Api/Curator.Api.csproj" />
+    <Project Path="src/Curator.Application/Curator.Application.csproj" />
+    <Project Path="src/Curator.Domain/Curator.Domain.csproj" />
+    <Project Path="src/Curator.Infrastructure/Curator.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Curator.IntegrationTests/Curator.IntegrationTests.csproj" />
+    <Project Path="tests/Curator.UnitTests/Curator.UnitTests.csproj" />
+  </Folder>
+</Solution>

@@ -1,0 +1,24 @@
+{
+  // Exclude common build and user files from the workspace
+  "files.exclude": {
+    "**/bin": true,
+    "**/obj": true,
+    "**/.vs": true,
+    "**/*.user": true,
+    "**/*.suo": true,
+    "**/*.cache": true
+  },
+  "search.exclude": {
+    "**/bin": true,
+    "**/obj": true
+  },
+
+  // Editor settings for formatting
+  "editor.formatOnSave": true,
+  "[json]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
+  "[jsonc]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
+  "[csharp]": { "editor.defaultFormatter": "ms-dotnettools.csharp" },
+
+  // Default .NET solution for the workspace
+  "dotnet.defaultSolution": "apps/api/Curator.slnx"
+}

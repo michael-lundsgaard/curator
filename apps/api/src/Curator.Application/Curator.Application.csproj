@@ -1,0 +1,5 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="..\Curator.Domain\Curator.Domain.csproj" />
+  </ItemGroup>
+</Project>

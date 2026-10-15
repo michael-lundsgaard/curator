@@ -1,0 +1,67 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    // .NET solution tasks
+    {
+      "label": "build",
+      "type": "process",
+      "command": "dotnet",
+      "args": ["build", "${workspaceFolder}/apps/api/Curator.slnx", "--nologo", "-v:q"],
+      "problemMatcher": "$msCompile",
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    },
+    {
+      "label": "watch api",
+      "type": "process",
+      "command": "dotnet",
+      "args": ["watch", "run", "--project", "${workspaceFolder}/apps/api/src/Curator.Api"],
+      "isBackground": true,
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "test",
+      "type": "process",
+      "command": "dotnet",
+      "args": ["test", "${workspaceFolder}/apps/api/Curator.slnx", "--nologo"],
+      "problemMatcher": "$msCompile",
+      "group": {
+        "kind": "test",
+        "isDefault": true
+      }
+    },
+
+    // Docker tasks
+    {
+      "label": "docker up",
+      "type": "shell",
+      "command": "docker compose up -d"
+    },
+    {
+      "label": "docker down",
+      "type": "shell",
+      "command": "docker compose down"
+    },
+
+    // Formatting tasks
+    {
+      "label": "format all",
+      "dependsOrder": "sequence",
+      "dependsOn": ["format api", "format rest"]
+    },
+    {
+      "label": "format api",
+      "type": "process",
+      "command": "dotnet",
+      "args": ["format", "${workspaceFolder}/apps/api/Curator.slnx"]
+    },
+    {
+      "label": "format rest",
+      "type": "process",
+      "command": "npx",
+      "args": ["prettier", "--write", "."]
+    }
+  ]
+}
