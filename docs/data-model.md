@@ -8,7 +8,8 @@ _Open questions_.
 - ✅ **Shared library.** Every invited user sees everything. `uploaded_by` / `created_by` are for
   attribution and edit/delete rights, not visibility.
 - ✅ **No tags** for now.
-- ✅ **Storage keys, not URLs**, are stored. The API returns short-lived signed URLs.
+- ✅ **Storage keys, not URLs**, are stored. The API returns short-lived signed URLs. Keys are derived from
+  the asset ID (`assets/{id}/original`), never from filenames.
 - ✅ **UUID v7** IDs (`Guid.CreateVersion7()`).
 - ✅ **Soft delete** via `deleted_at`. `status` describes the upload/processing lifecycle only.
 - ✅ **Status stored as text** (`HasConversion<string>()`), so new states don't require data migrations.

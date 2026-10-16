@@ -1,5 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
+    <!-- DbSet and the async LINQ extensions only. Nothing Postgres-specific (see ADR 0004). -->
+    <PackageReference Include="Microsoft.EntityFrameworkCore" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\Curator.Domain\Curator.Domain.csproj" />
   </ItemGroup>
 </Project>

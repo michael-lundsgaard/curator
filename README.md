@@ -28,6 +28,17 @@ dotnet test Curator.slnx      # integration tests start their own Postgres conta
 dotnet watch run --project src/Curator.Api
 ```
 
+Uploads go to a Cloudflare R2 bucket (`curator-dev` in Development, set in `appsettings.Development.json`).
+Create an R2 API token with _Object Read & Write_ on that bucket only, and store its S3 keys as user
+secrets (not the `cfat_` token value):
+
+```bash
+dotnet user-secrets set "R2:AccessKeyId" "<access key id>" --project src/Curator.Api
+dotnet user-secrets set "R2:SecretAccessKey" "<secret access key>" --project src/Curator.Api
+```
+
+Everything except uploads works without these, and the tests don't need them.
+
 Add a migration after changing the model:
 
 ```bash

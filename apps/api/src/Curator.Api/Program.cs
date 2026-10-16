@@ -1,5 +1,6 @@
 using System.Text.Json.Serialization;
 using Curator.Api.Authentication;
+using Curator.Application;
 using Curator.Infrastructure;
 using Scalar.AspNetCore;
 
@@ -12,6 +13,7 @@ builder.Services.AddControllers()
 builder.Services.AddOpenApi();
 builder.Services.AddHealthChecks();
 builder.Services.AddSupabaseAuthentication();
+builder.Services.AddApplication();
 builder.Services.AddInfrastructure();
 
 var app = builder.Build();

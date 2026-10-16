@@ -1,6 +1,9 @@
+using Curator.Application.Persistence;
 using Curator.Application.Profiles;
+using Curator.Application.Storage;
 using Curator.Infrastructure.Persistence;
 using Curator.Infrastructure.Profiles;
+using Curator.Infrastructure.Storage;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -25,6 +28,11 @@ public static class DependencyInjection
         });
 
         services.AddHealthChecks().AddDbContextCheck<CuratorDbContext>("database");
+
+        services.AddScoped<ICuratorDbContext>(sp => sp.GetRequiredService<CuratorDbContext>());
+
+        services.AddOptions<R2Options>().BindConfiguration(R2Options.SectionName);
+        services.AddSingleton<IFileStorage, R2FileStorage>();
 
         services.AddScoped<IProfileProvisioner, ProfileProvisioner>();
 

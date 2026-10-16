@@ -1,7 +1,7 @@
 # 0004: Application structure: use-case handlers and the DbContext
 
-- **Status:** Proposed. Review it at the start of the uploads step, build the first use case with it, and
-  accept or adjust it once it has met real code.
+- **Status:** Proposed. Reviewed and used for the first use case (`CreateUpload`). Accept it once
+  `CompleteUpload` has settled how failures are reported.
 - **Date:** 2026-10-16
 
 ## Context
@@ -63,11 +63,26 @@ Curator.Application/
 `ProfileProvisioner` stays an Infrastructure implementation of `IProfileProvisioner`. It's plumbing for
 authentication (handling a Postgres unique violation), not a use case.
 
-### Open, to settle in the uploads step
+### Settled with the first use case (`CreateUpload`)
 
-- **How handlers report failures** such as "not found" or "not allowed": a small result type mapped to
-  `ProblemDetails` in the controller, or exceptions mapped by middleware.
-- **Request validation:** data annotations on the request records, or checks in the handler and domain.
+- **Handler signature:** `HandleAsync(Command command, Profile user, CancellationToken)`. The user is a
+  separate parameter, not a field on the command, so the command can be the request body directly. There's
+  no separate request DTO in the Api project that only copies fields.
+- **Request validation:** data annotations on the command record. `[ApiController]` checks them and returns
+  `ValidationProblemDetails` (400) before the handler runs, and OpenAPI picks them up. Entities still guard
+  their invariants (`ArgumentException`), as a safety net rather than user-facing validation.
+- **Time:** handlers take `TimeProvider` (registered as `TimeProvider.System`) instead of calling
+  `DateTimeOffset.UtcNow`.
+- **Storage keys are derived in the domain** from the entity's ID (`assets/{id}/original`). No user input
+  (filenames) ends up in keys, and handlers don't need to know the ID before creating the entity.
+- **Order of side effects:** call external systems that can fail (e.g. presigning) before
+  `SaveChangesAsync`, so a failure doesn't leave orphaned rows.
+
+### Still open, to settle with `CompleteUpload`
+
+- **How handlers report failures** such as "not found", "not allowed" or "wrong state": a small result type
+  mapped to `ProblemDetails` in the controller, or exceptions mapped by middleware. `CreateUpload` has no
+  such failures, so this waits for the first use case that does.
 
 ## Alternatives considered
 

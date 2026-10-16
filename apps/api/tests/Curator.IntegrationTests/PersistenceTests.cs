@@ -45,7 +45,7 @@ public class PersistenceTests(CuratorApiFactory factory)
     {
         var now = DateTimeOffset.UtcNow;
         var profile = new Profile(Guid.NewGuid(), "Test user", now);
-        var asset = new Asset(profile.Id, "Clip", "clip.mp4", "video/mp4", "originals/clip.mp4", 1024, now, now);
+        var asset = new Asset(profile.Id, "clip.mp4", "video/mp4", 1024, now, now);
 
         await using var db = CreateDbContext();
         db.AddRange(profile, asset);

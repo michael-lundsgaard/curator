@@ -5,21 +5,23 @@ public class Asset
 {
     public Asset(
         Guid uploadedBy,
-        string title,
         string originalFilename,
         string contentType,
-        string sourceKey,
         long sourceSizeBytes,
         DateTimeOffset? recordedAt,
         DateTimeOffset createdAt)
     {
+        ArgumentException.ThrowIfNullOrWhiteSpace(originalFilename);
+        ArgumentException.ThrowIfNullOrWhiteSpace(contentType);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(sourceSizeBytes);
+
         Id = Guid.CreateVersion7(createdAt);
         UploadedBy = uploadedBy;
-        Title = title;
+        Title = DefaultTitle(originalFilename);
         OriginalFilename = originalFilename;
         ContentType = contentType;
         Status = AssetStatus.Pending;
-        SourceKey = sourceKey;
+        SourceKey = $"assets/{Id}/original";
         SourceSizeBytes = sourceSizeBytes;
         RecordedAt = recordedAt;
         CreatedAt = createdAt;
@@ -34,7 +36,10 @@ public class Asset
     public string ContentType { get; private set; }
     public AssetStatus Status { get; private set; }
 
-    /// <summary>Storage key of the original. Cleared once processing succeeds, unless originals are kept.</summary>
+    /// <summary>
+    /// Storage key of the original, derived from the ID so no user input ends up in keys. Cleared once processing
+    /// succeeds, unless originals are kept.
+    /// </summary>
     public string? SourceKey { get; private set; }
     public long SourceSizeBytes { get; private set; }
     public string? PlaybackKey { get; private set; }
@@ -56,5 +61,12 @@ public class Asset
     {
         DeletedAt ??= now;
         UpdatedAt = now;
+    }
+
+    /// <summary>The filename without its extension: "Funny moment.mp4" becomes "Funny moment".</summary>
+    private static string DefaultTitle(string filename)
+    {
+        var title = Path.GetFileNameWithoutExtension(filename).Trim();
+        return title.Length > 0 ? title : filename;
     }
 }

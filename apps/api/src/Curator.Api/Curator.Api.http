@@ -27,3 +27,17 @@ GET {{host}}/me
 Authorization: Bearer {{token}}
 
 ###
+
+# Start an upload, then PUT the file to uploadUrl with the same Content-Type.
+POST {{host}}/assets/uploads
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "filename": "Funny moment.mp4",
+  "contentType": "video/mp4",
+  "sizeBytes": 1048576,
+  "recordedAt": "2026-10-16T20:15:00+02:00"
+}
+
+###

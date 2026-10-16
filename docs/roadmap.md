@@ -10,8 +10,11 @@ Built step by step. Each step is small and shippable. Order may change.
       Docker → [0002](decisions/0002-local-postgres-in-docker.md)
 - [x] Authentication: validate Supabase JWTs, create the profile on first request, decide roles and
       edit/delete permissions → [0003](decisions/0003-authentication-and-permissions.md)
-- [ ] Uploads: create asset, presigned R2 upload URL, mark as uploaded. Start by reviewing the proposed
-      [0004](decisions/0004-application-structure.md)
+- [ ] Uploads, following [0004](decisions/0004-application-structure.md):
+  - [x] Create asset and presigned R2 upload URL (`POST /assets/uploads`)
+  - [ ] Mark as uploaded (`CompleteUpload`): check the object exists in R2 and its size matches, since
+        the presigned `PUT` doesn't enforce size. Settle failure reporting in 0004 and accept it
+  - [ ] R2 bucket CORS for browser `PUT`s from the app's origin
 - [ ] Collections: tree, add/remove clips, sorting, cover image
 - [ ] React app (`apps/app`, Vite): sign-in, generated API client, browse and upload
 - [ ] Video processing: transcode to playback version and generate thumbnail

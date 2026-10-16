@@ -24,6 +24,9 @@ public class CuratorApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
     private const string SupabaseUrl = "https://curator-tests.supabase.co";
     private const string Issuer = $"{SupabaseUrl}/auth/v1";
 
+    public const string R2AccountId = "curator-tests";
+    public const string R2Bucket = "curator-tests";
+
     private readonly PostgreSqlContainer _postgres = new PostgreSqlBuilder("postgres:17-alpine").Build();
 
     /// <summary>Stands in for the Supabase project's ECC (P-256) signing key.</summary>
@@ -38,6 +41,12 @@ public class CuratorApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
     {
         builder.UseSetting("ConnectionStrings:Curator", _postgres.GetConnectionString());
         builder.UseSetting("Supabase:Url", SupabaseUrl);
+
+        // Presigned URLs are computed locally, so made-up credentials work as long as nothing calls R2.
+        builder.UseSetting("R2:AccountId", R2AccountId);
+        builder.UseSetting("R2:Bucket", R2Bucket);
+        builder.UseSetting("R2:AccessKeyId", "test-access-key");
+        builder.UseSetting("R2:SecretAccessKey", "test-secret-key");
 
         // Serve the keys directly instead of fetching them from {Authority}/.well-known/openid-configuration.
         builder.ConfigureTestServices(services =>
