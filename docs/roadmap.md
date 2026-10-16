@@ -15,6 +15,10 @@ Built step by step. Each step is small and shippable. Order may change.
   - [ ] Mark as uploaded (`CompleteUpload`): check the object exists in R2 and its size matches, since
         the presigned `PUT` doesn't enforce size. Settle failure reporting in 0004 and accept it
   - [ ] R2 bucket CORS for browser `PUT`s from the app's origin
+- [ ] Library: list assets (search, filter, sort, pagination), get one, edit title, description and
+      `recorded_at`, delete (uploader or admin), signed playback and thumbnail URLs. Start by drafting
+      ADR 0005 for pagination (cursor vs offset), search (`pg_trgm` vs full-text) and where
+      Postgres-specific query code lives
 - [ ] Collections: tree, add/remove clips, sorting, cover image
 - [ ] React app (`apps/app`, Vite): sign-in, generated API client, browse and upload
 - [ ] Video processing: transcode to playback version and generate thumbnail
