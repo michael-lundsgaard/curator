@@ -10,7 +10,8 @@ namespace Curator.Api.Assets;
 public class AssetsController : ControllerBase
 {
     /// <summary>
-    /// Starts an upload. Upload the file to <c>uploadUrl</c> with <c>PUT</c> and the same <c>Content-Type</c>.
+    /// Starts an upload. Upload the file to <c>uploadUrl</c> with <c>PUT</c> and the same <c>Content-Type</c>. Storage
+    /// rejects a file whose size differs from <c>sizeBytes</c>.
     /// </summary>
     [HttpPost("uploads")]
     [ProducesResponseType<CreateUpload.Response>(StatusCodes.Status201Created)]

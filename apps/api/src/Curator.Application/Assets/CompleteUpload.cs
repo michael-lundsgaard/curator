@@ -9,7 +9,7 @@ namespace Curator.Application.Assets;
 
 /// <summary>
 /// Marks a <see cref="AssetStatus.Pending"/> asset as <see cref="AssetStatus.Uploaded"/> once the original is in
-/// storage. The presigned <c>PUT</c> doesn't enforce the size, so it's checked here.
+/// storage with the announced size.
 /// </summary>
 public static class CompleteUpload
 {
@@ -50,6 +50,7 @@ public static class CompleteUpload
                 return Error.Conflict("The file hasn't been uploaded yet.");
             }
 
+            // The signed Content-Length already makes storage reject other sizes. This is the backstop.
             if (size != asset.SourceSizeBytes)
             {
                 return Error.Conflict(

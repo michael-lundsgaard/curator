@@ -5,11 +5,13 @@ public interface IFileStorage
 {
     /// <summary>
     /// Creates a presigned URL the browser uploads to with <c>PUT</c>. The request must send the same
-    /// <c>Content-Type</c>, because it is part of the signature.
+    /// <c>Content-Type</c> and <c>Content-Length</c>, because they are part of the signature. Storage rejects a
+    /// file of any other size.
     /// </summary>
     Task<string> CreateUploadUrlAsync(
         string key,
         string contentType,
+        long sizeBytes,
         DateTimeOffset expiresAt,
         CancellationToken cancellationToken);
 

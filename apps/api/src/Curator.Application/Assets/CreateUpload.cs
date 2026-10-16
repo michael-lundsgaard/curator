@@ -19,7 +19,7 @@ public static class CreateUpload
 
     /// <param name="Filename">Name of the file on the user's device. The title defaults to it.</param>
     /// <param name="ContentType">MIME type of the file, e.g. <c>video/mp4</c>. The upload must send it.</param>
-    /// <param name="SizeBytes">Size of the file.</param>
+    /// <param name="SizeBytes">Size of the file. The upload is rejected if the file has another size.</param>
     /// <param name="RecordedAt">When the clip was captured, e.g. the browser's <c>File.lastModified</c>.</param>
     public sealed record Command(
         [Required, MaxLength(255)] string Filename,
@@ -44,7 +44,7 @@ public static class CreateUpload
             // Before saving, so a storage failure doesn't leave an asset nobody can upload to.
             var expiresAt = now + UploadUrlLifetime;
             var uploadUrl = await storage.CreateUploadUrlAsync(
-                asset.SourceKey!, asset.ContentType, expiresAt, cancellationToken);
+                asset.SourceKey!, asset.ContentType, asset.SourceSizeBytes, expiresAt, cancellationToken);
 
             db.Assets.Add(asset);
             await db.SaveChangesAsync(cancellationToken);

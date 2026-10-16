@@ -16,18 +16,24 @@ internal sealed class R2FileStorage(IOptions<R2Options> options) : IFileStorage,
     public async Task<string> CreateUploadUrlAsync(
         string key,
         string contentType,
+        long sizeBytes,
         DateTimeOffset expiresAt,
         CancellationToken cancellationToken)
     {
-        // Presigning is computed locally; it doesn't call R2.
-        return await _client.Value.GetPreSignedURLAsync(new GetPreSignedUrlRequest
+        var request = new GetPreSignedUrlRequest
         {
             BucketName = options.Value.Bucket,
             Key = key,
             Verb = HttpVerb.PUT,
             ContentType = contentType,
             Expires = expiresAt.UtcDateTime,
-        });
+        };
+
+        // Signed, so R2 rejects a PUT of any other size (403). Browsers set Content-Length from the file.
+        request.Headers.ContentLength = sizeBytes;
+
+        // Presigning is computed locally; it doesn't call R2.
+        return await _client.Value.GetPreSignedURLAsync(request);
     }
 
     public async Task<long?> GetSizeAsync(string key, CancellationToken cancellationToken)

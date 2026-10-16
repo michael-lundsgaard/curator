@@ -36,6 +36,8 @@ public class AssetUploadTests(CuratorApiFactory factory)
         Assert.Equal($"{CuratorApiFactory.R2AccountId}.r2.cloudflarestorage.com", url.Host);
         Assert.Equal($"/{CuratorApiFactory.R2Bucket}/{asset.SourceKey}", url.AbsolutePath);
         Assert.Contains("X-Amz-Signature=", url.Query);
+        // Signing Content-Length makes R2 reject files of another size.
+        Assert.Contains("X-Amz-SignedHeaders=content-length%3Bcontent-type%3Bhost", url.Query);
         Assert.InRange(upload.UploadUrlExpiresAt, DateTimeOffset.UtcNow, DateTimeOffset.UtcNow.AddMinutes(16));
     }
 

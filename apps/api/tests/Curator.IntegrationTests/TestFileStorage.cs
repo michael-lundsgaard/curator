@@ -12,9 +12,10 @@ internal sealed class TestFileStorage(IFileStorage presigner, ConcurrentDictiona
     public Task<string> CreateUploadUrlAsync(
         string key,
         string contentType,
+        long sizeBytes,
         DateTimeOffset expiresAt,
         CancellationToken cancellationToken) =>
-        presigner.CreateUploadUrlAsync(key, contentType, expiresAt, cancellationToken);
+        presigner.CreateUploadUrlAsync(key, contentType, sizeBytes, expiresAt, cancellationToken);
 
     public Task<long?> GetSizeAsync(string key, CancellationToken cancellationToken) =>
         Task.FromResult(objects.TryGetValue(key, out var size) ? size : (long?)null);
