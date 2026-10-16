@@ -1,3 +1,4 @@
+using System.Net;
 using Amazon.Runtime;
 using Amazon.S3;
 using Amazon.S3.Model;
@@ -27,6 +28,19 @@ internal sealed class R2FileStorage(IOptions<R2Options> options) : IFileStorage,
             ContentType = contentType,
             Expires = expiresAt.UtcDateTime,
         });
+    }
+
+    public async Task<long?> GetSizeAsync(string key, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var metadata = await _client.Value.GetObjectMetadataAsync(options.Value.Bucket, key, cancellationToken);
+            return metadata.ContentLength;
+        }
+        catch (AmazonS3Exception e) when (e.StatusCode == HttpStatusCode.NotFound)
+        {
+            return null;
+        }
     }
 
     public void Dispose()

@@ -11,6 +11,7 @@ public static class DependencyInjection
         services.TryAddSingleton(TimeProvider.System);
 
         services.AddScoped<CreateUpload.Handler>();
+        services.AddScoped<CompleteUpload.Handler>();
 
         return services;
     }

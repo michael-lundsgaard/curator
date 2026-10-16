@@ -25,4 +25,25 @@ public class AssetTests
     {
         Assert.Equal(title, CreateAsset(filename).Title);
     }
+
+    [Fact]
+    public void MarkUploaded_WhenPending_IsUploaded()
+    {
+        var asset = CreateAsset();
+        var now = asset.CreatedAt.AddMinutes(1);
+
+        asset.MarkUploaded(now);
+
+        Assert.Equal(AssetStatus.Uploaded, asset.Status);
+        Assert.Equal(now, asset.UpdatedAt);
+    }
+
+    [Fact]
+    public void MarkUploaded_WhenNotPending_Throws()
+    {
+        var asset = CreateAsset();
+        asset.MarkUploaded(DateTimeOffset.UtcNow);
+
+        Assert.Throws<InvalidOperationException>(() => asset.MarkUploaded(DateTimeOffset.UtcNow));
+    }
 }

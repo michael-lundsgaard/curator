@@ -57,6 +57,18 @@ public class Asset
     public DateTimeOffset UpdatedAt { get; private set; }
     public DateTimeOffset? DeletedAt { get; private set; }
 
+    /// <summary>The original is in storage. Only a <see cref="AssetStatus.Pending"/> asset can be marked.</summary>
+    public void MarkUploaded(DateTimeOffset now)
+    {
+        if (Status != AssetStatus.Pending)
+        {
+            throw new InvalidOperationException($"Only pending assets can be marked as uploaded, not {Status}.");
+        }
+
+        Status = AssetStatus.Uploaded;
+        UpdatedAt = now;
+    }
+
     public void Delete(DateTimeOffset now)
     {
         DeletedAt ??= now;

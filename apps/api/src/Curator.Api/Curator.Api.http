@@ -29,6 +29,7 @@ Authorization: Bearer {{token}}
 ###
 
 # Start an upload, then PUT the file to uploadUrl with the same Content-Type.
+# @name startUpload
 POST {{host}}/assets/uploads
 Authorization: Bearer {{token}}
 Content-Type: application/json
@@ -39,5 +40,11 @@ Content-Type: application/json
   "sizeBytes": 1048576,
   "recordedAt": "2026-10-16T20:15:00+02:00"
 }
+
+###
+
+# After the PUT succeeded. Returns 409 until the file is in R2 with the announced size.
+POST {{host}}/assets/{{startUpload.response.body.assetId}}/complete-upload
+Authorization: Bearer {{token}}
 
 ###

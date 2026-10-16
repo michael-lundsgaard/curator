@@ -1,7 +1,7 @@
 # 0004: Application structure: use-case handlers and the DbContext
 
-- **Status:** Proposed. Reviewed and used for the first use case (`CreateUpload`). Accept it once
-  `CompleteUpload` has settled how failures are reported.
+- **Status:** Accepted, after the first use cases (`CreateUpload`, `CompleteUpload`) settled the open
+  details.
 - **Date:** 2026-10-16
 
 ## Context
@@ -78,11 +78,33 @@ authentication (handling a Postgres unique violation), not a use case.
 - **Order of side effects:** call external systems that can fail (e.g. presigning) before
   `SaveChangesAsync`, so a failure doesn't leave orphaned rows.
 
-### Still open, to settle with `CompleteUpload`
+### Settled with `CompleteUpload`: how handlers report failures
 
-- **How handlers report failures** such as "not found", "not allowed" or "wrong state": a small result type
-  mapped to `ProblemDetails` in the controller, or exceptions mapped by middleware. `CreateUpload` has no
-  such failures, so this waits for the first use case that does.
+- **Expected failures are return values.** A handler that can fail returns `Result<Response>`
+  (`Curator.Application.Common`): either the response or an `Error(Kind, Message)`. Implicit conversions let
+  it `return response;` or `return Error.NotFound("...");`.
+- **Kinds are few and generic:** `NotFound` (404), `Forbidden` (403), `Conflict` (409, wrong state). Add one
+  when a use case needs a status these don't cover, not up front.
+- **The controller maps them** with `result.ToActionResult(this, Ok)`, which returns `ProblemDetails` with the
+  message as `detail`. The endpoint lists each status with `[ProducesResponseType<ProblemDetails>]`.
+- **Exceptions remain for bugs** and broken invariants (an entity's `InvalidOperationException`, a database
+  that's down). They become a 500, never an expected outcome.
+- Handlers that can't fail (like `CreateUpload`) keep returning the response directly.
+
+Why not exceptions mapped by middleware (`NotFoundException` → 404 in an `IExceptionHandler`)? It's a valid,
+widely used approach, with less code in controllers. It wasn't chosen because:
+
+- Failures are part of the use case's contract. With a result they're visible in the signature, and the
+  compiler makes the caller deal with them. A thrown exception can come from any depth, and nothing shows
+  which ones a handler throws.
+- "The file isn't uploaded yet" is a normal answer, not an exceptional situation. Exceptions as control flow
+  make the flow harder to follow (and are slower, though that doesn't matter here).
+- The mapping lives next to the endpoint and its `[ProducesResponseType]` attributes, instead of in a global
+  handler that has to know every exception type.
+
+The cost is a little more code per endpoint and no "early return from deep inside" (a helper that finds an
+asset has to return a result too). If `ToActionResult` boilerplate or nested results become painful, revisit.
+C# union types (expected in a future C# version) could replace the hand-written `Result<T>`.
 
 ## Alternatives considered
 

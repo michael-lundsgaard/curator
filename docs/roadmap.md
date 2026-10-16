@@ -12,8 +12,8 @@ Built step by step. Each step is small and shippable. Order may change.
       edit/delete permissions → [0003](decisions/0003-authentication-and-permissions.md)
 - [ ] Uploads, following [0004](decisions/0004-application-structure.md):
   - [x] Create asset and presigned R2 upload URL (`POST /assets/uploads`)
-  - [ ] Mark as uploaded (`CompleteUpload`): check the object exists in R2 and its size matches, since
-        the presigned `PUT` doesn't enforce size. Settle failure reporting in 0004 and accept it
+  - [x] Mark as uploaded (`POST /assets/{id}/complete-upload`): check the object exists in R2 and its size
+        matches, since the presigned `PUT` doesn't enforce size. Failures are results, 0004 accepted
   - [ ] R2 bucket CORS for browser `PUT`s from the app's origin
 - [ ] Library: list assets (search, filter, sort, pagination), get one, edit title, description and
       `recorded_at`, delete (uploader or admin), signed playback and thumbnail URLs. Start by drafting

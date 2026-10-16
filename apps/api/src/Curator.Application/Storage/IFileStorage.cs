@@ -12,4 +12,7 @@ public interface IFileStorage
         string contentType,
         DateTimeOffset expiresAt,
         CancellationToken cancellationToken);
+
+    /// <summary>Returns the size of the stored object, or <c>null</c> if there is none.</summary>
+    Task<long?> GetSizeAsync(string key, CancellationToken cancellationToken);
 }

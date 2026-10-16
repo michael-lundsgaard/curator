@@ -1,5 +1,7 @@
+using System.Collections.Concurrent;
 using System.Net.Http.Headers;
 using System.Security.Cryptography;
+using Curator.Application.Storage;
 using Curator.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Hosting;
@@ -42,22 +44,36 @@ public class CuratorApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
         builder.UseSetting("ConnectionStrings:Curator", _postgres.GetConnectionString());
         builder.UseSetting("Supabase:Url", SupabaseUrl);
 
-        // Presigned URLs are computed locally, so made-up credentials work as long as nothing calls R2.
+        // Presigned URLs are computed locally, so made-up credentials work as long as nothing calls R2 (see
+        // TestFileStorage).
         builder.UseSetting("R2:AccountId", R2AccountId);
         builder.UseSetting("R2:Bucket", R2Bucket);
         builder.UseSetting("R2:AccessKeyId", "test-access-key");
         builder.UseSetting("R2:SecretAccessKey", "test-secret-key");
 
-        // Serve the keys directly instead of fetching them from {Authority}/.well-known/openid-configuration.
         builder.ConfigureTestServices(services =>
+        {
+            // Serve the keys directly instead of fetching them from {Authority}/.well-known/openid-configuration.
             services.PostConfigure<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme, options =>
             {
                 var configuration = new OpenIdConnectConfiguration { Issuer = Issuer };
                 configuration.SigningKeys.Add(SigningKey);
                 configuration.SigningKeys.Add(LegacySecret);
                 options.ConfigurationManager = new StaticConfigurationManager<OpenIdConnectConfiguration>(configuration);
-            }));
+            });
+
+            // Keep the real storage for presigning, but wrap it so object lookups come from StoredObjects.
+            var storage = services.Single(d => d.ServiceType == typeof(IFileStorage));
+            var storageType = storage.ImplementationType!;
+            services.Remove(storage);
+            services.AddSingleton(storageType);
+            services.AddSingleton<IFileStorage>(sp =>
+                new TestFileStorage((IFileStorage)sp.GetRequiredService(storageType), StoredObjects));
+        });
     }
+
+    /// <summary>Objects "in R2" by key, with their size. Add one to simulate a finished upload.</summary>
+    public ConcurrentDictionary<string, long> StoredObjects { get; } = new();
 
     /// <summary>Creates a client signed in as the given user.</summary>
     public HttpClient CreateClient(Guid userId, string email = "test.user@example.com") =>

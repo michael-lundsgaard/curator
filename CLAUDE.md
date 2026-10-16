@@ -62,8 +62,9 @@ If the API is already running (debugger/watch), it locks `bin/`. To build or tes
   tests); regular constructors with `private set` properties for domain entities.
 - Use cases: one file per use case in `Curator.Application/<Feature>/` (`Command`, `Response`, `Handler`),
   registered in `AddApplication()`, called from a thin controller. Handlers use `ICuratorDbContext` directly
-  (no repositories) and validate with data annotations on the command. See
-  `docs/decisions/0004-application-structure.md`.
+  (no repositories) and validate with data annotations on the command. Expected failures (not found,
+  forbidden, conflict) are returned as `Result<T>` and mapped with `result.ToActionResult(this, Ok)`;
+  exceptions are for bugs. See `docs/decisions/0004-application-structure.md`.
 - Auth: every endpoint requires a signed-in user unless marked `AllowAnonymous`. Read the user with
   `HttpContext.GetProfile()`. Integration tests sign in with `factory.CreateClient(userId)`, never real
   Supabase tokens. See `docs/decisions/0003-authentication-and-permissions.md`.
