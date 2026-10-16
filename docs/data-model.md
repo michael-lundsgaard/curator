@@ -12,6 +12,16 @@ _Open questions_.
 - ✅ **UUID v7** IDs (`Guid.CreateVersion7()`).
 - ✅ **Soft delete** via `deleted_at`. `status` describes the upload/processing lifecycle only.
 - ✅ **Status stored as text** (`HasConversion<string>()`), so new states don't require data migrations.
+- ✅ **Generic collection tree + `recorded_at`.** Separate `Game` and `Session` entities were considered
+  and rejected as too specific.
+- ✅ **Tree depth is capped at 5 levels** (in addition to rejecting cycles). Can be lowered if it causes
+  problems.
+- ✅ **Deleting a collection deletes its sub-collections too.** Clips are never deleted.
+- ✅ **Originals are deleted once processing succeeds**, controlled by a setting (default: delete).
+- ✅ **Share links are for single assets only.** Sharing collections was considered and dropped as too
+  much work for too little benefit.
+- ✅ **Favorites are visible to everyone.** Each user has their own favorites, and others can see who
+  favorited what (e.g. "3 people favorited this").
 
 ## Proposed schema
 
@@ -20,7 +30,7 @@ profiles           id (= JWT sub), display_name, created_at
 
 assets             id, uploaded_by → profiles, title, description,
                    original_filename, content_type, status,
-                   source_key, source_size_bytes,
+                   source_key?, source_size_bytes,
                    playback_key, playback_size_bytes,
                    thumbnail_key, processing_error,
                    duration_ms, width, height, recorded_at,
@@ -33,7 +43,10 @@ collections        id, parent_id? → collections, created_by → profiles,
 collection_assets  collection_id, asset_id, position, added_by, added_at
                    PK (collection_id, asset_id)
 
-share_links        (later) id, token (unique), collection_id, created_by,
+favorites          (later) profile_id, asset_id, created_at
+                   PK (profile_id, asset_id)
+
+share_links        (later) id, token (unique), asset_id, created_by,
                    expires_at, revoked_at, created_at
 ```
 
@@ -48,7 +61,9 @@ Pending → Uploaded → Processing → Ready
 2. The browser uploads straight to R2, then tells the API it's done (`Uploaded`).
 3. A worker transcodes the original into a smaller playback version and creates a thumbnail
    (`Processing` → `Ready`, or `Failed` with `processing_error`).
-4. Policy (later): delete `source_key` once the asset is `Ready`, to save storage.
+4. Once the asset is `Ready`, the worker deletes the original and clears `source_key`, unless the
+   `KeepOriginals` setting is on. `source_size_bytes` is kept for reference. Failed assets keep their
+   original so processing can be retried.
 
 `recorded_at` is when the clip was captured. The browser sends `File.lastModified` on upload, and
 processing can correct it from the video's metadata.
@@ -57,20 +72,18 @@ processing can correct it from the video's metadata.
 
 - A generic tree using `parent_id`. Nothing in it is game- or session-specific: "Best of 2026 → Screams"
   and "R.E.P.O → Funny moments" are the same thing.
-- Any depth is allowed. The domain rejects cycles (moving a collection into one of its own descendants).
+- Max depth is 5. The domain rejects cycles (moving a collection into one of its own descendants) and
+  moves or creates that would exceed the depth (target depth + height of the moved subtree).
 - A clip is stored only in the collections it was explicitly added to, and can be in several.
   "Show clips from sub-collections too" is a display option, not duplicated data.
 - "Sessions" are a view: the clips in a collection grouped by `recorded_at`, not a structure.
 - Cover: an uploaded image (`cover_key`). If there is none, the UI uses the thumbnail of the newest
   clip in the collection or its sub-collections.
-- Deleting a collection never deletes clips.
+- Deleting a collection deletes all of its sub-collections and their `collection_assets` rows. The clips
+  themselves stay in the library. The UI should confirm with a count of affected sub-collections.
 
 ## Open questions
 
-- [ ] Is the generic collection tree + `recorded_at` the right model? (Alternative considered and
-      rejected: separate `Game` and `Session` entities, which are too specific.)
-- [ ] Should the tree have a maximum depth, or is "no cycles" enough?
-- [ ] Deleting a collection that has sub-collections: delete them too, or move them up a level?
-- [ ] Who can edit and delete: only the uploader/creator, or anyone in the group?
-- [ ] Delete the original upload once processing succeeds?
-- [ ] Share links: collections only, or single assets too?
+- [ ] Who can edit and delete? Leaning towards a role/permission setup (e.g. admin vs. member, plus
+      owner rights on your own uploads/collections) rather than a fixed rule. Decide together with auth.
+- [ ] Favorites: assets only (as drafted), or collections too?
