@@ -1,5 +1,29 @@
 @host = http://localhost:5238
+@supabase = https://jnofblywuslpfnouxniw.supabase.co
+
+# Sign in first. Credentials come from a git-ignored .env file next to this one:
+#   SUPABASE_PUBLISHABLE_KEY=sb_publishable_...
+#   CURATOR_EMAIL=you@example.com
+#   CURATOR_PASSWORD=...
+# @name signIn
+POST {{supabase}}/auth/v1/token?grant_type=password
+apikey: {{$dotenv SUPABASE_PUBLISHABLE_KEY}}
+Content-Type: application/json
+
+{
+  "email": "{{$dotenv CURATOR_EMAIL}}",
+  "password": "{{$dotenv CURATOR_PASSWORD}}"
+}
+
+###
+
+@token = {{signIn.response.body.access_token}}
 
 GET {{host}}/health
+
+###
+
+GET {{host}}/me
+Authorization: Bearer {{token}}
 
 ###

@@ -20,13 +20,19 @@ _Open questions_.
 - ✅ **Originals are deleted once processing succeeds**, controlled by a setting (default: delete).
 - ✅ **Share links are for single assets only.** Sharing collections was considered and dropped as too
   much work for too little benefit.
+- ✅ **Roles and permissions:** `profiles.role` is `Member` or `Admin`. Owners edit and delete their own
+  clips and collections, admins everything. Collections are shared: anyone can add and remove clips and
+  create sub-collections in any collection. See [0003](decisions/0003-authentication-and-permissions.md).
+- ✅ **Clips in a collection are sorted, not manually ordered.** Sort options (recorded, added, title)
+  cover the need and fit the "sessions" view grouped by `recorded_at`. Manual ordering can be added later
+  with a `position` column if it's missed.
 - ✅ **Favorites are visible to everyone.** Each user has their own favorites, and others can see who
   favorited what (e.g. "3 people favorited this").
 
 ## Proposed schema
 
 ```
-profiles           id (= JWT sub), display_name, created_at
+profiles           id (= JWT sub), display_name, role, created_at
 
 assets             id, uploaded_by → profiles, title, description,
                    original_filename, content_type, status,
@@ -40,7 +46,7 @@ collections        id, parent_id? → collections, created_by → profiles,
                    name, description, cover_key?, position,
                    created_at, updated_at
 
-collection_assets  collection_id, asset_id, position, added_by, added_at
+collection_assets  collection_id, asset_id, added_by, added_at
                    PK (collection_id, asset_id)
 
 favorites          (later) profile_id, asset_id, created_at
@@ -84,6 +90,4 @@ processing can correct it from the video's metadata.
 
 ## Open questions
 
-- [ ] Who can edit and delete? Leaning towards a role/permission setup (e.g. admin vs. member, plus
-      owner rights on your own uploads/collections) rather than a fixed rule. Decide together with auth.
 - [ ] Favorites: assets only (as drafted), or collections too?

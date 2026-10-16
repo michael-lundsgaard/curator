@@ -53,6 +53,5 @@ public class PersistenceTests(CuratorApiFactory factory)
         return asset;
     }
 
-    private CuratorDbContext CreateDbContext() =>
-        factory.Services.CreateScope().ServiceProvider.GetRequiredService<CuratorDbContext>();
+    private CuratorDbContext CreateDbContext() => factory.CreateDbContext();
 }

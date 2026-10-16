@@ -1,4 +1,6 @@
+using Curator.Application.Profiles;
 using Curator.Infrastructure.Persistence;
+using Curator.Infrastructure.Profiles;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -23,6 +25,8 @@ public static class DependencyInjection
         });
 
         services.AddHealthChecks().AddDbContextCheck<CuratorDbContext>("database");
+
+        services.AddScoped<IProfileProvisioner, ProfileProvisioner>();
 
         return services;
     }

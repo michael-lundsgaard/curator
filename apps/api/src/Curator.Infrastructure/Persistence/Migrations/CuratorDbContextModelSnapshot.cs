@@ -132,6 +132,11 @@ namespace Curator.Infrastructure.Persistence.Migrations
                         .HasColumnType("text")
                         .HasColumnName("display_name");
 
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("role");
+
                     b.HasKey("Id")
                         .HasName("pk_profiles");
 

@@ -7,10 +7,12 @@ public class Profile
     {
         Id = id;
         DisplayName = displayName;
+        Role = ProfileRole.Member;
         CreatedAt = createdAt;
     }
 
     public Guid Id { get; private set; }
     public string DisplayName { get; private set; }
+    public ProfileRole Role { get; private set; }
     public DateTimeOffset CreatedAt { get; private set; }
 }

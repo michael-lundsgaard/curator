@@ -55,6 +55,11 @@ If the API is already running (debugger/watch), it locks `bin/`. To build or tes
 - Package versions are centrally managed in `apps/api/Directory.Packages.props`. Add `<PackageVersion>` there
   and a version-less `<PackageReference>` in the csproj.
 - Formatting: `.editorconfig` (LF, 2 spaces; 4 for C#) and Prettier for JSON/MD/web files.
+- Constructors: primary constructors for types that only receive dependencies (services, `DbContext`,
+  tests); regular constructors with `private set` properties for domain entities.
+- Auth: every endpoint requires a signed-in user unless marked `AllowAnonymous`. Read the user with
+  `HttpContext.GetProfile()`. Integration tests sign in with `factory.CreateClient(userId)`, never real
+  Supabase tokens. See `docs/decisions/0003-authentication-and-permissions.md`.
 - `.http` files target the VS Code REST Client extension. Variable names must be plain words (`@host`, not `@Curator.Api_HostAddress`).
 - Tests: xUnit 2. Every new endpoint gets at least one integration test.
 - Commits: [Conventional Commits](https://www.conventionalcommits.org/): `type(scope): description`

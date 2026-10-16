@@ -10,5 +10,6 @@ internal sealed class ProfileConfiguration : IEntityTypeConfiguration<Profile>
     {
         // The ID comes from the JWT, never from the database.
         builder.Property(p => p.Id).ValueGeneratedNever();
+        builder.Property(p => p.Role).HasConversion<string>();
     }
 }

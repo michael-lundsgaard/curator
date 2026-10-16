@@ -8,10 +8,10 @@ Built step by step. Each step is small and shippable. Order may change.
       authentication, favorites scope to the favorites step)
 - [x] EF Core + Npgsql: `profiles` + `assets`, first migration, database health check, local Postgres in
       Docker → [0002](decisions/0002-local-postgres-in-docker.md)
-- [ ] Authentication: validate Supabase JWTs, create the profile on first request, decide roles and
-      edit/delete permissions
+- [x] Authentication: validate Supabase JWTs, create the profile on first request, decide roles and
+      edit/delete permissions → [0003](decisions/0003-authentication-and-permissions.md)
 - [ ] Uploads: create asset, presigned R2 upload URL, mark as uploaded
-- [ ] Collections: tree, add/remove clips, ordering, cover image
+- [ ] Collections: tree, add/remove clips, sorting, cover image
 - [ ] React app (`apps/app`, Vite): sign-in, generated API client, browse and upload
 - [ ] Video processing: transcode to playback version and generate thumbnail
 - [ ] Invitations (disable sign-up, `inviteUserByEmail`)
