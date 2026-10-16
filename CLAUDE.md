@@ -36,7 +36,12 @@ dotnet build Curator.slnx
 dotnet test Curator.slnx
 dotnet format Curator.slnx --verify-no-changes
 dotnet watch run --project src/Curator.Api   # http://localhost:5238
+dotnet ef migrations add <Name> --project src/Curator.Infrastructure --startup-project src/Curator.Api --output-dir Persistence/Migrations
+dotnet ef database update --project src/Curator.Infrastructure --startup-project src/Curator.Api
 ```
+
+- Local Postgres: `docker compose up -d` from the repo root (`compose.yaml`). Integration tests use
+  Testcontainers, so Docker must be running for `dotnet test`.
 
 - API docs (Development only): http://localhost:5238/scalar
 - Health: http://localhost:5238/health

@@ -1,0 +1,22 @@
+# Local development services. Run from the repo root: docker compose up -d
+services:
+  postgres:
+    # Same major version as the Supabase project.
+    image: postgres:17-alpine
+    container_name: curator-postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: curator
+      POSTGRES_USER: curator
+      POSTGRES_PASSWORD: curator
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U curator -d curator"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  postgres-data:

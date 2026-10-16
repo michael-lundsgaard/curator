@@ -33,17 +33,17 @@ Use one Supabase project (free tier, `eu-central-1`) for **Postgres and Auth onl
   changing the issuer and audience config.
 - Free-tier projects **pause after ~7 days of inactivity**. Accept this, or add a scheduled ping later.
 - Built-in auth email is heavily rate-limited. That's fine for invites; add custom SMTP if needed.
-- With only one Supabase project, local development hits the real database. Once friends use Curator,
-  move local development to Postgres in Docker. Integration tests use Testcontainers.
+- With only one Supabase project, local development would hit the real database. Superseded by
+  [0002](0002-local-postgres-in-docker.md): local development uses Postgres in Docker from the start, and
+  integration tests use Testcontainers.
 
 ## Configuration
 
 - `appsettings.json`: `Supabase:Url` (not a secret) and an empty `ConnectionStrings:Curator`.
-- Development: the connection string goes in user-secrets (Session pooler, port 5432, key=value format,
-  because Npgsql doesn't accept `postgresql://` URIs):
+- Development: local Postgres in Docker, see [0002](0002-local-postgres-in-docker.md).
+- Production: environment variable `ConnectionStrings__Curator`, using the Session pooler (port 5432) in
+  key=value format, because Npgsql doesn't accept `postgresql://` URIs:
 
-  ```powershell
-  dotnet user-secrets set 'ConnectionStrings:Curator' 'Host=aws-1-eu-central-1.pooler.supabase.com;Port=5432;Database=postgres;Username=postgres.jnofblywuslpfnouxniw;Password=...;SSL Mode=Require' --project src/Curator.Api
+  ```text
+  Host=aws-1-eu-central-1.pooler.supabase.com;Port=5432;Database=postgres;Username=postgres.jnofblywuslpfnouxniw;Password=...;SSL Mode=Require
   ```
-
-- Production: environment variable `ConnectionStrings__Curator`.

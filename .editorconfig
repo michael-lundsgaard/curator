@@ -10,3 +10,7 @@ trim_trailing_whitespace = true
 
 [*.cs]
 indent_size = 4
+
+# EF Core migrations are generated (CRLF + BOM). Git normalizes line endings; dotnet format skips them.
+[**/Migrations/*.cs]
+generated_code = true
