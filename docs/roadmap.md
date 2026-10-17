@@ -18,14 +18,20 @@ Built step by step. Each step is small and shippable. Order may change.
         is stored
   - [x] R2 bucket CORS for browser `PUT`s from the app's origin (`infra/r2/cors.json`, applied with
         wrangler). Add the production origin when the app is deployed
-- [ ] Library: list assets (search, filter, sort, pagination), get one, edit title, description and
-      `recorded_at`, delete (uploader or admin), signed playback and thumbnail URLs. Start by drafting
-      ADR 0005 for pagination (cursor vs offset), search (`pg_trgm` vs full-text) and where
-      Postgres-specific query code lives
+- [ ] Library:
+  - [x] ADR [0005](decisions/0005-listing-and-searching-assets.md): pagination (cursor vs offset), search
+        (`pg_trgm` vs full-text) and where Postgres-specific query code lives
+  - [ ] List assets (`GET /assets`): cursor pagination, sort, search, filters, `pg_trgm` indexes
+  - [ ] Get one (`GET /assets/{id}`) with signed playback and thumbnail URLs (playback falls back to the
+        original until processing exists)
+  - [ ] Edit title, description and `recorded_at` (`PATCH /assets/{id}`, uploader or admin)
+  - [ ] Delete (`DELETE /assets/{id}`, uploader or admin, soft delete)
 - [ ] Collections: tree, add/remove clips, sorting, cover image
 - [ ] React app (`apps/app`, Vite): sign-in, generated API client, browse and upload
 - [ ] Video processing: transcode to playback version and generate thumbnail. Also sweep abandoned
       uploads: delete assets still `Pending` after 24 hours, and their R2 objects
+- [ ] Dashboards: admins see stuck uploads (`Pending`, `Failed`) to diagnose "missing" clips; possibly a user
+      dashboard for one's own uploads (retry or discard) and profile settings
 - [ ] Invitations (disable sign-up, `inviteUserByEmail`)
 - [ ] Favorites (visible to everyone)
 - [ ] Share links (single assets only)
