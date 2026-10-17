@@ -22,10 +22,13 @@ Built step by step. Each step is small and shippable. Order may change.
   - [x] ADR [0005](decisions/0005-listing-and-searching-assets.md): pagination (cursor vs offset), search
         (`pg_trgm` vs full-text) and where Postgres-specific query code lives
   - [x] List assets (`GET /assets`): cursor pagination, sort, search, filters, `pg_trgm` indexes
-  - [ ] Get one (`GET /assets/{id}`) with signed playback and thumbnail URLs (playback falls back to the
+  - [x] Get one (`GET /assets/{id}`) with signed playback and thumbnail URLs (playback falls back to the
         original until processing exists)
   - [ ] Edit title, description and `recorded_at` (`PATCH /assets/{id}`, uploader or admin)
   - [ ] Delete (`DELETE /assets/{id}`, uploader or admin, soft delete)
+- [ ] Documentation review before the app starts using the API: can a newcomer get from clone to a running
+      API with passing tests from the README? Does `data-model.md` (still a draft) match the schema, and do the
+      ADRs match the code? Is a short overview of how a request flows through the layers missing?
 - [ ] Collections: tree, add/remove clips, sorting, cover image
 - [ ] React app (`apps/app`, Vite): sign-in, generated API client, browse and upload
 - [ ] Hosting and observability: where the API (and later the processing worker) runs and how it's
@@ -33,6 +36,10 @@ Built step by step. Each step is small and shippable. Order may change.
       sleep when idle: Render's free tier (used for asset-vault) spins down after 15 minutes without traffic
       and the next request waits for a cold start
 - [ ] Video processing: transcode to playback version and generate thumbnail
+  - Decide how thumbnails are served (ADR) before adding `thumbnailUrl` to `GET /assets`, which 0005
+    assumes. Presigned URLs change on every request, so neither the browser nor Cloudflare's cache can keep
+    them. Options: a public thumbnails bucket on a custom domain with random keys and immutable caching, or
+    presigned URLs with the expiry rounded to fixed windows so they stay the same for a while
 - [ ] Storage cleanup: a scheduled job that keeps R2 in step with the database
   - Abandoned uploads: delete assets still `Pending` after 24 hours, and their R2 objects
   - Deleted clips: remove the original, playback version and thumbnail of soft-deleted assets after a grace
