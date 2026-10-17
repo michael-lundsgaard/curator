@@ -5,6 +5,8 @@ namespace Curator.Application.Common;
 /// <summary>Kinds of expected failures. The Api maps each to an HTTP status.</summary>
 public enum ErrorKind
 {
+    /// <summary>The request is wrong in a way data annotations can't check, e.g. an unreadable cursor.</summary>
+    Invalid,
     NotFound,
     Forbidden,
     Conflict,
@@ -13,6 +15,7 @@ public enum ErrorKind
 /// <summary>An expected failure of a use case, such as "not found". Bugs are still exceptions.</summary>
 public sealed record Error(ErrorKind Kind, string Message)
 {
+    public static Error Invalid(string message) => new(ErrorKind.Invalid, message);
     public static Error NotFound(string message) => new(ErrorKind.NotFound, message);
     public static Error Forbidden(string message) => new(ErrorKind.Forbidden, message);
     public static Error Conflict(string message) => new(ErrorKind.Conflict, message);

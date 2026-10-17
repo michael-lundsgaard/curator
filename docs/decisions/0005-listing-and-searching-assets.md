@@ -85,8 +85,9 @@ Do it when punctuation search is missed, or if the Danish-letters test fails.
   `Microsoft.EntityFrameworkCore` and translates to `lower(title) LIKE @pattern`. No `EF.Functions.ILike`, so
   `Curator.Application` still doesn't reference Npgsql, as 0004 decided.
 - What makes it fast is Postgres-specific, and lives in Infrastructure: the `pg_trgm` extension
-  (`HasPostgresExtension`) and the GIN expression indexes (`gin_trgm_ops`) in `AssetConfiguration` and the
-  migration.
+  (`HasPostgresExtension` in `CuratorDbContext`) and the GIN expression indexes (`gin_trgm_ops`). EF Core
+  can't model expression indexes, so they're SQL in the `AddAssetSearch` migration. Verified with `EXPLAIN`:
+  Postgres uses both indexes even for a generic plan with the pattern as a parameter.
 - The listing query (filters, search, sort, cursor) lives in the `ListAssets` handler. When collections need
   the same filtering, extract it into `IQueryable<Asset>` extension methods, as 0004 says.
 - If a future query genuinely needs a Postgres function in LINQ (`similarity()`, `tsvector`), add an

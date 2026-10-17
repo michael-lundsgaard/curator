@@ -21,7 +21,7 @@ Built step by step. Each step is small and shippable. Order may change.
 - [ ] Library:
   - [x] ADR [0005](decisions/0005-listing-and-searching-assets.md): pagination (cursor vs offset), search
         (`pg_trgm` vs full-text) and where Postgres-specific query code lives
-  - [ ] List assets (`GET /assets`): cursor pagination, sort, search, filters, `pg_trgm` indexes
+  - [x] List assets (`GET /assets`): cursor pagination, sort, search, filters, `pg_trgm` indexes
   - [ ] Get one (`GET /assets/{id}`) with signed playback and thumbnail URLs (playback falls back to the
         original until processing exists)
   - [ ] Edit title, description and `recorded_at` (`PATCH /assets/{id}`, uploader or admin)

@@ -18,6 +18,7 @@ public static class ResultExtensions
 
         var statusCode = result.Error.Kind switch
         {
+            ErrorKind.Invalid => StatusCodes.Status400BadRequest,
             ErrorKind.NotFound => StatusCodes.Status404NotFound,
             ErrorKind.Forbidden => StatusCodes.Status403Forbidden,
             ErrorKind.Conflict => StatusCodes.Status409Conflict,

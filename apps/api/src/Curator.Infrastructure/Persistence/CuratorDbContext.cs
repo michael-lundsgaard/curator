@@ -13,6 +13,10 @@ public class CuratorDbContext(DbContextOptions<CuratorDbContext> options) : DbCo
     protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder) =>
         configurationBuilder.Properties<DateTimeOffset>().HaveConversion<UtcDateTimeOffsetConverter>();
 
-    protected override void OnModelCreating(ModelBuilder modelBuilder) =>
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        // Trigram indexes for substring search (ADR 0005).
+        modelBuilder.HasPostgresExtension("pg_trgm");
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(CuratorDbContext).Assembly);
+    }
 }

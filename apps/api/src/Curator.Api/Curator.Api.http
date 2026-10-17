@@ -48,3 +48,17 @@ POST {{host}}/assets/{{startUpload.response.body.assetId}}/complete-upload
 Authorization: Bearer {{token}}
 
 ###
+
+# The library, newest recordings first. Also: q, sort (recorded, added, title), order (asc, desc), uploadedBy,
+# recordedFrom, recordedTo.
+# @name listAssets
+GET {{host}}/assets?limit=20
+Authorization: Bearer {{token}}
+
+###
+
+# The next page: same parameters plus the cursor.
+GET {{host}}/assets?limit=20&cursor={{listAssets.response.body.nextCursor}}
+Authorization: Bearer {{token}}
+
+###

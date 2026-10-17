@@ -60,7 +60,7 @@ If the API is already running (debugger/watch), it locks `bin/`. To build or tes
 - Formatting: `.editorconfig` (LF, 2 spaces; 4 for C#) and Prettier for JSON/MD/web files.
 - Constructors: primary constructors for types that only receive dependencies (services, `DbContext`,
   tests); regular constructors with `private set` properties for domain entities.
-- Use cases: one file per use case in `Curator.Application/<Feature>/` (`Command`, `Response`, `Handler`),
+- Use cases: one file per use case in `Curator.Application/<Feature>/` (`Command` or `Query` for reads, `Response`, `Handler`),
   registered in `AddApplication()`, called from a thin controller. Handlers use `ICuratorDbContext` directly
   (no repositories) and validate with data annotations on the command. Expected failures (not found,
   forbidden, conflict) are returned as `Result<T>` and mapped with `result.ToActionResult(this, Ok)`;

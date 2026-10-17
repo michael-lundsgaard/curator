@@ -18,5 +18,8 @@ internal sealed class AssetConfiguration : IEntityTypeConfiguration<Asset>
             .OnDelete(DeleteBehavior.Restrict);
 
         builder.HasQueryFilter(a => a.DeletedAt == null);
+
+        // Search (ADR 0005) uses trigram GIN indexes on lower(title) and lower(description). EF Core can't model
+        // expression indexes, so they're created with SQL in the AddAssetSearch migration.
     }
 }

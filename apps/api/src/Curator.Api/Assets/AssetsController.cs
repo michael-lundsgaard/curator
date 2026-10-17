@@ -10,6 +10,22 @@ namespace Curator.Api.Assets;
 public class AssetsController : ControllerBase
 {
     /// <summary>
+    /// Lists the shared library, a page at a time. Pass <c>nextCursor</c> as <c>cursor</c> for the next page,
+    /// with the same other parameters. Uploads that haven't completed aren't listed.
+    /// </summary>
+    [HttpGet]
+    [ProducesResponseType<ListAssets.Response>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> List(
+        [FromQuery] ListAssets.Query query,
+        ListAssets.Handler handler,
+        CancellationToken cancellationToken)
+    {
+        var result = await handler.HandleAsync(query, cancellationToken);
+        return result.ToActionResult(this, Ok);
+    }
+
+    /// <summary>
     /// Starts an upload. Upload the file to <c>uploadUrl</c> with <c>PUT</c> and the same <c>Content-Type</c>. Storage
     /// rejects a file whose size differs from <c>sizeBytes</c>.
     /// </summary>
