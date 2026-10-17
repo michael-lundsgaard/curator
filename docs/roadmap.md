@@ -28,8 +28,17 @@ Built step by step. Each step is small and shippable. Order may change.
   - [ ] Delete (`DELETE /assets/{id}`, uploader or admin, soft delete)
 - [ ] Collections: tree, add/remove clips, sorting, cover image
 - [ ] React app (`apps/app`, Vite): sign-in, generated API client, browse and upload
-- [ ] Video processing: transcode to playback version and generate thumbnail. Also sweep abandoned
-      uploads: delete assets still `Pending` after 24 hours, and their R2 objects
+- [ ] Hosting and observability: where the API (and later the processing worker) runs and how it's
+      deployed; structured logs with request logging, and somewhere to read logs and errors. Avoid hosts that
+      sleep when idle: Render's free tier (used for asset-vault) spins down after 15 minutes without traffic
+      and the next request waits for a cold start
+- [ ] Video processing: transcode to playback version and generate thumbnail
+- [ ] Storage cleanup: a scheduled job that keeps R2 in step with the database
+  - Abandoned uploads: delete assets still `Pending` after 24 hours, and their R2 objects
+  - Deleted clips: remove the original, playback version and thumbnail of soft-deleted assets after a grace
+    period
+  - Orphaned objects with no asset row (e.g. after a local database reset): find them by listing the bucket,
+    or an R2 lifecycle rule on `curator-dev` that expires objects after N days
 - [ ] Dashboards: admins see stuck uploads (`Pending`, `Failed`) to diagnose "missing" clips; possibly a user
       dashboard for one's own uploads (retry or discard) and profile settings
 - [ ] Invitations (disable sign-up, `inviteUserByEmail`)
