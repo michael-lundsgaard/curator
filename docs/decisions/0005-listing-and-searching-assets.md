@@ -99,6 +99,9 @@ Do it when punctuation search is missed, or if the Danish-letters test fails.
   `coalesce(recorded_at, created_at)` key). Filtering by collection comes with collections.
 - `Pending` assets are never listed: they're uploads that haven't finished (or were abandoned), with nothing
   to show. The uploading browser already knows about them. Deleted assets are hidden by the query filter.
+- `GET /assets/{id}` follows the same rule, except that the uploader can get their own `Pending` asset (without
+  a playback URL), so the `Location` of `POST /assets/uploads` works straight away. For everyone else it's 404,
+  as if it didn't exist.
 - `Uploaded`, `Processing` and `Failed` assets are listed, so a clip appears as soon as its upload completes,
   before it has a thumbnail.
 - Finding stuck uploads (`Pending`, and later `Failed`) belongs in a separate admin dashboard, and possibly a
