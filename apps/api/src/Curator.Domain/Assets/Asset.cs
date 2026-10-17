@@ -47,6 +47,12 @@ public class Asset
     public string? ThumbnailKey { get; private set; }
     public string? ProcessingError { get; private set; }
 
+    /// <summary>
+    /// Storage key of the file to play: the playback version, or the original until processing has created one.
+    /// <c>null</c> while the upload is <see cref="AssetStatus.Pending"/>, because the original may not be there yet.
+    /// </summary>
+    public string? PlayableKey => Status == AssetStatus.Pending ? null : PlaybackKey ?? SourceKey;
+
     public long? DurationMs { get; private set; }
     public int? Width { get; private set; }
     public int? Height { get; private set; }

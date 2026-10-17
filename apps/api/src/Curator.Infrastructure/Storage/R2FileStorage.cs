@@ -36,6 +36,22 @@ internal sealed class R2FileStorage(IOptions<R2Options> options) : IFileStorage,
         return await _client.Value.GetPreSignedURLAsync(request);
     }
 
+    public async Task<string> CreateDownloadUrlAsync(
+        string key,
+        DateTimeOffset expiresAt,
+        CancellationToken cancellationToken)
+    {
+        var request = new GetPreSignedUrlRequest
+        {
+            BucketName = options.Value.Bucket,
+            Key = key,
+            Verb = HttpVerb.GET,
+            Expires = expiresAt.UtcDateTime,
+        };
+
+        return await _client.Value.GetPreSignedURLAsync(request);
+    }
+
     public async Task<long?> GetSizeAsync(string key, CancellationToken cancellationToken)
     {
         try

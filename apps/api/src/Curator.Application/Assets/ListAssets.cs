@@ -74,8 +74,6 @@ public static class ListAssets
         int? Width,
         int? Height);
 
-    public sealed record Uploader(Guid Id, string DisplayName);
-
     public sealed class Handler(ICuratorDbContext db)
     {
         public async Task<Result<Response>> HandleAsync(Query query, CancellationToken cancellationToken)

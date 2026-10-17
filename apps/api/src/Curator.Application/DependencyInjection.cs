@@ -13,6 +13,7 @@ public static class DependencyInjection
         services.AddScoped<CreateUpload.Handler>();
         services.AddScoped<CompleteUpload.Handler>();
         services.AddScoped<ListAssets.Handler>();
+        services.AddScoped<GetAsset.Handler>();
 
         return services;
     }

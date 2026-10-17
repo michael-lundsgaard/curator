@@ -68,3 +68,9 @@ GET {{host}}/assets?limit=20&cursor={{listAssets.response.body.nextCursor}}
 Authorization: Bearer {{token}}
 
 ###
+
+# One asset with signed playback and thumbnail URLs (valid for an hour). Uses the first item of the list above.
+GET {{host}}/assets/{{listAssets.response.body.$.items[0].id}}
+Authorization: Bearer {{token}}
+
+###

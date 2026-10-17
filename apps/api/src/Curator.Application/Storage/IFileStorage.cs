@@ -15,6 +15,12 @@ public interface IFileStorage
         DateTimeOffset expiresAt,
         CancellationToken cancellationToken);
 
+    /// <summary>
+    /// Creates a presigned URL for reading an object with <c>GET</c>, e.g. as a <c>&lt;video&gt;</c> or
+    /// <c>&lt;img&gt;</c> source. Range requests (seeking) use the same URL until it expires.
+    /// </summary>
+    Task<string> CreateDownloadUrlAsync(string key, DateTimeOffset expiresAt, CancellationToken cancellationToken);
+
     /// <summary>Returns the size of the stored object, or <c>null</c> if there is none.</summary>
     Task<long?> GetSizeAsync(string key, CancellationToken cancellationToken);
 }

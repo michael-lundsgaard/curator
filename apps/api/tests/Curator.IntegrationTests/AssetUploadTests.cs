@@ -21,6 +21,7 @@ public class AssetUploadTests(CuratorApiFactory factory)
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
         var upload = await response.Content.ReadFromJsonAsync<UploadResponse>();
         Assert.NotNull(upload);
+        Assert.Equal($"/assets/{upload.AssetId}", response.Headers.Location?.AbsolutePath);
 
         await using var db = factory.CreateDbContext();
         var asset = await db.Assets.SingleAsync(a => a.Id == upload.AssetId);

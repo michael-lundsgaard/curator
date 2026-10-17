@@ -39,6 +39,21 @@ public class AssetTests
     }
 
     [Fact]
+    public void PlayableKey_WhenPending_IsNull()
+    {
+        Assert.Null(CreateAsset().PlayableKey);
+    }
+
+    [Fact]
+    public void PlayableKey_WhenUploadedWithoutPlaybackVersion_IsTheOriginal()
+    {
+        var asset = CreateAsset();
+        asset.MarkUploaded(DateTimeOffset.UtcNow);
+
+        Assert.Equal(asset.SourceKey, asset.PlayableKey);
+    }
+
+    [Fact]
     public void MarkUploaded_WhenNotPending_Throws()
     {
         var asset = CreateAsset();

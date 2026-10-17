@@ -26,6 +26,22 @@ public class AssetsController : ControllerBase
     }
 
     /// <summary>
+    /// Gets one asset, with signed URLs for playing it and showing its thumbnail. Fetch it again for new URLs
+    /// after <c>urlsExpireAt</c>. An upload that hasn't completed is only visible to its uploader.
+    /// </summary>
+    [HttpGet("{id:guid}")]
+    [ProducesResponseType<GetAsset.Response>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> Get(
+        Guid id,
+        GetAsset.Handler handler,
+        CancellationToken cancellationToken)
+    {
+        var result = await handler.HandleAsync(new(id), HttpContext.GetProfile(), cancellationToken);
+        return result.ToActionResult(this, Ok);
+    }
+
+    /// <summary>
     /// Starts an upload. Upload the file to <c>uploadUrl</c> with <c>PUT</c> and the same <c>Content-Type</c>. Storage
     /// rejects a file whose size differs from <c>sizeBytes</c>.
     /// </summary>
@@ -38,9 +54,7 @@ public class AssetsController : ControllerBase
         CancellationToken cancellationToken)
     {
         var response = await handler.HandleAsync(command, HttpContext.GetProfile(), cancellationToken);
-
-        // No Location yet: there's no endpoint for a single asset.
-        return StatusCode(StatusCodes.Status201Created, response);
+        return CreatedAtAction(nameof(Get), new { id = response.AssetId }, response);
     }
 
     /// <summary>
