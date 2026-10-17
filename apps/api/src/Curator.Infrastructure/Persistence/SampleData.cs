@@ -1,6 +1,7 @@
 using Curator.Domain.Assets;
 using Curator.Domain.Profiles;
 using Microsoft.EntityFrameworkCore;
+using Npgsql;
 
 namespace Curator.Infrastructure.Persistence;
 
@@ -36,6 +37,12 @@ public static class SampleData
         ("Old clip from the archive", "Recorded before Curator existed", 700, 2),
     ];
 
+    /// <summary>Number of clips added, all listed in the library.</summary>
+    public static int ClipCount => Clips.Length;
+
+    /// <summary>Number of those clips uploaded by the caller.</summary>
+    public static int CallerClipCount => Clips.Count(c => c.Uploader == 0);
+
     /// <summary>Adds the samples, unless they've already been added. Returns the number of clips added.</summary>
     public static async Task<int> SeedAsync(
         CuratorDbContext db,
@@ -70,5 +77,35 @@ public static class SampleData
 
         await db.SaveChangesAsync(cancellationToken);
         return Clips.Length;
+    }
+
+    /// <summary>
+    /// Deletes every asset, including deleted and pending ones, and the sample profiles. Real users' profiles stay,
+    /// with their roles. Files in storage are left alone. Returns the number of assets deleted.
+    /// </summary>
+    public static async Task<int> ClearAsync(CuratorDbContext db, CancellationToken cancellationToken)
+    {
+        if (!IsLocalDatabase(db))
+        {
+            throw new InvalidOperationException("Only a database on this machine can be cleared.");
+        }
+
+        await using var transaction = await db.Database.BeginTransactionAsync(cancellationToken);
+
+        var deleted = await db.Assets.IgnoreQueryFilters().ExecuteDeleteAsync(cancellationToken);
+        await db.Profiles.Where(p => p.Id == FrejaId || p.Id == MadsId).ExecuteDeleteAsync(cancellationToken);
+
+        await transaction.CommitAsync(cancellationToken);
+        return deleted;
+    }
+
+    /// <summary>
+    /// Whether the database runs on this machine (Docker or Testcontainers). A second lock on clearing, besides the
+    /// Development environment, so a misconfigured server can't wipe the hosted database.
+    /// </summary>
+    public static bool IsLocalDatabase(CuratorDbContext db)
+    {
+        var host = new NpgsqlConnectionStringBuilder(db.Database.GetConnectionString()).Host;
+        return host is "localhost" or "127.0.0.1" or "::1";
     }
 }

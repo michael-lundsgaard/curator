@@ -63,6 +63,26 @@ dotnet ef migrations add <Name> --project src/Curator.Infrastructure --startup-p
 
 The `.http` files run with the REST Client extension.
 
+### Local data and tokens
+
+Every endpoint except `/health` needs a Supabase access token. Run the `signIn` request in
+[`Curator.Api.http`](apps/api/src/Curator.Api/Curator.Api.http) (credentials come from a git-ignored `.env` next
+to it, see the top of the file). The other requests there use the token automatically. For Scalar, paste
+`access_token` from the response into the _Bearer_ field; Scalar remembers it.
+
+In Development, two endpoints manage local data:
+
+| Request                 | What                                                                     |
+| ----------------------- | ------------------------------------------------------------------------ |
+| `POST /dev/sample-data` | Adds sample clips by you and two sample users. No files are stored in R2 |
+| `DELETE /dev/data`      | Deletes all assets and the sample users. Your profile and role stay      |
+
+`DELETE /dev/data` only clears a database on this machine (host `localhost`), and returns 403 otherwise, so a
+server started in Development by mistake can't wipe the hosted one. It leaves files in R2: uploads made while
+testing stay in `curator-dev` until storage cleanup exists (see the [roadmap](docs/roadmap.md)). To start
+completely over, drop the database instead:
+`docker compose down -v`, `docker compose up -d` and `dotnet ef database update`.
+
 ## VS Code
 
 Launch configs (F5):
