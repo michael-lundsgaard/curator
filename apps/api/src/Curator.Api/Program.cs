@@ -1,5 +1,6 @@
 using System.Text.Json.Serialization;
 using Curator.Api.Authentication;
+using Curator.Api.Development;
 using Curator.Application;
 using Curator.Infrastructure;
 using Scalar.AspNetCore;
@@ -10,7 +11,7 @@ builder.Services.AddControllers()
     .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+builder.Services.AddOpenApi(options => options.AddDocumentTransformer<BearerSecuritySchemeTransformer>());
 builder.Services.AddHealthChecks();
 builder.Services.AddSupabaseAuthentication();
 builder.Services.AddApplication();
@@ -22,7 +23,11 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi().AllowAnonymous();
-    app.MapScalarApiReference().AllowAnonymous();
+    app.MapScalarApiReference(options => options
+            .AddPreferredSecuritySchemes(BearerSecuritySchemeTransformer.SchemeName)
+            .EnablePersistentAuthentication())
+        .AllowAnonymous();
+    app.MapDevelopmentEndpoints();
 }
 
 app.UseHttpsRedirection();
