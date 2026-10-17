@@ -1,4 +1,5 @@
 using Curator.Domain.Assets;
+using Curator.Domain.Profiles;
 
 namespace Curator.UnitTests.Assets;
 
@@ -60,5 +61,57 @@ public class AssetTests
         asset.MarkUploaded(DateTimeOffset.UtcNow);
 
         Assert.Throws<InvalidOperationException>(() => asset.MarkUploaded(DateTimeOffset.UtcNow));
+    }
+
+    [Fact]
+    public void Edit_TrimsAndReplacesDetails()
+    {
+        var asset = CreateAsset();
+        var recordedAt = new DateTimeOffset(2026, 10, 1, 20, 0, 0, TimeSpan.Zero);
+        var now = asset.CreatedAt.AddMinutes(1);
+
+        asset.Edit("  Screams  ", " The best one ", recordedAt, now);
+
+        Assert.Equal("Screams", asset.Title);
+        Assert.Equal("The best one", asset.Description);
+        Assert.Equal(recordedAt, asset.RecordedAt);
+        Assert.Equal(now, asset.UpdatedAt);
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData("   ")]
+    public void Edit_WithBlankDescription_ClearsIt(string? description)
+    {
+        var asset = CreateAsset();
+        asset.Edit("Title", "Something", DateTimeOffset.UtcNow, DateTimeOffset.UtcNow);
+
+        asset.Edit("Title", description, null, DateTimeOffset.UtcNow);
+
+        Assert.Null(asset.Description);
+        Assert.Null(asset.RecordedAt);
+    }
+
+    [Theory]
+    [InlineData("")]
+    [InlineData("   ")]
+    public void Edit_WithBlankTitle_Throws(string title)
+    {
+        Assert.Throws<ArgumentException>(() => CreateAsset().Edit(title, null, null, DateTimeOffset.UtcNow));
+    }
+
+    [Fact]
+    public void CanBeEditedBy_UploaderAndAdmins()
+    {
+        var uploader = new Profile(Guid.NewGuid(), "uploader", DateTimeOffset.UtcNow);
+        var member = new Profile(Guid.NewGuid(), "member", DateTimeOffset.UtcNow);
+        var admin = new Profile(Guid.NewGuid(), "admin", DateTimeOffset.UtcNow);
+        admin.ChangeRole(ProfileRole.Admin);
+        var asset = new Asset(uploader.Id, "clip.mp4", "video/mp4", 1024, null, DateTimeOffset.UtcNow);
+
+        Assert.True(asset.CanBeEditedBy(uploader));
+        Assert.False(asset.CanBeEditedBy(member));
+        Assert.True(asset.CanBeEditedBy(admin));
     }
 }

@@ -42,6 +42,25 @@ public class AssetsController : ControllerBase
     }
 
     /// <summary>
+    /// Edits the title, description and recording time. Send all three: a missing or <c>null</c> description or
+    /// <c>recordedAt</c> clears it. Only the uploader and admins can edit an asset.
+    /// </summary>
+    [HttpPatch("{id:guid}")]
+    [ProducesResponseType<EditAsset.Response>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> Edit(
+        Guid id,
+        EditAsset.Command command,
+        EditAsset.Handler handler,
+        CancellationToken cancellationToken)
+    {
+        var result = await handler.HandleAsync(id, command, HttpContext.GetProfile(), cancellationToken);
+        return result.ToActionResult(this, Ok);
+    }
+
+    /// <summary>
     /// Starts an upload. Upload the file to <c>uploadUrl</c> with <c>PUT</c> and the same <c>Content-Type</c>. Storage
     /// rejects a file whose size differs from <c>sizeBytes</c>.
     /// </summary>

@@ -15,4 +15,7 @@ public class Profile
     public string DisplayName { get; private set; }
     public ProfileRole Role { get; private set; }
     public DateTimeOffset CreatedAt { get; private set; }
+
+    /// <summary>No endpoint calls this yet. Roles are changed with SQL, see ADR 0003.</summary>
+    public void ChangeRole(ProfileRole role) => Role = role;
 }

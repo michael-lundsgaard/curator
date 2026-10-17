@@ -1,3 +1,5 @@
+using Curator.Domain.Profiles;
+
 namespace Curator.Domain.Assets;
 
 /// <summary>A video clip in the shared library.</summary>
@@ -72,6 +74,22 @@ public class Asset
         }
 
         Status = AssetStatus.Uploaded;
+        UpdatedAt = now;
+    }
+
+    /// <summary>Its uploader and admins may edit or delete it.</summary>
+    public bool CanBeEditedBy(Profile user) => user.Id == UploadedBy || user.Role == ProfileRole.Admin;
+
+    /// <summary>
+    /// Replaces the details people edit. The title is required; a blank description is stored as none.
+    /// </summary>
+    public void Edit(string title, string? description, DateTimeOffset? recordedAt, DateTimeOffset now)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(title);
+
+        Title = title.Trim();
+        Description = string.IsNullOrWhiteSpace(description) ? null : description.Trim();
+        RecordedAt = recordedAt;
         UpdatedAt = now;
     }
 

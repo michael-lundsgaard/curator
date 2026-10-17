@@ -73,7 +73,12 @@ Pending → Uploaded → Processing → Ready
    original so processing can be retried.
 
 `recorded_at` is when the clip was captured. The browser sends `File.lastModified` on upload, and
-processing can correct it from the video's metadata.
+processing can correct it from the video's metadata. Neither is reliable (downloading or copying a file resets
+its modification time, and many tools don't write or keep `creation_time`), so the uploader or an admin can
+also edit it (`PATCH /assets/{id}`).
+
+- [ ] With processing: don't let metadata overwrite a time someone set by hand. For example a
+      `recorded_at_source` (`Browser`, `Metadata`, `Manual`), where only `Browser` is replaced.
 
 ### Collections
 

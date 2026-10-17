@@ -80,3 +80,17 @@ GET {{host}}/assets/{{listAssets.response.body.$.items[0].id}}
 Authorization: Bearer {{token}}
 
 ###
+
+# Edit the first asset of the list above (uploader or admin). Send all three fields: a missing or null description
+# or recordedAt clears it.
+PATCH {{host}}/assets/{{listAssets.response.body.$.items[0].id}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "title": "Screams",
+  "description": "The best jumpscare of the evening",
+  "recordedAt": "2026-10-16T20:15:00+02:00"
+}
+
+###

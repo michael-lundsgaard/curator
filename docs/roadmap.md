@@ -24,7 +24,10 @@ Built step by step. Each step is small and shippable. Order may change.
   - [x] List assets (`GET /assets`): cursor pagination, sort, search, filters, `pg_trgm` indexes
   - [x] Get one (`GET /assets/{id}`) with signed playback and thumbnail URLs (playback falls back to the
         original until processing exists)
-  - [ ] Edit title, description and `recorded_at` (`PATCH /assets/{id}`, uploader or admin)
+  - [x] Edit title, description and `recorded_at` (`PATCH /assets/{id}`, uploader or admin). The body
+        replaces all three fields (missing or `null` clears), not JSON Merge Patch: the edit form sends them
+        all, and telling a missing field from `null` would need an `Optional<T>` with its own JSON converter,
+        OpenAPI transformer and validation
   - [ ] Delete (`DELETE /assets/{id}`, uploader or admin, soft delete)
 - [ ] Documentation review before the app starts using the API: can a newcomer get from clone to a running
       API with passing tests from the README? Does `data-model.md` (still a draft) match the schema, and do the
