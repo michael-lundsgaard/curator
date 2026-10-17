@@ -10,13 +10,14 @@ Built step by step. Each step is small and shippable. Order may change.
       Docker → [0002](decisions/0002-local-postgres-in-docker.md)
 - [x] Authentication: validate Supabase JWTs, create the profile on first request, decide roles and
       edit/delete permissions → [0003](decisions/0003-authentication-and-permissions.md)
-- [ ] Uploads, following [0004](decisions/0004-application-structure.md):
+- [x] Uploads, following [0004](decisions/0004-application-structure.md):
   - [x] Create asset and presigned R2 upload URL (`POST /assets/uploads`)
   - [x] Mark as uploaded (`POST /assets/{id}/complete-upload`): check the object exists in R2 and its size
         matches. Failures are results, 0004 accepted
   - [x] Sign `Content-Length` into the upload URL, so R2 rejects a `PUT` of another size (403) and nothing
         is stored
-  - [ ] R2 bucket CORS for browser `PUT`s from the app's origin
+  - [x] R2 bucket CORS for browser `PUT`s from the app's origin (`infra/r2/cors.json`, applied with
+        wrangler). Add the production origin when the app is deployed
 - [ ] Library: list assets (search, filter, sort, pagination), get one, edit title, description and
       `recorded_at`, delete (uploader or admin), signed playback and thumbnail URLs. Start by drafting
       ADR 0005 for pagination (cursor vs offset), search (`pg_trgm` vs full-text) and where

@@ -9,6 +9,7 @@ Media asset manager for videos. Upload in bulk, organize into collections, searc
 | Path       | What                                              |
 | ---------- | ------------------------------------------------- |
 | `apps/api` | .NET 10 Web API (Clean Architecture-style layers) |
+| `infra`    | Cloud configuration (R2 bucket CORS)              |
 
 ## Prerequisites
 
@@ -38,6 +39,15 @@ dotnet user-secrets set "R2:SecretAccessKey" "<secret access key>" --project src
 ```
 
 Everything except uploads works without these, and the tests don't need them.
+
+Browsers `PUT` straight to the presigned URL, so the bucket needs a CORS policy for the app's origin
+([`infra/r2/cors.json`](infra/r2/cors.json), the Vite dev server on `http://localhost:5173`). Apply it
+once per bucket, and again after changing the file (`wrangler login` first):
+
+```bash
+npx wrangler r2 bucket cors set curator-dev --file infra/r2/cors.json   # from the repo root
+npx wrangler r2 bucket cors list curator-dev
+```
 
 Add a migration after changing the model:
 
