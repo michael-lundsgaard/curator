@@ -31,12 +31,8 @@ Built step by step. Each step is small and shippable. Order may change.
   - [x] Delete (`DELETE /assets/{id}`, uploader or admin, soft delete). Returns `200` with `id` and
         `deletedAt`; deleting again is `404`, since deleted assets are filtered out. Files stay in R2 until
         storage cleanup removes them
-  - [ ] Decide how titles sort, then sort with an explicit ICU collation. Today `sort=title` uses the database's
-        default collation, so digits compare as text ("Clip 10" before "Clip 2") and the order depends on the
-        host: `postgres:17-alpine` (local and tests) compares code points (Å, Æ, Ø), while Supabase's glibc
-        `en_US` probably mixes Æ, Ø and Å in with A and O. Open question: Danish rules (`da-u-kn-true`: Æ, Ø, Å
-        after Z) or English (`en-u-kn-true`: like Windows Explorer on an English system). Either one fixes the
-        number order and makes every environment agree; any title sort index needs the same collation
+  - [x] Title sort order: keep the database's default collation for now. The known differences between
+        environments, and the ICU collation fix if they cause a bug, are in ADR 0005, _Consequences_
 - [ ] Documentation review before the app starts using the API: can a newcomer get from clone to a running
       API with passing tests from the README? Does `data-model.md` (still a draft) match the schema, and do the
       ADRs match the code? Is a short overview of how a request flows through the layers missing?

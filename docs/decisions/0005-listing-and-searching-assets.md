@@ -130,6 +130,18 @@ Do it when punctuation search is missed, or if the Danish-letters test fails.
 - `lower()` follows the database's locale. If Supabase's database lowercases only ASCII, "Øl" wouldn't match
   "øl". An integration test with Danish letters checks this against Postgres; if it fails, switch to the
   `search_text` column described under _Search_.
+- Title sorting follows the database's default collation, which comes from the host's C library and differs
+  between environments: `postgres:17-alpine` (musl, local and tests) compares code points, so Å, Æ and Ø sort
+  after Z, while Supabase uses glibc. Digits compare as text everywhere ("Clip 10" before "Clip 2"). Accepted
+  for now (decided 2026-10-18). If sorting turns out wrong, the fix that was tried and works: an ICU collation
+  on the column, so every environment sorts the same and the LINQ needs no `COLLATE`:
+  - `modelBuilder.HasCollation("titles", locale: "en-u-kn", provider: "icu")` in `CuratorDbContext`
+    (English rules with Å, Æ and Ø next to A and O, as most of the group use English systems; `kn` compares
+    numbers by value) and `builder.Property(a => a.Title).UseCollation("titles")` in `AssetConfiguration`.
+    `lower(title)` takes the column's collation, and the trigram index keeps working.
+  - Expected order: Åben, apple, Bil, Clip 2, Clip 10, Øl, Oscar, Zebra. Use it in an integration test.
+  - Check the generated migration's `Down`: EF drops the collation before resetting the column, which fails.
+    Swap the two steps.
 - Every listed item carries signed thumbnail URLs. Presigning is computed locally (no call to R2), so this
   costs nothing per item.
 
