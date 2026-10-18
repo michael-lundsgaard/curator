@@ -18,7 +18,7 @@ Built step by step. Each step is small and shippable. Order may change.
         is stored
   - [x] R2 bucket CORS for browser `PUT`s from the app's origin (`infra/r2/cors.json`, applied with
         wrangler). Add the production origin when the app is deployed
-- [ ] Library:
+- [x] Library:
   - [x] ADR [0005](decisions/0005-listing-and-searching-assets.md): pagination (cursor vs offset), search
         (`pg_trgm` vs full-text) and where Postgres-specific query code lives
   - [x] List assets (`GET /assets`): cursor pagination, sort, search, filters, `pg_trgm` indexes
