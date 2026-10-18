@@ -33,9 +33,10 @@ Built step by step. Each step is small and shippable. Order may change.
         storage cleanup removes them
   - [x] Title sort order: keep the database's default collation for now. The known differences between
         environments, and the ICU collation fix if they cause a bug, are in ADR 0005, _Consequences_
-- [ ] Documentation review before the app starts using the API: can a newcomer get from clone to a running
-      API with passing tests from the README? Does `data-model.md` (still a draft) match the schema, and do the
-      ADRs match the code? Is a short overview of how a request flows through the layers missing?
+- [x] Documentation review before the app starts using the API: README checked on a fresh clone (Node and a
+      Supabase user were missing, and which endpoints need R2 keys), `data-model.md` matched to the schema,
+      ADRs 0004 and 0005 matched to the code, and a request-flow overview in
+      [architecture.md](architecture.md)
 - [ ] Collections: tree, add/remove clips, sorting, cover image
 - [ ] React app (`apps/app`, Vite): sign-in, generated API client, browse and upload
 - [ ] Hosting and observability: where the API (and later the processing worker) runs and how it's

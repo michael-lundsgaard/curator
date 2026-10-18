@@ -1,6 +1,6 @@
 # Data model
 
-**Status:** Draft. Settled decisions are marked ✅, and things still being considered are listed under
+**Status:** Draft for the parts not built yet (collections, favorites, share links). Settled decisions are marked ✅, and things still being considered are listed under
 _Open questions_.
 
 ## Settled
@@ -30,24 +30,28 @@ _Open questions_.
 - ✅ **Favorites are visible to everyone.** Each user has their own favorites, and others can see who
   favorited what (e.g. "3 people favorited this").
 
-## Proposed schema
+## Schema
+
+`profiles` and `assets` exist; the entities in `Curator.Domain` and their EF configuration in
+`Curator.Infrastructure` are the source of truth for them. The other tables are still proposed. `?` marks a
+nullable column.
 
 ```
 profiles           id (= JWT sub), display_name, role, created_at
 
-assets             id, uploaded_by → profiles, title, description,
+assets             id, uploaded_by → profiles, title, description?,
                    original_filename, content_type, status,
                    source_key?, source_size_bytes,
-                   playback_key, playback_size_bytes,
-                   thumbnail_key, processing_error,
-                   duration_ms, width, height, recorded_at,
-                   created_at, updated_at, deleted_at
+                   playback_key?, playback_size_bytes?,
+                   thumbnail_key?, processing_error?,
+                   duration_ms?, width?, height?, recorded_at?,
+                   created_at, updated_at, deleted_at?
 
-collections        id, parent_id? → collections, created_by → profiles,
-                   name, description, cover_key?, position,
+collections        (proposed) id, parent_id? → collections, created_by → profiles,
+                   name, description?, cover_key?, position,
                    created_at, updated_at
 
-collection_assets  collection_id, asset_id, added_by, added_at
+collection_assets  (proposed) collection_id, asset_id, added_by, added_at
                    PK (collection_id, asset_id)
 
 favorites          (later) profile_id, asset_id, created_at

@@ -10,11 +10,16 @@ Media asset manager for videos. Upload in bulk, organize into collections, searc
 | ---------- | ------------------------------------------------- |
 | `apps/api` | .NET 10 Web API (Clean Architecture-style layers) |
 | `infra`    | Cloud configuration (R2 bucket CORS)              |
+| `docs`     | Roadmap, data model, architecture and ADRs        |
+
+New here? [docs/architecture.md](docs/architecture.md) shows how a request flows through the layers, and
+[docs/roadmap.md](docs/roadmap.md) what's next.
 
 ## Prerequisites
 
 - [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0) (pinned in `apps/api/global.json`)
 - [Docker Desktop](https://www.docker.com/products/docker-desktop/) (local Postgres and integration tests)
+- [Node.js](https://nodejs.org/) for `npx` (Prettier, and wrangler for the R2 CORS policy)
 - VS Code with the recommended extensions (`.vscode/extensions.json`)
 
 ## Getting started
@@ -38,7 +43,8 @@ dotnet user-secrets set "R2:AccessKeyId" "<access key id>" --project src/Curator
 dotnet user-secrets set "R2:SecretAccessKey" "<secret access key>" --project src/Curator.Api
 ```
 
-Everything except uploads works without these, and the tests don't need them.
+Without them the API starts and lists assets, but uploads and `GET /assets/{id}` (which signs playback URLs)
+return 500. The tests don't need them.
 
 Browsers `PUT` straight to the presigned URL, so the bucket needs a CORS policy for the app's origin
 ([`infra/r2/cors.json`](infra/r2/cors.json), the Vite dev server on `http://localhost:5173`). Apply it
@@ -65,9 +71,10 @@ The `.http` files run with the REST Client extension.
 
 ### Local data and tokens
 
-Every endpoint except `/health` needs a Supabase access token. Run the `signIn` request in
+Every endpoint except `/health` needs a Supabase access token, so you need a user in the Supabase project
+(created in the dashboard under _Authentication_, until invitations exist). Run the `signIn` request in
 [`Curator.Api.http`](apps/api/src/Curator.Api/Curator.Api.http) (credentials come from a git-ignored `.env` next
-to it, see the top of the file). The other requests there use the token automatically. For Scalar, paste
+to it, see the top of the file; the publishable key is under _Project Settings → API Keys_). The other requests there use the token automatically. For Scalar, paste
 `access_token` from the response into the _Bearer_ field; Scalar remembers it.
 
 In Development, two endpoints manage local data:

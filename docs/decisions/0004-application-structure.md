@@ -67,7 +67,9 @@ authentication (handling a Postgres unique violation), not a use case.
 
 - **Handler signature:** `HandleAsync(Command command, Profile user, CancellationToken)`. The user is a
   separate parameter, not a field on the command, so the command can be the request body directly. There's
-  no separate request DTO in the Api project that only copies fields.
+  no separate request DTO in the Api project that only copies fields. Route values that aren't part of the
+  body come first (`EditAsset`: `HandleAsync(id, command, user, ct)`), and handlers that don't need the user
+  leave it out (`ListAssets`).
 - **Request validation:** data annotations on the command record. `[ApiController]` checks them and returns
   `ValidationProblemDetails` (400) before the handler runs, and OpenAPI picks them up. Entities still guard
   their invariants (`ArgumentException`), as a safety net rather than user-facing validation.
@@ -83,8 +85,9 @@ authentication (handling a Postgres unique violation), not a use case.
 - **Expected failures are return values.** A handler that can fail returns `Result<Response>`
   (`Curator.Application.Common`): either the response or an `Error(Kind, Message)`. Implicit conversions let
   it `return response;` or `return Error.NotFound("...");`.
-- **Kinds are few and generic:** `NotFound` (404), `Forbidden` (403), `Conflict` (409, wrong state). Add one
-  when a use case needs a status these don't cover, not up front.
+- **Kinds are few and generic:** `NotFound` (404), `Forbidden` (403), `Conflict` (409, wrong state), and
+  `Invalid` (400) for input data annotations can't check, added with `ListAssets` for an unreadable cursor.
+  Add one when a use case needs a status these don't cover, not up front.
 - **The controller maps them** with `result.ToActionResult(this, Ok)`, which returns `ProblemDetails` with the
   message as `detail`. The endpoint lists each status with `[ProducesResponseType<ProblemDetails>]`.
 - **Exceptions remain for bugs** and broken invariants (an entity's `InvalidOperationException`, a database

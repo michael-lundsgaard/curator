@@ -7,7 +7,8 @@ reference on _what_ to build, but don't copy their structure by default. This re
 We build it step by step. Keep changes small and focused on the step at hand; don't scaffold ahead.
 
 Design decisions and plans live in `docs/`: `roadmap.md` (next steps), `data-model.md` (draft and open
-questions) and `decisions/` (accepted decision records). Read them before starting a step, and update them
+questions), `architecture.md` (how a request flows through the layers) and `decisions/` (accepted decision
+records). Read them before starting a step, and update them
 when a decision changes.
 
 ## Layout
@@ -44,7 +45,8 @@ dotnet ef database update --project src/Curator.Infrastructure --startup-project
   Testcontainers, so Docker must be running for `dotnet test`.
 
 - Storage: Cloudflare R2 (`R2` settings; keys in user secrets, see README). Tests never call R2: presigning
-  is computed locally with made-up keys in `CuratorApiFactory`.
+  is computed locally with made-up keys in `CuratorApiFactory`, and `TestFileStorage` answers "is the object
+  there" from `factory.StoredObjects`.
 
 - API docs (Development only): http://localhost:5238/scalar
 - Health: http://localhost:5238/health

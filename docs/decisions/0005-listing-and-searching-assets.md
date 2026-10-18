@@ -142,8 +142,10 @@ Do it when punctuation search is missed, or if the Danish-letters test fails.
   - Expected order: Åben, apple, Bil, Clip 2, Clip 10, Øl, Oscar, Zebra. Use it in an integration test.
   - Check the generated migration's `Down`: EF drops the collation before resetting the column, which fails.
     Swap the two steps.
-- Every listed item carries signed thumbnail URLs. Presigning is computed locally (no call to R2), so this
-  costs nothing per item.
+- Listed items were meant to carry signed thumbnail URLs (presigning is computed locally, so it costs nothing
+  per item). They don't yet: there are no thumbnails before processing, and presigned URLs change on every
+  request, so browsers can't cache them. How thumbnails are served is decided with video processing (see the
+  [roadmap](../roadmap.md)).
 
 ## References
 
