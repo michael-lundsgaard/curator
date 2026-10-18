@@ -94,3 +94,9 @@ Content-Type: application/json
 }
 
 ###
+
+# Delete the first asset of the list above (uploader or admin). Its files stay in R2 for now.
+DELETE {{host}}/assets/{{listAssets.response.body.$.items[0].id}}
+Authorization: Bearer {{token}}
+
+###

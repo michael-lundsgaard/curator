@@ -98,6 +98,7 @@ public class Asset
         UpdatedAt = now;
     }
 
+    /// <summary>Soft delete: hidden from queries, files removed later. Deleting again keeps the first time.</summary>
     public void Delete(DateTimeOffset now)
     {
         DeletedAt ??= now;

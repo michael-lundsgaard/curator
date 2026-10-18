@@ -61,6 +61,23 @@ public class AssetsController : ControllerBase
     }
 
     /// <summary>
+    /// Deletes an asset from the library. Only the uploader and admins can delete it. Deleting it again returns
+    /// 404, like any asset that doesn't exist.
+    /// </summary>
+    [HttpDelete("{id:guid}")]
+    [ProducesResponseType<DeleteAsset.Response>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> Delete(
+        Guid id,
+        DeleteAsset.Handler handler,
+        CancellationToken cancellationToken)
+    {
+        var result = await handler.HandleAsync(new(id), HttpContext.GetProfile(), cancellationToken);
+        return result.ToActionResult(this, Ok);
+    }
+
+    /// <summary>
     /// Starts an upload. Upload the file to <c>uploadUrl</c> with <c>PUT</c> and the same <c>Content-Type</c>. Storage
     /// rejects a file whose size differs from <c>sizeBytes</c>.
     /// </summary>

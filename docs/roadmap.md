@@ -28,7 +28,9 @@ Built step by step. Each step is small and shippable. Order may change.
         replaces all three fields (missing or `null` clears), not JSON Merge Patch: the edit form sends them
         all, and telling a missing field from `null` would need an `Optional<T>` with its own JSON converter,
         OpenAPI transformer and validation
-  - [ ] Delete (`DELETE /assets/{id}`, uploader or admin, soft delete)
+  - [x] Delete (`DELETE /assets/{id}`, uploader or admin, soft delete). Returns `200` with `id` and
+        `deletedAt`; deleting again is `404`, since deleted assets are filtered out. Files stay in R2 until
+        storage cleanup removes them
   - [ ] Decide how titles sort, then sort with an explicit ICU collation. Today `sort=title` uses the database's
         default collation, so digits compare as text ("Clip 10" before "Clip 2") and the order depends on the
         host: `postgres:17-alpine` (local and tests) compares code points (Å, Æ, Ø), while Supabase's glibc

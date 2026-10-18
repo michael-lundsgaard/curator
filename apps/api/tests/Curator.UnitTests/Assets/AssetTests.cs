@@ -116,6 +116,18 @@ public class AssetTests
     }
 
     [Fact]
+    public void Delete_AgainKeepsTheFirstTime()
+    {
+        var asset = CreateAsset();
+        var first = DateTimeOffset.UtcNow;
+
+        asset.Delete(first);
+        asset.Delete(first.AddMinutes(1));
+
+        Assert.Equal(first, asset.DeletedAt);
+    }
+
+    [Fact]
     public void IsVisibleTo_WhenPending_OnlyTheUploader()
     {
         var uploader = new Profile(Guid.NewGuid(), "uploader", DateTimeOffset.UtcNow);
