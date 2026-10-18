@@ -23,7 +23,8 @@ public class DeleteAssetTests(CuratorApiFactory factory)
 
         await using var db = factory.CreateDbContext();
         var saved = await db.Assets.IgnoreQueryFilters().SingleAsync(a => a.Id == asset.Id);
-        Assert.Equal(deleted.DeletedAt, saved.DeletedAt);
+        // Postgres stores microseconds; the response has the clock's 100 ns ticks.
+        Assert.Equal(deleted.DeletedAt, saved.DeletedAt!.Value, TimeSpan.FromMilliseconds(1));
         Assert.Equal(HttpStatusCode.NotFound, (await client.GetAsync($"/assets/{asset.Id}")).StatusCode);
     }
 
