@@ -1,7 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using Curator.Application.Common;
 using Curator.Application.Persistence;
-using Curator.Domain.Assets;
 using Curator.Domain.Profiles;
 using Microsoft.EntityFrameworkCore;
 
@@ -42,8 +41,7 @@ public static class EditAsset
         {
             var asset = await db.Assets.SingleOrDefaultAsync(a => a.Id == assetId, cancellationToken);
 
-            // Someone else's unfinished upload doesn't exist for them, as in GetAsset.
-            if (asset is null || (asset.Status == AssetStatus.Pending && asset.UploadedBy != user.Id))
+            if (asset is null || !asset.IsVisibleTo(user))
             {
                 return Error.NotFound("The asset doesn't exist.");
             }

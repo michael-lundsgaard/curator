@@ -6,7 +6,7 @@ using Npgsql;
 
 namespace Curator.Infrastructure.Profiles;
 
-internal sealed class ProfileProvisioner(CuratorDbContext db) : IProfileProvisioner
+internal sealed class ProfileProvisioner(CuratorDbContext db, TimeProvider time) : IProfileProvisioner
 {
     public async Task<Profile> GetOrCreateAsync(Guid id, string displayName, CancellationToken cancellationToken)
     {
@@ -16,7 +16,7 @@ internal sealed class ProfileProvisioner(CuratorDbContext db) : IProfileProvisio
             return existing;
         }
 
-        var profile = new Profile(id, displayName, DateTimeOffset.UtcNow);
+        var profile = new Profile(id, displayName, time.GetUtcNow());
         db.Profiles.Add(profile);
         try
         {

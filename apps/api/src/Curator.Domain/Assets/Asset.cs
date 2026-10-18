@@ -77,6 +77,11 @@ public class Asset
         UpdatedAt = now;
     }
 
+    /// <summary>
+    /// An unfinished upload isn't in the library yet, so only its uploader can see it. Everything else is shared.
+    /// </summary>
+    public bool IsVisibleTo(Profile user) => Status != AssetStatus.Pending || user.Id == UploadedBy;
+
     /// <summary>Its uploader and admins may edit or delete it.</summary>
     public bool CanBeEditedBy(Profile user) => user.Id == UploadedBy || user.Role == ProfileRole.Admin;
 

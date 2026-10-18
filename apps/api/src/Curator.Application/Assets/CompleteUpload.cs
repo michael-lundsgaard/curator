@@ -26,8 +26,7 @@ public static class CompleteUpload
             Profile user,
             CancellationToken cancellationToken)
         {
-            var asset = await db.Assets.SingleOrDefaultAsync(
-                a => a.Id == command.AssetId && a.DeletedAt == null, cancellationToken);
+            var asset = await db.Assets.SingleOrDefaultAsync(a => a.Id == command.AssetId, cancellationToken);
             if (asset is null)
             {
                 return Error.NotFound("The asset doesn't exist.");

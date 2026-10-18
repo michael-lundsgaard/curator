@@ -64,8 +64,7 @@ public static class GetAsset
                 })
                 .SingleOrDefaultAsync(cancellationToken);
 
-            // Someone else's unfinished upload isn't in the library yet, so it doesn't exist for them.
-            if (row is null || (row.Asset.Status == AssetStatus.Pending && row.Asset.UploadedBy != user.Id))
+            if (row is null || !row.Asset.IsVisibleTo(user))
             {
                 return Error.NotFound("The asset doesn't exist.");
             }

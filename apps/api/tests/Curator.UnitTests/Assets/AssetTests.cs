@@ -114,4 +114,20 @@ public class AssetTests
         Assert.False(asset.CanBeEditedBy(member));
         Assert.True(asset.CanBeEditedBy(admin));
     }
+
+    [Fact]
+    public void IsVisibleTo_WhenPending_OnlyTheUploader()
+    {
+        var uploader = new Profile(Guid.NewGuid(), "uploader", DateTimeOffset.UtcNow);
+        var admin = new Profile(Guid.NewGuid(), "admin", DateTimeOffset.UtcNow);
+        admin.ChangeRole(ProfileRole.Admin);
+        var asset = new Asset(uploader.Id, "clip.mp4", "video/mp4", 1024, null, DateTimeOffset.UtcNow);
+
+        Assert.True(asset.IsVisibleTo(uploader));
+        Assert.False(asset.IsVisibleTo(admin));
+
+        asset.MarkUploaded(DateTimeOffset.UtcNow);
+
+        Assert.True(asset.IsVisibleTo(admin));
+    }
 }
