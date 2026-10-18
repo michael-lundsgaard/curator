@@ -60,3 +60,6 @@ Built step by step. Each step is small and shippable. Order may change.
 - [ ] Invitations (disable sign-up, `inviteUserByEmail`)
 - [ ] Favorites (visible to everyone)
 - [ ] Share links (single assets only)
+  - Short, unguessable tokens of their own, not the asset ID: these are the URLs that leave the app. Inside the
+    app, `/watch/{id}` with the UUID is fine (decided against slugs and YouTube-style short IDs: titles change
+    and repeat, and nobody types these links)
