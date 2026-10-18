@@ -71,6 +71,17 @@ public class DevelopmentToolsTests(CuratorApiFactory factory)
         Assert.Equal("bearer", scheme.GetProperty("scheme").GetString());
     }
 
+    [Fact]
+    public async Task OpenApiDocument_DescribesEnumsByName_SoScalarSuggestsReadableValues()
+    {
+        var document = await factory.CreateClient().GetFromJsonAsync<JsonElement>("/openapi/v1.json");
+
+        var sort = document.GetProperty("components").GetProperty("schemas").GetProperty("AssetSort");
+        Assert.Equal(
+            ["Recorded", "Added", "Title"],
+            sort.GetProperty("enum").EnumerateArray().Select(v => v.GetString()));
+    }
+
     private sealed record Added([property: JsonPropertyName("added")] int Count);
 
     private sealed record Deleted([property: JsonPropertyName("deleted")] int Count);
