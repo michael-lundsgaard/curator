@@ -107,4 +107,40 @@ public class CollectionsController : ControllerBase
         var result = await handler.HandleAsync(new(id), HttpContext.GetProfile(), cancellationToken);
         return result.ToActionResult(this, Ok);
     }
+
+    /// <summary>
+    /// Adds up to 100 clips to a collection. Anyone can add clips to any collection. Clips already in it are skipped,
+    /// and a clip that doesn't exist (deleted, or not uploaded yet) fails the whole request.
+    /// </summary>
+    [HttpPost("{id:guid}/assets")]
+    [ProducesResponseType<AddClipsToCollection.Response>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> AddClips(
+        Guid id,
+        AddClipsToCollection.Command command,
+        AddClipsToCollection.Handler handler,
+        CancellationToken cancellationToken)
+    {
+        var result = await handler.HandleAsync(id, command, HttpContext.GetProfile(), cancellationToken);
+        return result.ToActionResult(this, Ok);
+    }
+
+    /// <summary>
+    /// Removes up to 100 clips from a collection. Anyone can remove clips from any collection. Clips that aren't in it
+    /// are skipped, and the clips stay in the library. A <c>POST</c>, because a body on <c>DELETE</c> is often dropped.
+    /// </summary>
+    [HttpPost("{id:guid}/assets/remove")]
+    [ProducesResponseType<RemoveClipsFromCollection.Response>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> RemoveClips(
+        Guid id,
+        RemoveClipsFromCollection.Command command,
+        RemoveClipsFromCollection.Handler handler,
+        CancellationToken cancellationToken)
+    {
+        var result = await handler.HandleAsync(id, command, cancellationToken);
+        return result.ToActionResult(this, Ok);
+    }
 }

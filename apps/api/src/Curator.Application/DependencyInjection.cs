@@ -24,6 +24,8 @@ public static class DependencyInjection
         services.AddScoped<EditCollection.Handler>();
         services.AddScoped<MoveCollection.Handler>();
         services.AddScoped<DeleteCollection.Handler>();
+        services.AddScoped<AddClipsToCollection.Handler>();
+        services.AddScoped<RemoveClipsFromCollection.Handler>();
 
         return services;
     }

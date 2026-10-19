@@ -17,8 +17,8 @@ public class ListCollectionsTests(CuratorApiFactory factory)
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         var items = (await response.Content.ReadFromJsonAsync<Page>())!.Items;
-        Assert.Contains(new Item(parent.Id, null, parent.Name), items);
-        Assert.Contains(new Item(child.Id, parent.Id, child.Name), items);
+        Assert.Contains(new Item(parent.Id, null, parent.Name, 0), items);
+        Assert.Contains(new Item(child.Id, parent.Id, child.Name, 0), items);
     }
 
     [Fact]
@@ -53,5 +53,5 @@ public class ListCollectionsTests(CuratorApiFactory factory)
 
     private sealed record Page(IReadOnlyList<Item> Items);
 
-    private sealed record Item(Guid Id, Guid? ParentId, string Name);
+    private sealed record Item(Guid Id, Guid? ParentId, string Name, int ClipCount);
 }

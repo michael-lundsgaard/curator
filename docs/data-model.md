@@ -1,6 +1,6 @@
 # Data model
 
-**Status:** Draft for the parts not built yet (collections, favorites, share links). Settled decisions are marked ✅, and things still being considered are listed under
+**Status:** Draft for the parts not built yet (favorites, share links). Settled decisions are marked ✅, and things still being considered are listed under
 _Open questions_.
 
 ## Settled
@@ -32,9 +32,9 @@ _Open questions_.
 
 ## Schema
 
-`profiles`, `assets` and `collections` exist; the entities in `Curator.Domain` and their EF configuration in
-`Curator.Infrastructure` are the source of truth for them. The other tables and columns are still proposed.
-`?` marks a nullable column.
+`profiles`, `assets`, `collections` and `collection_assets` exist; the entities in `Curator.Domain` and their EF
+configuration in `Curator.Infrastructure` are the source of truth for them. The other tables and columns are
+still proposed. `?` marks a nullable column.
 
 ```
 profiles           id (= JWT sub), display_name, role, created_at
@@ -50,7 +50,8 @@ assets             id, uploaded_by → profiles, title, description?,
 collections        id, parent_id? → collections (cascade), created_by → profiles,
                    name, description?, created_at, updated_at
 
-collection_assets  (proposed) collection_id, asset_id, added_by, added_at
+collection_assets  collection_id → collections (cascade), asset_id → assets (cascade),
+                   added_by → profiles, added_at
                    PK (collection_id, asset_id)
 
 favorites          (later) profile_id, asset_id, created_at

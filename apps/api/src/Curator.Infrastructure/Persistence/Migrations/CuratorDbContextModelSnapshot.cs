@@ -161,6 +161,36 @@ namespace Curator.Infrastructure.Persistence.Migrations
                     b.ToTable("collections", (string)null);
                 });
 
+            modelBuilder.Entity("Curator.Domain.Collections.CollectionAsset", b =>
+                {
+                    b.Property<Guid>("CollectionId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("collection_id");
+
+                    b.Property<Guid>("AssetId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("asset_id");
+
+                    b.Property<DateTimeOffset>("AddedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("added_at");
+
+                    b.Property<Guid>("AddedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("added_by");
+
+                    b.HasKey("CollectionId", "AssetId")
+                        .HasName("pk_collection_assets");
+
+                    b.HasIndex("AddedBy")
+                        .HasDatabaseName("ix_collection_assets_added_by");
+
+                    b.HasIndex("AssetId")
+                        .HasDatabaseName("ix_collection_assets_asset_id");
+
+                    b.ToTable("collection_assets", (string)null);
+                });
+
             modelBuilder.Entity("Curator.Domain.Profiles.Profile", b =>
                 {
                     b.Property<Guid>("Id")
@@ -211,6 +241,30 @@ namespace Curator.Infrastructure.Persistence.Migrations
                         .HasForeignKey("ParentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .HasConstraintName("fk_collections_collections_parent_id");
+                });
+
+            modelBuilder.Entity("Curator.Domain.Collections.CollectionAsset", b =>
+                {
+                    b.HasOne("Curator.Domain.Profiles.Profile", null)
+                        .WithMany()
+                        .HasForeignKey("AddedBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_collection_assets_profiles_added_by");
+
+                    b.HasOne("Curator.Domain.Assets.Asset", null)
+                        .WithMany()
+                        .HasForeignKey("AssetId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_collection_assets_assets_asset_id");
+
+                    b.HasOne("Curator.Domain.Collections.Collection", null)
+                        .WithMany()
+                        .HasForeignKey("CollectionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_collection_assets_collections_collection_id");
                 });
 #pragma warning restore 612, 618
         }

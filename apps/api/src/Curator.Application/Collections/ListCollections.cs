@@ -15,7 +15,10 @@ public static class ListCollections
     public sealed record Response(IReadOnlyList<Item> Items);
 
     /// <param name="ParentId">The collection this one is inside, or <c>null</c> at the top level.</param>
-    public sealed record Item(Guid Id, Guid? ParentId, string Name);
+    /// <param name="ClipCount">
+    /// How many clips were added to this collection itself, not counting its sub-collections' or deleted ones.
+    /// </param>
+    public sealed record Item(Guid Id, Guid? ParentId, string Name, int ClipCount);
 
     public sealed class Handler(ICuratorDbContext db)
     {
@@ -24,7 +27,13 @@ public static class ListCollections
             var items = await db.Collections
                 .OrderBy(c => c.Name.ToLower())
                 .ThenBy(c => c.Id)
-                .Select(c => new Item(c.Id, c.ParentId, c.Name))
+                .Select(c => new Item(
+                    c.Id,
+                    c.ParentId,
+                    c.Name,
+                    // Going through Assets applies its filter, so deleted clips aren't counted.
+                    db.CollectionAssets.Count(ca =>
+                        ca.CollectionId == c.Id && db.Assets.Any(a => a.Id == ca.AssetId))))
                 .ToListAsync(cancellationToken);
 
             return new Response(items);

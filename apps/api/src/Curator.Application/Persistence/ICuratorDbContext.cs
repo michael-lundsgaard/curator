@@ -12,6 +12,7 @@ public interface ICuratorDbContext
     DbSet<Profile> Profiles { get; }
     DbSet<Asset> Assets { get; }
     DbSet<Collection> Collections { get; }
+    DbSet<CollectionAsset> CollectionAssets { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 

@@ -15,6 +15,7 @@ public class CuratorDbContext(DbContextOptions<CuratorDbContext> options) : DbCo
     public DbSet<Profile> Profiles => Set<Profile>();
     public DbSet<Asset> Assets => Set<Asset>();
     public DbSet<Collection> Collections => Set<Collection>();
+    public DbSet<CollectionAsset> CollectionAssets => Set<CollectionAsset>();
 
     public async Task<IDbContextTransaction> LockCollectionTreeAsync(CancellationToken cancellationToken)
     {

@@ -161,6 +161,28 @@ Content-Type: application/json
 
 ###
 
+# Add up to 100 clips. Clips already in the collection are skipped. Uses the first asset of the list above.
+POST {{host}}/collections/{{createCollection.response.body.id}}/assets
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "assetIds": ["{{listAssets.response.body.$.items[0].id}}"]
+}
+
+###
+
+# Take up to 100 clips out of the collection. Clips not in it are skipped; all stay in the library.
+POST {{host}}/collections/{{createCollection.response.body.id}}/assets/remove
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "assetIds": ["{{listAssets.response.body.$.items[0].id}}"]
+}
+
+###
+
 # Deletes it and all of its sub-collections. The clips stay in the library.
 DELETE {{host}}/collections/{{createCollection.response.body.id}}
 Authorization: Bearer {{token}}

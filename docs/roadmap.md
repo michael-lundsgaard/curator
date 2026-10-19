@@ -53,9 +53,16 @@ Built step by step. Each step is small and shippable. Order may change.
         Create (inside a parent), move and delete take a Postgres advisory lock (`pg_advisory_xact_lock`) around
         their tree checks and save, so two moves at the same moment can't make a cycle and a create can't land in
         a collection being deleted
-  - [ ] Add and remove clips (`collection_assets`); a collection's clips through `GET /assets` with
-        `collectionId` (and sub-collections as an option), reusing its sorts and cursor. Add `clipCount` to
-        `GET /collections` items for sidebar badges
+  - [x] Add and remove clips (`collection_assets`): `POST /collections/{id}/assets` with up to 100 `assetIds`
+        (already added ones are skipped, deleted or pending ones fail the request; returns `addedCount`) and
+        `POST /collections/{id}/assets/remove` the same way (ones not in it are skipped; returns `removedCount`),
+        for selecting several clips in the app. A `POST`, since a body on `DELETE` is often dropped. Anyone, in
+        any collection. Adding takes the collection tree
+        lock, so it can't race a delete of the collection or another add of the same clip. `clipCount` on
+        `GET /collections` items for sidebar badges: the collection's own clips, not its sub-collections', and not
+        deleted ones
+  - [ ] A collection's clips through `GET /assets` with `collectionId` (and sub-collections as an option),
+        reusing its sorts and cursor
 - [ ] React app (`apps/app`, Vite): sign-in, generated API client, browse and upload
 - [ ] Hosting and observability: where the API (and later the processing worker) runs and how it's
       deployed; structured logs with request logging, and somewhere to read logs and errors. Avoid hosts that

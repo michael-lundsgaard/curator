@@ -34,6 +34,9 @@ public class DevelopmentToolsTests(CuratorApiFactory factory)
             sample.Clips.Count(c => c.UploadedBy == userId), mine.GetProperty("items").GetArrayLength());
         var collections = await client.GetFromJsonAsync<JsonElement>("/collections");
         Assert.Equal(sample.Collections.Count, collections.GetProperty("items").GetArrayLength());
+        Assert.Equal(
+            sample.CollectionClips.Count,
+            collections.GetProperty("items").EnumerateArray().Sum(c => c.GetProperty("clipCount").GetInt32()));
     }
 
     [Fact]

@@ -28,6 +28,7 @@ public static class DevelopmentData
         db.Collections.AddRange(sample.Collections);
         db.Assets.AddRange(sample.Clips);
         db.Assets.AddRange(sample.AbandonedUploads);
+        db.CollectionAssets.AddRange(sample.CollectionClips);
 
         await db.SaveChangesAsync(cancellationToken);
         return (sample.Clips.Count, sample.Collections.Count);
