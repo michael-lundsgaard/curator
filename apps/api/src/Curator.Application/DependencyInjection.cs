@@ -1,4 +1,5 @@
 using Curator.Application.Assets;
+using Curator.Application.Collections;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
@@ -16,6 +17,9 @@ public static class DependencyInjection
         services.AddScoped<GetAsset.Handler>();
         services.AddScoped<EditAsset.Handler>();
         services.AddScoped<DeleteAsset.Handler>();
+
+        services.AddScoped<CreateCollection.Handler>();
+        services.AddScoped<GetCollection.Handler>();
 
         return services;
     }

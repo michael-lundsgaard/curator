@@ -32,7 +32,7 @@ _Open questions_.
 
 ## Schema
 
-`profiles` and `assets` exist; the entities in `Curator.Domain` and their EF configuration in
+`profiles`, `assets` and `collections` exist; the entities in `Curator.Domain` and their EF configuration in
 `Curator.Infrastructure` are the source of truth for them. The other tables and columns are still proposed.
 `?` marks a nullable column.
 
@@ -47,7 +47,7 @@ assets             id, uploaded_by → profiles, title, description?,
                    duration_ms?, width?, height?, recorded_at?,
                    created_at, updated_at, deleted_at?
 
-collections        (proposed) id, parent_id? → collections, created_by → profiles,
+collections        id, parent_id? → collections (cascade), created_by → profiles,
                    name, description?, created_at, updated_at
 
 collection_assets  (proposed) collection_id, asset_id, added_by, added_at

@@ -118,6 +118,49 @@ namespace Curator.Infrastructure.Persistence.Migrations
                     b.ToTable("assets", (string)null);
                 });
 
+            modelBuilder.Entity("Curator.Domain.Collections.Collection", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("created_by");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("text")
+                        .HasColumnName("description");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("name");
+
+                    b.Property<Guid?>("ParentId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("parent_id");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.HasKey("Id")
+                        .HasName("pk_collections");
+
+                    b.HasIndex("CreatedBy")
+                        .HasDatabaseName("ix_collections_created_by");
+
+                    b.HasIndex("ParentId")
+                        .HasDatabaseName("ix_collections_parent_id");
+
+                    b.ToTable("collections", (string)null);
+                });
+
             modelBuilder.Entity("Curator.Domain.Profiles.Profile", b =>
                 {
                     b.Property<Guid>("Id")
@@ -152,6 +195,22 @@ namespace Curator.Infrastructure.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("fk_assets_profiles_uploaded_by");
+                });
+
+            modelBuilder.Entity("Curator.Domain.Collections.Collection", b =>
+                {
+                    b.HasOne("Curator.Domain.Profiles.Profile", null)
+                        .WithMany()
+                        .HasForeignKey("CreatedBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_collections_profiles_created_by");
+
+                    b.HasOne("Curator.Domain.Collections.Collection", null)
+                        .WithMany()
+                        .HasForeignKey("ParentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .HasConstraintName("fk_collections_collections_parent_id");
                 });
 #pragma warning restore 612, 618
         }

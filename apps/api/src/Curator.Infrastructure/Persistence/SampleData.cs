@@ -80,8 +80,8 @@ public static class SampleData
     }
 
     /// <summary>
-    /// Deletes every asset, including deleted and pending ones, and the sample profiles. Real users' profiles stay,
-    /// with their roles. Files in storage are left alone. Returns the number of assets deleted.
+    /// Deletes every asset, including deleted and pending ones, every collection and the sample profiles. Real users'
+    /// profiles stay, with their roles. Files in storage are left alone. Returns the number of assets deleted.
     /// </summary>
     public static async Task<int> ClearAsync(CuratorDbContext db, CancellationToken cancellationToken)
     {
@@ -93,6 +93,7 @@ public static class SampleData
         await using var transaction = await db.Database.BeginTransactionAsync(cancellationToken);
 
         var deleted = await db.Assets.IgnoreQueryFilters().ExecuteDeleteAsync(cancellationToken);
+        await db.Collections.ExecuteDeleteAsync(cancellationToken);
         await db.Profiles.Where(p => p.Id == FrejaId || p.Id == MadsId).ExecuteDeleteAsync(cancellationToken);
 
         await transaction.CommitAsync(cancellationToken);

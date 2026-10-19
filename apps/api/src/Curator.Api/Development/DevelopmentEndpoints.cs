@@ -22,7 +22,7 @@ public static class DevelopmentEndpoints
             })
             .WithSummary("Adds sample clips. Does nothing if they're already there.");
 
-        // Assets from manual testing pile up. Profiles stay, so the caller keeps their role.
+        // Assets and collections from manual testing pile up. Profiles stay, so the caller keeps their role.
         dev.MapDelete("/data", async (CuratorDbContext db, CancellationToken cancellationToken) =>
             {
                 if (!SampleData.IsLocalDatabase(db))
@@ -34,6 +34,6 @@ public static class DevelopmentEndpoints
                 var deleted = await SampleData.ClearAsync(db, cancellationToken);
                 return Results.Ok(new { deleted });
             })
-            .WithSummary("Deletes all assets and the sample profiles. Files in storage are left alone.");
+            .WithSummary("Deletes all assets, collections and the sample profiles. Files in storage are left alone.");
     }
 }

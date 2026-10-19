@@ -4,12 +4,12 @@ How a request travels through the API. The reasons behind each part are in the A
 
 ## Layers
 
-| Project                  | Holds                                                     | References          |
-| ------------------------ | --------------------------------------------------------- | ------------------- |
-| `Curator.Api`            | Host, middleware, thin controllers                        | Application, Infra  |
-| `Curator.Application`    | Use cases (handlers), interfaces for the outside world    | Domain, EF Core     |
-| `Curator.Domain`         | Entities and their rules (`Asset`, `Profile`)             | nothing             |
-| `Curator.Infrastructure` | `CuratorDbContext`, migrations, R2 storage, profile setup | Application, Npgsql |
+| Project                  | Holds                                                       | References          |
+| ------------------------ | ----------------------------------------------------------- | ------------------- |
+| `Curator.Api`            | Host, middleware, thin controllers                          | Application, Infra  |
+| `Curator.Application`    | Use cases (handlers), interfaces for the outside world      | Domain, EF Core     |
+| `Curator.Domain`         | Entities and their rules (`Asset`, `Collection`, `Profile`) | nothing             |
+| `Curator.Infrastructure` | `CuratorDbContext`, migrations, R2 storage, profile setup   | Application, Npgsql |
 
 `Curator.Api` references Infrastructure only to call `AddInfrastructure()` in `Program.cs`.
 

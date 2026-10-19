@@ -40,7 +40,7 @@ Built step by step. Each step is small and shippable. Order may change.
 - [ ] Collections:
   - [x] Covers: none for now, neither uploaded images nor a clip's thumbnail. The image question moved to
         thumbnails ([0006](decisions/0006-serving-thumbnails.md), proposed)
-  - [ ] Create (`POST /collections`, optional `parentId`, max depth 5) and get one (`GET /collections/{id}`)
+  - [x] Create (`POST /collections`, optional `parentId`, max depth 5) and get one (`GET /collections/{id}`)
   - [ ] List (`GET /collections`): the whole tree as a flat list with `parentId`, sorted by name. The app
         builds the sidebar tree from it. Keep items lean (`id`, `parentId`, `name`).
         Scale: 1,000 collections is about a millisecond in Postgres and 150–200 KB of JSON (40–60 KB gzipped),

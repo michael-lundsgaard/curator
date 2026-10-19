@@ -35,6 +35,7 @@ public class DevelopmentToolsTests(CuratorApiFactory factory)
         var userId = Guid.NewGuid();
         var client = factory.CreateClient(userId);
         (await client.PostAsync("/dev/sample-data", null)).EnsureSuccessStatusCode();
+        (await client.PostAsJsonAsync("/collections", new { name = "Screams" })).EnsureSuccessStatusCode();
         await using var db = factory.CreateDbContext();
         // Other tests' assets, deleted and pending ones included, go too.
         var assets = await db.Assets.IgnoreQueryFilters().CountAsync();
@@ -44,6 +45,7 @@ public class DevelopmentToolsTests(CuratorApiFactory factory)
         response.EnsureSuccessStatusCode();
         Assert.Equal(assets, (await response.Content.ReadFromJsonAsync<Deleted>())!.Count);
         Assert.False(await db.Assets.IgnoreQueryFilters().AnyAsync());
+        Assert.False(await db.Collections.AnyAsync());
         Assert.True(await db.Profiles.AnyAsync(p => p.Id == userId));
         // The sample profiles are gone, so the samples can be added again.
         var again = await client.PostAsync("/dev/sample-data", null);

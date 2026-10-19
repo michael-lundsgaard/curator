@@ -100,3 +100,33 @@ DELETE {{host}}/assets/{{listAssets.response.body.$.items[0].id}}
 Authorization: Bearer {{token}}
 
 ###
+
+# Create a top-level collection.
+# @name createCollection
+POST {{host}}/collections
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "R.E.P.O",
+  "description": "Monster-filled evenings"
+}
+
+###
+
+# Create a sub-collection inside the one above. Collections can be nested 5 levels deep.
+POST {{host}}/collections
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "Funny moments",
+  "parentId": "{{createCollection.response.body.id}}"
+}
+
+###
+
+GET {{host}}/collections/{{createCollection.response.body.id}}
+Authorization: Bearer {{token}}
+
+###
