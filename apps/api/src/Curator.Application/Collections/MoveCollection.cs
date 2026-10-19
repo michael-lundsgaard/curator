@@ -12,9 +12,8 @@ namespace Curator.Application.Collections;
 /// <see cref="Collection.MaxDepth"/>.
 /// </summary>
 /// <remarks>
-/// The checks run against the tree as loaded, so two moves at the same moment could still make a cycle (A into B
-/// while B goes into A). Unlikely with a handful of people; <see cref="CollectionTree"/> fails instead of looping if
-/// it happens.
+/// The checks run under the collection tree lock. Without it, two moves at the same moment could both pass their
+/// checks and together make a cycle (A into B while B goes into A).
 /// </remarks>
 public static class MoveCollection
 {
@@ -31,6 +30,8 @@ public static class MoveCollection
             Profile user,
             CancellationToken cancellationToken)
         {
+            await using var transaction = await db.LockCollectionTreeAsync(cancellationToken);
+
             var collection = await db.Collections.SingleOrDefaultAsync(c => c.Id == collectionId, cancellationToken);
 
             if (collection is null)
@@ -67,6 +68,7 @@ public static class MoveCollection
 
             collection.MoveTo(command.ParentId, time.GetUtcNow());
             await db.SaveChangesAsync(cancellationToken);
+            await transaction.CommitAsync(cancellationToken);
 
             return new Response(collection.Id, collection.ParentId, collection.UpdatedAt);
         }

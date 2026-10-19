@@ -50,7 +50,9 @@ Built step by step. Each step is small and shippable. Order may change.
         (`POST /collections/{id}/move` with `parentId`; no cycles, depth counts the moved sub-collections) and
         delete with sub-collections (`DELETE /collections/{id}`, returns `deletedCount`). Creator or admin. Moving
         is its own endpoint so an edit that leaves out `parentId` can't move a collection to the top by accident.
-        Two moves at the same moment could still make a cycle; `CollectionTree` throws rather than loops if so
+        Create (inside a parent), move and delete take a Postgres advisory lock (`pg_advisory_xact_lock`) around
+        their tree checks and save, so two moves at the same moment can't make a cycle and a create can't land in
+        a collection being deleted
   - [ ] Add and remove clips (`collection_assets`); a collection's clips through `GET /assets` with
         `collectionId` (and sub-collections as an option), reusing its sorts and cursor. Add `clipCount` to
         `GET /collections` items for sidebar badges

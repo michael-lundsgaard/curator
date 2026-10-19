@@ -23,6 +23,9 @@ public static class DeleteCollection
             Profile user,
             CancellationToken cancellationToken)
         {
+            // Under the lock, a create or move into one of these collections waits, and then finds it gone.
+            await using var transaction = await db.LockCollectionTreeAsync(cancellationToken);
+
             var collection = await db.Collections
                 .SingleOrDefaultAsync(c => c.Id == command.CollectionId, cancellationToken);
 
@@ -41,6 +44,7 @@ public static class DeleteCollection
 
             db.Collections.Remove(collection);
             await db.SaveChangesAsync(cancellationToken);
+            await transaction.CommitAsync(cancellationToken);
 
             return new Response(collection.Id, deletedCount);
         }

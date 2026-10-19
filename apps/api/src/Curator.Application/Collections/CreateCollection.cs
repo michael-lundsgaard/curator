@@ -38,6 +38,12 @@ public static class CreateCollection
             Profile user,
             CancellationToken cancellationToken)
         {
+            // Inside a parent, the depth and the parent itself are checked under the lock, so a move or delete running
+            // at the same moment can't invalidate them before the save. A top-level collection depends on nothing.
+            await using var transaction = command.ParentId is null
+                ? null
+                : await db.LockCollectionTreeAsync(cancellationToken);
+
             if (command.ParentId is { } parentId)
             {
                 var tree = await db.LoadCollectionTreeAsync(cancellationToken);
@@ -59,6 +65,10 @@ public static class CreateCollection
 
             db.Collections.Add(collection);
             await db.SaveChangesAsync(cancellationToken);
+            if (transaction is not null)
+            {
+                await transaction.CommitAsync(cancellationToken);
+            }
 
             return new Response(
                 collection.Id, collection.ParentId, collection.Name, collection.Description, collection.CreatedAt);

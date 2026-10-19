@@ -153,6 +153,41 @@ public class ChangeCollectionTests(CuratorApiFactory factory)
     }
 
     [Fact]
+    public async Task Move_WaitsWhileAnotherRequestHoldsTheTreeLock()
+    {
+        var (client, _) = await CreateUserAsync();
+        var collection = await CreateAsync(client, "Screams");
+        var target = await CreateAsync(client, "Best of");
+        await using var db = factory.CreateDbContext();
+        var held = await db.LockCollectionTreeAsync(CancellationToken.None);
+
+        var move = client.PostAsJsonAsync($"/collections/{collection.Id}/move", new { parentId = target.Id });
+
+        // Still waiting after a moment, because this test holds the lock.
+        Assert.NotSame(move, await Task.WhenAny(move, Task.Delay(TimeSpan.FromMilliseconds(500))));
+        await held.RollbackAsync();
+        await held.DisposeAsync();
+        Assert.Equal(HttpStatusCode.OK, (await move).StatusCode);
+    }
+
+    [Fact]
+    public async Task Move_TwoIntoEachOtherAtOnce_OnlyOneSucceeds()
+    {
+        var (client, _) = await CreateUserAsync();
+        var a = await CreateAsync(client, "A");
+        var b = await CreateAsync(client, "B");
+
+        // Without the lock both could pass their checks before either saves, leaving A and B inside each other.
+        var responses = await Task.WhenAll(
+            client.PostAsJsonAsync($"/collections/{a.Id}/move", new { parentId = b.Id }),
+            client.PostAsJsonAsync($"/collections/{b.Id}/move", new { parentId = a.Id }));
+
+        Assert.Equal(
+            [HttpStatusCode.OK, HttpStatusCode.Conflict],
+            responses.Select(r => r.StatusCode).Order());
+    }
+
+    [Fact]
     public async Task Delete_ByCreator_DeletesSubCollectionsByOthersToo()
     {
         var (client, _) = await CreateUserAsync();
