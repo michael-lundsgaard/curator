@@ -1,3 +1,5 @@
+using Curator.Domain.Profiles;
+
 namespace Curator.Domain.Collections;
 
 /// <summary>
@@ -31,4 +33,36 @@ public class Collection
     public string? Description { get; private set; }
     public DateTimeOffset CreatedAt { get; private set; }
     public DateTimeOffset UpdatedAt { get; private set; }
+
+    /// <summary>
+    /// Its creator and admins may edit, move or delete it. Everyone can add clips and sub-collections to it.
+    /// </summary>
+    public bool CanBeEditedBy(Profile user) => user.Id == CreatedBy || user.Role == ProfileRole.Admin;
+
+    /// <summary>
+    /// Replaces the name and description. The name is required; a blank description is stored as none.
+    /// </summary>
+    public void Edit(string name, string? description, DateTimeOffset now)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(name);
+
+        Name = name.Trim();
+        Description = string.IsNullOrWhiteSpace(description) ? null : description.Trim();
+        UpdatedAt = now;
+    }
+
+    /// <summary>
+    /// Moves it, with its sub-collections, inside <paramref name="parentId"/> or to the top level (<c>null</c>).
+    /// Whether it fits there is checked against the <see cref="CollectionTree"/> first.
+    /// </summary>
+    public void MoveTo(Guid? parentId, DateTimeOffset now)
+    {
+        if (parentId == Id)
+        {
+            throw new ArgumentException("A collection can't be inside itself.", nameof(parentId));
+        }
+
+        ParentId = parentId;
+        UpdatedAt = now;
+    }
 }

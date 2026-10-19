@@ -50,4 +50,61 @@ public class CollectionsController : ControllerBase
         var result = await handler.HandleAsync(command, HttpContext.GetProfile(), cancellationToken);
         return result.ToActionResult(this, response => CreatedAtAction(nameof(Get), new { id = response.Id }, response));
     }
+
+    /// <summary>
+    /// Edits the name and description. Send both: a missing or <c>null</c> description clears it. Only the creator
+    /// and admins can edit a collection. Move it with <c>POST /collections/{id}/move</c>.
+    /// </summary>
+    [HttpPatch("{id:guid}")]
+    [ProducesResponseType<EditCollection.Response>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> Edit(
+        Guid id,
+        EditCollection.Command command,
+        EditCollection.Handler handler,
+        CancellationToken cancellationToken)
+    {
+        var result = await handler.HandleAsync(id, command, HttpContext.GetProfile(), cancellationToken);
+        return result.ToActionResult(this, Ok);
+    }
+
+    /// <summary>
+    /// Moves a collection, with its sub-collections, inside <c>parentId</c> or to the top level (<c>null</c>). Only the
+    /// creator and admins can move it. Moving it into itself or one of its sub-collections, or deeper than 5 levels
+    /// in all, is a conflict.
+    /// </summary>
+    [HttpPost("{id:guid}/move")]
+    [ProducesResponseType<MoveCollection.Response>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status409Conflict)]
+    public async Task<IActionResult> Move(
+        Guid id,
+        MoveCollection.Command command,
+        MoveCollection.Handler handler,
+        CancellationToken cancellationToken)
+    {
+        var result = await handler.HandleAsync(id, command, HttpContext.GetProfile(), cancellationToken);
+        return result.ToActionResult(this, Ok);
+    }
+
+    /// <summary>
+    /// Deletes a collection and all of its sub-collections, also those created by others. Only the creator and
+    /// admins can delete it. The clips stay in the library.
+    /// </summary>
+    [HttpDelete("{id:guid}")]
+    [ProducesResponseType<DeleteCollection.Response>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> Delete(
+        Guid id,
+        DeleteCollection.Handler handler,
+        CancellationToken cancellationToken)
+    {
+        var result = await handler.HandleAsync(new(id), HttpContext.GetProfile(), cancellationToken);
+        return result.ToActionResult(this, Ok);
+    }
 }

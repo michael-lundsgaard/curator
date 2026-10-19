@@ -115,6 +115,7 @@ Content-Type: application/json
 ###
 
 # Create a sub-collection inside the one above. Collections can be nested 5 levels deep.
+# @name createSubCollection
 POST {{host}}/collections
 Authorization: Bearer {{token}}
 Content-Type: application/json
@@ -133,6 +134,35 @@ Authorization: Bearer {{token}}
 
 # The whole tree, flat and sorted by name.
 GET {{host}}/collections
+Authorization: Bearer {{token}}
+
+###
+
+# Replaces both: leaving out the description clears it.
+PATCH {{host}}/collections/{{createCollection.response.body.id}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "R.E.P.O",
+  "description": "Monsters, trucks and screaming"
+}
+
+###
+
+# Move the sub-collection to the top level. Send a collection's ID as parentId to move it inside that one.
+POST {{host}}/collections/{{createSubCollection.response.body.id}}/move
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "parentId": null
+}
+
+###
+
+# Deletes it and all of its sub-collections. The clips stay in the library.
+DELETE {{host}}/collections/{{createCollection.response.body.id}}
 Authorization: Bearer {{token}}
 
 ###

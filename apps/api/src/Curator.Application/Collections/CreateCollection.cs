@@ -40,9 +40,7 @@ public static class CreateCollection
         {
             if (command.ParentId is { } parentId)
             {
-                var tree = new CollectionTree(await db.Collections
-                    .Select(c => new { c.Id, c.ParentId })
-                    .ToDictionaryAsync(c => c.Id, c => c.ParentId, cancellationToken));
+                var tree = await db.LoadCollectionTreeAsync(cancellationToken);
 
                 if (!tree.Contains(parentId))
                 {

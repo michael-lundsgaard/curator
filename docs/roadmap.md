@@ -46,9 +46,14 @@ Built step by step. Each step is small and shippable. Order may change.
         Scale: 1,000 collections is about a millisecond in Postgres and 150–200 KB of JSON (40–60 KB gzipped),
         fetched once and cached by the app, so not a concern. If it ever reaches tens of thousands, enable
         response compression first, then fetch one level at a time (`?parentId=`)
-  - [ ] Edit name and description, move (no cycles, depth), delete with sub-collections. Creator or admin
+  - [x] Edit name and description (`PATCH /collections/{id}`, replaces both), move
+        (`POST /collections/{id}/move` with `parentId`; no cycles, depth counts the moved sub-collections) and
+        delete with sub-collections (`DELETE /collections/{id}`, returns `deletedCount`). Creator or admin. Moving
+        is its own endpoint so an edit that leaves out `parentId` can't move a collection to the top by accident.
+        Two moves at the same moment could still make a cycle; `CollectionTree` throws rather than loops if so
   - [ ] Add and remove clips (`collection_assets`); a collection's clips through `GET /assets` with
-        `collectionId` (and sub-collections as an option), reusing its sorts and cursor
+        `collectionId` (and sub-collections as an option), reusing its sorts and cursor. Add `clipCount` to
+        `GET /collections` items for sidebar badges
 - [ ] React app (`apps/app`, Vite): sign-in, generated API client, browse and upload
 - [ ] Hosting and observability: where the API (and later the processing worker) runs and how it's
       deployed; structured logs with request logging, and somewhere to read logs and errors. Avoid hosts that
