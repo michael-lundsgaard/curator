@@ -79,3 +79,11 @@ Built step by step. Each step is small and shippable. Order may change.
   - Short, unguessable tokens of their own, not the asset ID: these are the URLs that leave the app. Inside the
     app, `/watch/{id}` with the UUID is fine (decided against slugs and YouTube-style short IDs: titles change
     and repeat, and nobody types these links)
+- [ ] Permissions review, once invitations and real use show how roles work out. Today the creator or an admin
+      edits, moves and deletes a collection (ADR [0003](decisions/0003-authentication-and-permissions.md)),
+      on the assumption that the core group are admins and only newcomers stay members
+  - Known gap: deleting a collection also deletes sub-collections others created inside it, which they can't
+    delete directly. Options considered: also allow the creator of any collection above it, or let everyone
+    change collections
+  - Lower roles (e.g. viewers who can't upload or change collections), and how a member becomes an admin
+    without SQL
