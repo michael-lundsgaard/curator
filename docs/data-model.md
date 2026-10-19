@@ -24,7 +24,7 @@ _Open questions_.
 - ✅ **Roles and permissions:** `profiles.role` is `Member` or `Admin`. Owners edit and delete their own
   clips and collections, admins everything. Collections are shared: anyone can add and remove clips and
   create sub-collections in any collection. See [0003](decisions/0003-authentication-and-permissions.md).
-- ✅ **Clips in a collection are sorted, not manually ordered.** Sort options (recorded, added, title)
+- ✅ **Clips in a collection are sorted, not manually ordered.** Sort options (recorded, uploaded, title)
   cover the need and fit the "sessions" view grouped by `recorded_at`. Manual ordering can be added later
   with a `position` column if it's missed.
 - ✅ **Favorites are visible to everyone.** Each user has their own favorites, and others can see who
@@ -35,6 +35,45 @@ _Open questions_.
 `profiles`, `assets`, `collections` and `collection_assets` exist; the entities in `Curator.Domain` and their EF
 configuration in `Curator.Infrastructure` are the source of truth for them. The other tables and columns are
 still proposed. `?` marks a nullable column.
+
+The tables that exist, with their keys and a few columns that explain them (all columns are in the list below):
+
+```mermaid
+erDiagram
+    profiles ||--o{ assets : "uploads (uploaded_by)"
+    profiles ||--o{ collections : "creates (created_by)"
+    profiles ||--o{ collection_assets : "adds (added_by)"
+    collections |o--o{ collections : "contains (parent_id, cascade)"
+    collections ||--o{ collection_assets : "holds (cascade)"
+    assets ||--o{ collection_assets : "is in (cascade)"
+
+    profiles {
+        uuid id PK "= JWT sub"
+        text display_name
+        text role "Member or Admin"
+    }
+    assets {
+        uuid id PK
+        uuid uploaded_by FK
+        text title
+        text status "Pending, Uploaded, ..."
+        timestamptz recorded_at "nullable"
+        timestamptz created_at
+        timestamptz deleted_at "nullable, soft delete"
+    }
+    collections {
+        uuid id PK
+        uuid parent_id FK "nullable, top level"
+        uuid created_by FK
+        text name
+    }
+    collection_assets {
+        uuid collection_id PK, FK
+        uuid asset_id PK, FK
+        uuid added_by FK
+        timestamptz added_at
+    }
+```
 
 ```
 profiles           id (= JWT sub), display_name, role, created_at
@@ -86,12 +125,15 @@ also edit it (`PATCH /assets/{id}`).
 
 ### Collections
 
+How the tree is stored, checked, locked and read is in [0007](decisions/0007-collection-tree.md).
+
 - A generic tree using `parent_id`. Nothing in it is game- or session-specific: "Best of 2026 → Screams"
   and "R.E.P.O → Funny moments" are the same thing.
 - Max depth is 5. The domain rejects cycles (moving a collection into one of its own descendants) and
   moves or creates that would exceed the depth (target depth + height of the moved subtree).
 - A clip is stored only in the collections it was explicitly added to, and can be in several.
-  "Show clips from sub-collections too" is a display option, not duplicated data.
+  "Show clips from sub-collections too" is a display option (`GET /assets?collectionId=…&includeSubCollections=true`),
+  not duplicated data.
 - The app shows the tree as a sidebar. Selecting a collection shows its clips; collections aren't mixed in
   with clips in the grid. So the API lists the whole tree once (`GET /collections`) rather than a level at a
   time.

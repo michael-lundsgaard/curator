@@ -51,6 +51,8 @@ HTTP ─► JWT bearer ─► ProfileMiddleware ─► authorization ─► Cont
 
 - **Postgres** through EF Core. Handlers write provider-neutral LINQ; Postgres-specific parts (the `pg_trgm`
   extension and indexes) live in Infrastructure. See [0005](decisions/0005-listing-and-searching-assets.md).
+  Changes to the collection tree take a Postgres advisory lock through `ICuratorDbContext`; see
+  [0007](decisions/0007-collection-tree.md). The tables are drawn in [data-model.md](data-model.md).
 - **R2** through `IFileStorage`. The API never handles file bytes: it hands out presigned URLs, the browser
   uploads to and plays from R2 directly, and `complete-upload` asks R2 for the stored size.
 - **Supabase Auth** only for validating tokens. The API doesn't call it per request; signing keys come from
