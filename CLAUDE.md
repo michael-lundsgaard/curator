@@ -7,8 +7,8 @@ reference on _what_ to build, but don't copy their structure by default. This re
 We build it step by step. Keep changes small and focused on the step at hand; don't scaffold ahead.
 
 Design decisions and plans live in `docs/`: `roadmap.md` (next steps), `data-model.md` (draft and open
-questions), `architecture.md` (how a request flows through the layers) and `decisions/` (accepted decision
-records). Read them before starting a step, and update them
+questions), `architecture.md` (how a request flows through the layers), `design.md` (the app's brand, colors and
+themes, with a link to the screen mocks) and `decisions/` (accepted decision records). Read them before starting a step, and update them
 when a decision changes.
 
 ## Layout

@@ -10,7 +10,7 @@ Media asset manager for videos. Upload in bulk, organize into collections, searc
 | ---------- | ------------------------------------------------- |
 | `apps/api` | .NET 10 Web API (Clean Architecture-style layers) |
 | `infra`    | Cloud configuration (R2 bucket CORS)              |
-| `docs`     | Roadmap, data model, architecture and ADRs        |
+| `docs`     | Roadmap, data model, architecture, design, ADRs   |
 
 New here? [docs/architecture.md](docs/architecture.md) shows how a request flows through the layers, and
 [docs/roadmap.md](docs/roadmap.md) what's next.
