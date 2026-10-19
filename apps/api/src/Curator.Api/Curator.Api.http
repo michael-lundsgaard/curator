@@ -130,3 +130,9 @@ GET {{host}}/collections/{{createCollection.response.body.id}}
 Authorization: Bearer {{token}}
 
 ###
+
+# The whole tree, flat and sorted by name.
+GET {{host}}/collections
+Authorization: Bearer {{token}}
+
+###

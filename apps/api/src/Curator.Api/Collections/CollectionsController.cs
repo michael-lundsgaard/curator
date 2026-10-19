@@ -9,6 +9,18 @@ namespace Curator.Api.Collections;
 [Route("collections")]
 public class CollectionsController : ControllerBase
 {
+    /// <summary>
+    /// Lists every collection, sorted by name. The tree comes flat: build it from each item's <c>parentId</c>.
+    /// </summary>
+    [HttpGet]
+    [ProducesResponseType<ListCollections.Response>(StatusCodes.Status200OK)]
+    public async Task<IActionResult> List(
+        ListCollections.Handler handler,
+        CancellationToken cancellationToken)
+    {
+        return Ok(await handler.HandleAsync(new(), cancellationToken));
+    }
+
     /// <summary>Gets one collection.</summary>
     [HttpGet("{id:guid}")]
     [ProducesResponseType<GetCollection.Response>(StatusCodes.Status200OK)]

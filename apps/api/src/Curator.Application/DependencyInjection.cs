@@ -20,6 +20,7 @@ public static class DependencyInjection
 
         services.AddScoped<CreateCollection.Handler>();
         services.AddScoped<GetCollection.Handler>();
+        services.AddScoped<ListCollections.Handler>();
 
         return services;
     }

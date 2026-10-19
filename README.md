@@ -79,10 +79,10 @@ to it, see the top of the file; the publishable key is under _Project Settings â
 
 In Development, two endpoints manage local data:
 
-| Request                 | What                                                                     |
-| ----------------------- | ------------------------------------------------------------------------ |
-| `POST /dev/sample-data` | Adds sample clips by you and two sample users. No files are stored in R2 |
-| `DELETE /dev/data`      | Deletes all assets and the sample users. Your profile and role stay      |
+| Request                 | What                                                                                     |
+| ----------------------- | ---------------------------------------------------------------------------------------- |
+| `POST /dev/sample-data` | Adds sample clips and collections by you and two sample users. No files are stored in R2 |
+| `DELETE /dev/data`      | Deletes all assets, collections and the sample users. Your profile and role stay         |
 
 `DELETE /dev/data` only clears a database on this machine (host `localhost`), and returns 403 otherwise, so a
 server started in Development by mistake can't wipe the hosted one. It leaves files in R2: uploads made while

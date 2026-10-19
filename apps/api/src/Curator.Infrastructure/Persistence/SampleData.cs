@@ -1,4 +1,5 @@
 using Curator.Domain.Assets;
+using Curator.Domain.Collections;
 using Curator.Domain.Profiles;
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
@@ -6,8 +7,8 @@ using Npgsql;
 namespace Curator.Infrastructure.Persistence;
 
 /// <summary>
-/// Sample profiles and clips for trying the API locally (Development only). The clips have no files in storage,
-/// so nothing is uploaded to R2 and nothing is left behind there.
+/// Sample profiles, clips and collections for trying the API locally (Development only). The clips have no files in
+/// storage, so nothing is uploaded to R2 and nothing is left behind there.
 /// </summary>
 public static class SampleData
 {
@@ -37,14 +38,34 @@ public static class SampleData
         ("Old clip from the archive", "Recorded before Curator existed", 700, 2),
     ];
 
+    // Name, description, parent's index in this list (null: top level), creator (as for clips). Parents come first.
+    private static readonly (string Name, string? Description, int? Parent, int Creator)[] Collections =
+    [
+        ("R.E.P.O", "Monster-filled evenings", null, 2),
+        ("Phasmophobia", null, null, 0),
+        ("Haunted house", "Two nights in a row", 1, 2),
+        ("Lethal Company", null, null, 1),
+        ("Best of", "The clips worth showing others", null, 1),
+        ("2025", null, 4, 1),
+        ("2026", null, 4, 0),
+        ("Screams", null, 6, 2),
+        ("Fails", null, 6, 1),
+        ("hangouts", "Lowercase on purpose: collections sort by name ignoring case", null, 0),
+    ];
+
     /// <summary>Number of clips added, all listed in the library.</summary>
     public static int ClipCount => Clips.Length;
 
     /// <summary>Number of those clips uploaded by the caller.</summary>
     public static int CallerClipCount => Clips.Count(c => c.Uploader == 0);
 
-    /// <summary>Adds the samples, unless they've already been added. Returns the number of clips added.</summary>
-    public static async Task<int> SeedAsync(
+    /// <summary>Number of collections added, in a tree three levels deep.</summary>
+    public static int CollectionCount => Collections.Length;
+
+    /// <summary>
+    /// Adds the samples, unless they've already been added. Returns the number of clips and collections added.
+    /// </summary>
+    public static async Task<(int Clips, int Collections)> SeedAsync(
         CuratorDbContext db,
         Profile caller,
         DateTimeOffset now,
@@ -52,10 +73,10 @@ public static class SampleData
     {
         if (await db.Profiles.AnyAsync(p => p.Id == FrejaId, cancellationToken))
         {
-            return 0;
+            return (0, 0);
         }
 
-        Guid[] uploaders = [caller.Id, FrejaId, MadsId];
+        Guid[] people = [caller.Id, FrejaId, MadsId];
         db.Profiles.Add(new Profile(FrejaId, "Freja (sample)", now));
         db.Profiles.Add(new Profile(MadsId, "Mads (sample)", now));
 
@@ -65,7 +86,7 @@ public static class SampleData
             var recordedAt = recordedDaysAgo is { } days ? now.AddDays(-days).AddHours(-i) : (DateTimeOffset?)null;
             // Uploaded a little after recording, in the order of the list.
             var createdAt = (recordedAt ?? now.AddDays(-20)).AddHours(2);
-            var asset = new Asset(uploaders[uploader], $"{title}.mp4", "video/mp4", 10_000_000 + i, recordedAt, createdAt);
+            var asset = new Asset(people[uploader], $"{title}.mp4", "video/mp4", 10_000_000 + i, recordedAt, createdAt);
             asset.MarkUploaded(createdAt);
             db.Assets.Add(asset);
             // There's no way to set a description through the domain yet.
@@ -75,8 +96,18 @@ public static class SampleData
         // An upload that never completed: not listed.
         db.Assets.Add(new Asset(caller.Id, "Abandoned upload.mp4", "video/mp4", 1_000, now, now));
 
+        var collections = new Collection[Collections.Length];
+        for (var i = 0; i < Collections.Length; i++)
+        {
+            var (name, description, parent, creator) = Collections[i];
+            var parentId = parent is { } p ? collections[p].Id : (Guid?)null;
+            collections[i] = new Collection(
+                people[creator], parentId, name, description, now.AddDays(-40).AddHours(i));
+            db.Collections.Add(collections[i]);
+        }
+
         await db.SaveChangesAsync(cancellationToken);
-        return Clips.Length;
+        return (Clips.Length, Collections.Length);
     }
 
     /// <summary>

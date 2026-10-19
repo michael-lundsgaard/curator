@@ -11,7 +11,7 @@ namespace Curator.IntegrationTests;
 public class DevelopmentToolsTests(CuratorApiFactory factory)
 {
     [Fact]
-    public async Task SampleData_AddsClipsOnce_IncludingSomeByTheCaller()
+    public async Task SampleData_AddsClipsAndCollectionsOnce_IncludingSomeByTheCaller()
     {
         var userId = Guid.NewGuid();
         var client = factory.CreateClient(userId);
@@ -22,11 +22,15 @@ public class DevelopmentToolsTests(CuratorApiFactory factory)
         var second = await client.PostAsync("/dev/sample-data", null);
 
         first.EnsureSuccessStatusCode();
-        Assert.Equal(SampleData.ClipCount, (await first.Content.ReadFromJsonAsync<Added>())!.Count);
-        Assert.Equal(0, (await second.Content.ReadFromJsonAsync<Added>())!.Count);
+        Assert.Equal(
+            new Added(SampleData.ClipCount, SampleData.CollectionCount),
+            await first.Content.ReadFromJsonAsync<Added>());
+        Assert.Equal(new Added(0, 0), await second.Content.ReadFromJsonAsync<Added>());
         var mine = await client.GetFromJsonAsync<JsonElement>($"/assets?uploadedBy={userId}");
         // The caller's abandoned upload isn't listed.
         Assert.Equal(SampleData.CallerClipCount, mine.GetProperty("items").GetArrayLength());
+        var collections = await client.GetFromJsonAsync<JsonElement>("/collections");
+        Assert.Equal(SampleData.CollectionCount, collections.GetProperty("items").GetArrayLength());
     }
 
     [Fact]
@@ -49,7 +53,7 @@ public class DevelopmentToolsTests(CuratorApiFactory factory)
         Assert.True(await db.Profiles.AnyAsync(p => p.Id == userId));
         // The sample profiles are gone, so the samples can be added again.
         var again = await client.PostAsync("/dev/sample-data", null);
-        Assert.Equal(SampleData.ClipCount, (await again.Content.ReadFromJsonAsync<Added>())!.Count);
+        Assert.Equal(SampleData.ClipCount, (await again.Content.ReadFromJsonAsync<Added>())!.Clips);
     }
 
     [Fact]
@@ -84,7 +88,7 @@ public class DevelopmentToolsTests(CuratorApiFactory factory)
             sort.GetProperty("enum").EnumerateArray().Select(v => v.GetString()));
     }
 
-    private sealed record Added([property: JsonPropertyName("added")] int Count);
+    private sealed record Added(int Clips, int Collections);
 
     private sealed record Deleted([property: JsonPropertyName("deleted")] int Count);
 }
