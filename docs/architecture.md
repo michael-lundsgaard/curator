@@ -33,7 +33,9 @@ Taking `PATCH /assets/{id}` (edit an asset) as the example:
 6. **Domain.** `Asset` guards its own state: private setters, methods that change it, and permission checks.
    No database or HTTP here.
 7. **Response.** `result.ToActionResult(this, Ok)` turns the response into 200, or an error into
-   `ProblemDetails` with the matching status. Anything thrown is a bug and becomes a 500.
+   `ProblemDetails` with the matching status. Anything thrown is a bug and becomes a 500. Errors ASP.NET Core
+   answers itself (no matching route, no token, an exception) are `ProblemDetails` too, through
+   `AddProblemDetails()` and `UseStatusCodePages()`, so every error has the same shape.
 
 ```
 HTTP ─► JWT bearer ─► ProfileMiddleware ─► authorization ─► Controller
