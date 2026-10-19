@@ -37,17 +37,27 @@ Built step by step. Each step is small and shippable. Order may change.
       Supabase user were missing, and which endpoints need R2 keys), `data-model.md` matched to the schema,
       ADRs 0004 and 0005 matched to the code, and a request-flow overview in
       [architecture.md](architecture.md)
-- [ ] Collections: tree, add/remove clips, sorting, cover image
+- [ ] Collections:
+  - [x] Covers: none for now, neither uploaded images nor a clip's thumbnail. The image question moved to
+        thumbnails ([0006](decisions/0006-serving-thumbnails.md), proposed)
+  - [ ] Create (`POST /collections`, optional `parentId`, max depth 5) and get one (`GET /collections/{id}`)
+  - [ ] List (`GET /collections`): the whole tree as a flat list with `parentId`, sorted by name. The app
+        builds the sidebar tree from it. Keep items lean (`id`, `parentId`, `name`).
+        Scale: 1,000 collections is about a millisecond in Postgres and 150–200 KB of JSON (40–60 KB gzipped),
+        fetched once and cached by the app, so not a concern. If it ever reaches tens of thousands, enable
+        response compression first, then fetch one level at a time (`?parentId=`)
+  - [ ] Edit name and description, move (no cycles, depth), delete with sub-collections. Creator or admin
+  - [ ] Add and remove clips (`collection_assets`); a collection's clips through `GET /assets` with
+        `collectionId` (and sub-collections as an option), reusing its sorts and cursor
 - [ ] React app (`apps/app`, Vite): sign-in, generated API client, browse and upload
 - [ ] Hosting and observability: where the API (and later the processing worker) runs and how it's
       deployed; structured logs with request logging, and somewhere to read logs and errors. Avoid hosts that
       sleep when idle: Render's free tier (used for asset-vault) spins down after 15 minutes without traffic
       and the next request waits for a cold start
 - [ ] Video processing: transcode to playback version and generate thumbnail
-  - Decide how thumbnails are served (ADR) before adding `thumbnailUrl` to `GET /assets`, which 0005
-    assumes. Presigned URLs change on every request, so neither the browser nor Cloudflare's cache can keep
-    them. Options: a public thumbnails bucket on a custom domain with random keys and immutable caching, or
-    presigned URLs with the expiry rounded to fixed windows so they stay the same for a while
+  - Choose between options A (public bucket on a custom domain) and B (presigned URLs per response) in
+    [0006](decisions/0006-serving-thumbnails.md): find out what a domain and the rest of A cost. Then store
+    thumbnails under versioned keys and add `thumbnailUrl` to `GET /assets`, which 0005 assumes
 - [ ] Storage cleanup: a scheduled job that keeps R2 in step with the database
   - Abandoned uploads: delete assets still `Pending` after 24 hours, and their R2 objects
   - Deleted clips: remove the original, playback version and thumbnail of soft-deleted assets after a grace

@@ -33,8 +33,8 @@ _Open questions_.
 ## Schema
 
 `profiles` and `assets` exist; the entities in `Curator.Domain` and their EF configuration in
-`Curator.Infrastructure` are the source of truth for them. The other tables are still proposed. `?` marks a
-nullable column.
+`Curator.Infrastructure` are the source of truth for them. The other tables and columns are still proposed.
+`?` marks a nullable column.
 
 ```
 profiles           id (= JWT sub), display_name, role, created_at
@@ -43,13 +43,12 @@ assets             id, uploaded_by → profiles, title, description?,
                    original_filename, content_type, status,
                    source_key?, source_size_bytes,
                    playback_key?, playback_size_bytes?,
-                   thumbnail_key?, processing_error?,
+                   thumbnail_key? (versioned, ADR 0006), processing_error?,
                    duration_ms?, width?, height?, recorded_at?,
                    created_at, updated_at, deleted_at?
 
 collections        (proposed) id, parent_id? → collections, created_by → profiles,
-                   name, description?, cover_key?, position,
-                   created_at, updated_at
+                   name, description?, created_at, updated_at
 
 collection_assets  (proposed) collection_id, asset_id, added_by, added_at
                    PK (collection_id, asset_id)
@@ -92,9 +91,14 @@ also edit it (`PATCH /assets/{id}`).
   moves or creates that would exceed the depth (target depth + height of the moved subtree).
 - A clip is stored only in the collections it was explicitly added to, and can be in several.
   "Show clips from sub-collections too" is a display option, not duplicated data.
+- The app shows the tree as a sidebar. Selecting a collection shows its clips; collections aren't mixed in
+  with clips in the grid. So the API lists the whole tree once (`GET /collections`) rather than a level at a
+  time.
 - "Sessions" are a view: the clips in a collection grouped by `recorded_at`, not a structure.
-- Cover: an uploaded image (`cover_key`). If there is none, the UI uses the thumbnail of the newest
-  clip in the collection or its sub-collections.
+- Sub-collections sort by name. The draft's `position` column for a manual order was dropped, as for clips;
+  add it if a manual order is missed.
+- No covers for now (decided 2026-10-19): neither an uploaded image nor a clip's thumbnail. If covers are
+  wanted later, a chosen clip (`cover_asset_id`) reuses thumbnails and needs no image uploads.
 - Deleting a collection deletes all of its sub-collections and their `collection_assets` rows. The clips
   themselves stay in the library. The UI should confirm with a count of affected sub-collections.
 
