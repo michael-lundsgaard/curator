@@ -61,7 +61,7 @@ Authorization: Bearer {{token}}
 
 ###
 
-# The library, newest recordings first. Also: q, sort (recorded, added, title), order (asc, desc), uploadedBy,
+# The library, newest recordings first. Also: q, sort (recorded, uploaded, title), order (asc, desc), uploadedBy,
 # recordedFrom, recordedTo.
 # @name listAssets
 GET {{host}}/assets?limit=20
@@ -169,6 +169,13 @@ Content-Type: application/json
 {
   "assetIds": ["{{listAssets.response.body.$.items[0].id}}"]
 }
+
+###
+
+# The collection's clips, with the same sorts, filters and cursor as the library. Drop includeSubCollections for
+# only the collection's own clips.
+GET {{host}}/assets?collectionId={{createCollection.response.body.id}}&includeSubCollections=true
+Authorization: Bearer {{token}}
 
 ###
 

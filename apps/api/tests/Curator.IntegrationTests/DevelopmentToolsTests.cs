@@ -93,7 +93,7 @@ public class DevelopmentToolsTests(CuratorApiFactory factory)
 
         var sort = document.GetProperty("components").GetProperty("schemas").GetProperty("AssetSort");
         Assert.Equal(
-            ["Recorded", "Added", "Title"],
+            ["Recorded", "Uploaded", "Title"],
             sort.GetProperty("enum").EnumerateArray().Select(v => v.GetString()));
     }
 

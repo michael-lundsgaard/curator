@@ -11,11 +11,13 @@ public class AssetsController : ControllerBase
 {
     /// <summary>
     /// Lists the shared library, a page at a time. Pass <c>nextCursor</c> as <c>cursor</c> for the next page,
-    /// with the same other parameters. Uploads that haven't completed aren't listed.
+    /// with the same other parameters. Uploads that haven't completed aren't listed. Pass <c>collectionId</c> for
+    /// a collection's clips; 404 if the collection doesn't exist.
     /// </summary>
     [HttpGet]
     [ProducesResponseType<ListAssets.Response>(StatusCodes.Status200OK)]
     [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> List(
         [FromQuery] ListAssets.Query query,
         ListAssets.Handler handler,

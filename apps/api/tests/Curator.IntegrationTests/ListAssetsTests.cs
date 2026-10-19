@@ -36,14 +36,14 @@ public class ListAssetsTests(CuratorApiFactory factory)
     [Theory]
     [InlineData("recorded", null, "a,b,B,c,d")]
     [InlineData("recorded", "asc", "d,c,B,b,a")]
-    [InlineData("added", null, "d,c,b,B,a")]
-    [InlineData("added", "asc", "a,B,b,c,d")]
+    [InlineData("uploaded", null, "d,c,b,B,a")]
+    [InlineData("uploaded", "asc", "a,B,b,c,d")]
     [InlineData("title", null, "a,B,b,c,d")]
     [InlineData("title", "desc", "d,c,b,B,a")]
     public async Task List_PagesThroughEverySortWithoutGapsOrDuplicates(string sort, string? order, string expected)
     {
         var (client, userId) = await CreateUserAsync();
-        // Added in this order; IDs (the tie-breaker) increase with it.
+        // Uploaded in this order; IDs (the tie-breaker) increase with it.
         await SaveAssetAsync(userId, "a", recordedAt: Day.AddDays(5), createdAt: Day);
         await SaveAssetAsync(userId, "B", recordedAt: Day.AddDays(3), createdAt: Day.AddMinutes(1));
         await SaveAssetAsync(userId, "b", recordedAt: Day.AddDays(3), createdAt: Day.AddMinutes(2));
@@ -121,6 +121,53 @@ public class ListAssetsTests(CuratorApiFactory factory)
     }
 
     [Fact]
+    public async Task List_WithCollectionId_ReturnsItsClips_AndWithSubCollectionsTheirsToo_EachOnce()
+    {
+        var (client, userId) = await CreateUserAsync();
+        var root = await CreateCollectionAsync(client, "Horror");
+        var child = await CreateCollectionAsync(client, "Phasmophobia", root);
+        var grandchild = await CreateCollectionAsync(client, "Screams", child);
+        var other = await CreateCollectionAsync(client, "Racing");
+        var a = await SaveAssetAsync(userId, "a");
+        var b = await SaveAssetAsync(userId, "b");
+        var c = await SaveAssetAsync(userId, "c");
+        var d = await SaveAssetAsync(userId, "d");
+        await SaveAssetAsync(userId, "Not in any");
+        await AddClipsAsync(client, root, a);
+        await AddClipsAsync(client, child, a, b); // a is in two of them.
+        await AddClipsAsync(client, grandchild, c);
+        await AddClipsAsync(client, other, d);
+
+        var own = await ListAllTitlesAsync(client, new() { ["collectionId"] = root.ToString() });
+        var all = await ListAllTitlesAsync(client, new()
+        {
+            ["collectionId"] = root.ToString(),
+            ["includeSubCollections"] = "true",
+            ["sort"] = "title",
+            ["limit"] = "2",
+        });
+
+        Assert.Equal(["a"], own);
+        Assert.Equal(["a", "b", "c"], all);
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task List_WithUnknownCollectionId_ReturnsNotFound(bool includeSubCollections)
+    {
+        var (client, _) = await CreateUserAsync();
+
+        var response = await client.GetAsync(Url(new()
+        {
+            ["collectionId"] = Guid.NewGuid().ToString(),
+            ["includeSubCollections"] = includeSubCollections.ToString(),
+        }));
+
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+    }
+
+    [Fact]
     public async Task List_WithCursorFromAnotherQuery_ReturnsBadRequest()
     {
         var (client, userId) = await CreateUserAsync();
@@ -143,6 +190,7 @@ public class ListAssetsTests(CuratorApiFactory factory)
     [InlineData("cursor", "not-a-cursor")]
     [InlineData("limit", "101")]
     [InlineData("sort", "size")]
+    [InlineData("includeSubCollections", "true")] // Without a collectionId.
     public async Task List_WithInvalidParameter_ReturnsBadRequest(string name, string value)
     {
         var (client, _) = await CreateUserAsync();
@@ -189,6 +237,19 @@ public class ListAssetsTests(CuratorApiFactory factory)
         return asset.Id;
     }
 
+    private static async Task<Guid> CreateCollectionAsync(HttpClient client, string name, Guid? parentId = null)
+    {
+        var response = await client.PostAsJsonAsync("/collections", new { name, parentId });
+        response.EnsureSuccessStatusCode();
+        return (await response.Content.ReadFromJsonAsync<Created>())!.Id;
+    }
+
+    private static async Task AddClipsAsync(HttpClient client, Guid collectionId, params Guid[] assetIds)
+    {
+        var response = await client.PostAsJsonAsync($"/collections/{collectionId}/assets", new { assetIds });
+        response.EnsureSuccessStatusCode();
+    }
+
     private static async Task<Page> ListAsync(HttpClient client, Dictionary<string, string?> parameters)
     {
         var response = await client.GetAsync(Url(parameters));
@@ -228,4 +289,6 @@ public class ListAssetsTests(CuratorApiFactory factory)
         DateTimeOffset CreatedAt);
 
     private sealed record Uploader(Guid Id, string DisplayName);
+
+    private sealed record Created(Guid Id);
 }

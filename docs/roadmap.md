@@ -37,7 +37,7 @@ Built step by step. Each step is small and shippable. Order may change.
       Supabase user were missing, and which endpoints need R2 keys), `data-model.md` matched to the schema,
       ADRs 0004 and 0005 matched to the code, and a request-flow overview in
       [architecture.md](architecture.md)
-- [ ] Collections:
+- [x] Collections → [0007](decisions/0007-collection-tree.md) (written afterwards):
   - [x] Covers: none for now, neither uploaded images nor a clip's thumbnail. The image question moved to
         thumbnails ([0006](decisions/0006-serving-thumbnails.md), proposed)
   - [x] Create (`POST /collections`, optional `parentId`, max depth 5) and get one (`GET /collections/{id}`)
@@ -61,8 +61,9 @@ Built step by step. Each step is small and shippable. Order may change.
         lock, so it can't race a delete of the collection or another add of the same clip. `clipCount` on
         `GET /collections` items for sidebar badges: the collection's own clips, not its sub-collections', and not
         deleted ones
-  - [ ] A collection's clips through `GET /assets` with `collectionId` (and sub-collections as an option),
-        reusing its sorts and cursor
+  - [x] A collection's clips through `GET /assets` with `collectionId` (and `includeSubCollections=true`,
+        each clip once), reusing its sorts, filters and cursor. Unknown collection is `404`. See ADR 0005,
+        _Filters and visibility_
 - [ ] React app (`apps/app`, Vite): sign-in, generated API client, browse and upload
 - [ ] Hosting and observability: where the API (and later the processing worker) runs and how it's
       deployed; structured logs with request logging, and somewhere to read logs and errors. Avoid hosts that

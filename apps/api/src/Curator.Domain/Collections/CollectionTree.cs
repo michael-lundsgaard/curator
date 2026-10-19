@@ -71,14 +71,19 @@ public sealed class CollectionTree(IReadOnlyDictionary<Guid, Guid?> parents)
     }
 
     /// <summary>How many collections a collection is, counting itself and all of its sub-collections.</summary>
-    public int CountWithin(Guid id)
+    public int CountWithin(Guid id) => IdsWithin(id).Count;
+
+    /// <summary>The IDs of a collection and all of its sub-collections, at every level.</summary>
+    public IReadOnlyList<Guid> IdsWithin(Guid id)
     {
         if (!Contains(id))
         {
             throw new ArgumentException($"Collection {id} isn't in the tree.", nameof(id));
         }
 
-        return CountWithin(id, levels: 1);
+        var ids = new List<Guid>();
+        AddIdsWithin(id, levels: 1, ids);
+        return ids;
     }
 
     /// <summary>Whether a new collection fits inside <paramref name="parentId"/> without exceeding the depth.</summary>
@@ -98,10 +103,14 @@ public sealed class CollectionTree(IReadOnlyDictionary<Guid, Guid?> parents)
         return 1 + children[id].Select(child => HeightOf(child, levels + 1)).DefaultIfEmpty(0).Max();
     }
 
-    private int CountWithin(Guid id, int levels)
+    private void AddIdsWithin(Guid id, int levels, List<Guid> ids)
     {
         ThrowIfCycle(id, levels);
-        return 1 + children[id].Sum(child => CountWithin(child, levels + 1));
+        ids.Add(id);
+        foreach (var child in children[id])
+        {
+            AddIdsWithin(child, levels + 1, ids);
+        }
     }
 
     // A cycle can't be created, but if one got into the database, fail instead of recursing forever.

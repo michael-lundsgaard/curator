@@ -1,6 +1,7 @@
 using System.Buffers.Text;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json;
+using Curator.Application.Collections;
 using Curator.Application.Common;
 using Curator.Application.Persistence;
 using Curator.Domain.Assets;
@@ -10,7 +11,8 @@ namespace Curator.Application.Assets;
 
 /// <summary>
 /// Lists the shared library a page at a time, continuing after the last asset of the previous page (keyset
-/// pagination). <see cref="AssetStatus.Pending"/> assets aren't listed. See ADR 0005.
+/// pagination). <see cref="AssetStatus.Pending"/> assets aren't listed. A collection's clips are listed here too,
+/// with the same sorts and filters. See ADR 0005.
 /// </summary>
 public static class ListAssets
 {
@@ -23,7 +25,7 @@ public static class ListAssets
         Recorded,
 
         /// <summary>When the clip was uploaded. Newest first by default.</summary>
-        Added,
+        Uploaded,
 
         /// <summary>Title, ignoring case. A to Z by default.</summary>
         Title,
@@ -41,6 +43,10 @@ public static class ListAssets
     /// <param name="UploadedBy">Only assets uploaded by this profile.</param>
     /// <param name="RecordedFrom">Only assets recorded at or after this time.</param>
     /// <param name="RecordedTo">Only assets recorded before this time.</param>
+    /// <param name="CollectionId">Only the clips in this collection.</param>
+    /// <param name="IncludeSubCollections">
+    /// With <c>collectionId</c>: also the clips in its sub-collections, at every level. Each clip is listed once.
+    /// </param>
     /// <param name="Limit">Assets per page, at most 100. Defaults to 50.</param>
     /// <param name="Cursor">
     /// <c>nextCursor</c> of the previous page. Send the same other parameters as for that page.
@@ -52,6 +58,8 @@ public static class ListAssets
         Guid? UploadedBy = null,
         DateTimeOffset? RecordedFrom = null,
         DateTimeOffset? RecordedTo = null,
+        Guid? CollectionId = null,
+        bool IncludeSubCollections = false,
         [Range(1, MaxLimit)] int Limit = DefaultLimit,
         [MaxLength(1000)] string? Cursor = null);
 
@@ -93,7 +101,41 @@ public static class ListAssets
                 after = cursor.After;
             }
 
-            var assets = Filter(db.Assets.Where(a => a.Status != AssetStatus.Pending), parameters);
+            var assets = db.Assets.Where(a => a.Status != AssetStatus.Pending);
+
+            if (parameters.CollectionId is { } collectionId)
+            {
+                IReadOnlyList<Guid> collectionIds;
+                if (parameters.IncludeSubCollections)
+                {
+                    var tree = await db.LoadCollectionTreeAsync(cancellationToken);
+                    if (!tree.Contains(collectionId))
+                    {
+                        return Error.NotFound("The collection doesn't exist.");
+                    }
+
+                    collectionIds = tree.IdsWithin(collectionId);
+                }
+                else
+                {
+                    if (!await db.Collections.AnyAsync(c => c.Id == collectionId, cancellationToken))
+                    {
+                        return Error.NotFound("The collection doesn't exist.");
+                    }
+
+                    collectionIds = [collectionId];
+                }
+
+                // EXISTS rather than a join, so a clip in several of the collections is listed once.
+                assets = assets.Where(a => db.CollectionAssets.Any(ca =>
+                    ca.AssetId == a.Id && collectionIds.Contains(ca.CollectionId)));
+            }
+            else if (parameters.IncludeSubCollections)
+            {
+                return Error.Invalid("includeSubCollections needs a collectionId.");
+            }
+
+            assets = Filter(assets, parameters);
             assets = Sort(assets, parameters.Sort, parameters.Descending, after);
 
             // One extra row tells whether there's a next page.
@@ -188,10 +230,10 @@ public static class ListAssets
                         ? assets.OrderByDescending(a => a.RecordedAt ?? a.CreatedAt).ThenByDescending(a => a.Id)
                         : assets.OrderBy(a => a.RecordedAt ?? a.CreatedAt).ThenBy(a => a.Id);
 
-                case AssetSort.Added:
+                case AssetSort.Uploaded:
                     if (after is not null)
                     {
-                        var (key, id) = (after.Added, after.Id);
+                        var (key, id) = (after.Uploaded, after.Id);
                         assets = descending
                             ? assets.Where(a => a.CreatedAt < key || (a.CreatedAt == key && a.Id.CompareTo(id) < 0))
                             : assets.Where(a => a.CreatedAt > key || (a.CreatedAt == key && a.Id.CompareTo(id) > 0));
@@ -236,7 +278,9 @@ public static class ListAssets
         bool Descending,
         Guid? UploadedBy,
         DateTimeOffset? RecordedFrom,
-        DateTimeOffset? RecordedTo)
+        DateTimeOffset? RecordedTo,
+        Guid? CollectionId,
+        bool IncludeSubCollections)
     {
         public static Parameters From(Query query) => new(
             string.IsNullOrWhiteSpace(query.Q) ? null : query.Q.Trim(),
@@ -244,14 +288,16 @@ public static class ListAssets
             (query.Order ?? (query.Sort == AssetSort.Title ? SortOrder.Asc : SortOrder.Desc)) == SortOrder.Desc,
             query.UploadedBy,
             query.RecordedFrom,
-            query.RecordedTo);
+            query.RecordedTo,
+            query.CollectionId,
+            query.IncludeSubCollections);
 
         public IEnumerable<string> Words =>
             Q?.Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries).Distinct() ?? [];
     }
 
     /// <summary>The last asset of a page. Only the key of the cursor's sort is used.</summary>
-    private sealed record Position(DateTimeOffset Recorded, DateTimeOffset Added, string Title, Guid Id);
+    private sealed record Position(DateTimeOffset Recorded, DateTimeOffset Uploaded, string Title, Guid Id);
 
     /// <summary>Opaque to clients: base64url-encoded JSON.</summary>
     private sealed record Cursor(Parameters Parameters, Position After)

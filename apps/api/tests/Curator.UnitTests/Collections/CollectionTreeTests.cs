@@ -64,6 +64,16 @@ public class CollectionTreeTests
     }
 
     [Fact]
+    public void IdsWithin_TheCollectionAndItsSubCollectionsAtEveryLevel()
+    {
+        var (tree, chain) = CreateChain(3);
+
+        Assert.Equal(chain.Order(), tree.IdsWithin(chain[0]).Order());
+        Assert.Equal(chain[1..].Order(), tree.IdsWithin(chain[1]).Order());
+        Assert.Equal([chain[2]], tree.IdsWithin(chain[2]));
+    }
+
+    [Fact]
     public void IsWithin_TheCollectionAndItsSubCollections()
     {
         var (tree, chain) = CreateChain(3);

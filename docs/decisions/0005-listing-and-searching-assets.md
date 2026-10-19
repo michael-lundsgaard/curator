@@ -6,7 +6,7 @@
 ## Context
 
 The library step adds `GET /assets`: the shared library as a grid the app scrolls through, with a search box,
-a few filters and the sort options from [data-model.md](../data-model.md) (recorded, added, title). It has to
+a few filters and the sort options from [data-model.md](../data-model.md) (recorded, uploaded, title). It has to
 decide three things before the first query is written:
 
 1. **Pagination:** offset (`?page=3`) or cursor (`?cursor=…`).
@@ -42,7 +42,7 @@ this scale.
 | `sort`     | Key                                 | Default order |
 | ---------- | ----------------------------------- | ------------- |
 | `recorded` | `coalesce(recorded_at, created_at)` | `desc`        |
-| `added`    | `created_at`                        | `desc`        |
+| `uploaded` | `created_at`                        | `desc`        |
 | `title`    | `lower(title)`                      | `asc`         |
 
 - `recorded_at` is nullable. A keyset can't compare with `NULL`, so a clip without one sorts by when it was
@@ -88,15 +88,22 @@ Do it when punctuation search is missed, or if the Danish-letters test fails.
   (`HasPostgresExtension` in `CuratorDbContext`) and the GIN expression indexes (`gin_trgm_ops`). EF Core
   can't model expression indexes, so they're SQL in the `AddAssetSearch` migration. Verified with `EXPLAIN`:
   Postgres uses both indexes even for a generic plan with the pattern as a parameter.
-- The listing query (filters, search, sort, cursor) lives in the `ListAssets` handler. When collections need
-  the same filtering, extract it into `IQueryable<Asset>` extension methods, as 0004 says.
+- The listing query (filters, search, sort, cursor) lives in the `ListAssets` handler. A collection's clips
+  are a filter on the same endpoint (below), so nothing had to be extracted. If another use case needs the
+  same filtering, extract it into `IQueryable<Asset>` extension methods, as 0004 says.
 - If a future query genuinely needs a Postgres function in LINQ (`similarity()`, `tsvector`), add an
   interface in Application with the query in Infrastructure, like `IFileStorage`. Revisit this ADR then.
 
 ### Filters and visibility
 
 - `uploadedBy` (a profile ID, e.g. "my clips") and `recordedFrom` / `recordedTo` (on the same
-  `coalesce(recorded_at, created_at)` key). Filtering by collection comes with collections.
+  `coalesce(recorded_at, created_at)` key).
+- `collectionId` lists a collection's clips, with every sort and filter above; `includeSubCollections=true`
+  adds those in its sub-collections at every level. The handler loads the tree, collects the IDs and filters
+  with `EXISTS (… collection_id = ANY(@ids))`, so a clip in several of them is listed once. An unknown
+  collection is 404, and `includeSubCollections` without `collectionId` is 400. Both are part of the cursor.
+  Why there's no sort by when a clip was put into the collection, and how to add one, is in
+  [0007](0007-collection-tree.md).
 - `Pending` assets are never listed: they're uploads that haven't finished (or were abandoned), with nothing
   to show. The uploading browser already knows about them. Deleted assets are hidden by the query filter.
 - `GET /assets/{id}` follows the same rule, except that the uploader can get their own `Pending` asset (without
