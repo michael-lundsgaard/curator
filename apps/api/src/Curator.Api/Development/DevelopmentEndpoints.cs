@@ -18,7 +18,7 @@ public static class DevelopmentEndpoints
                 CancellationToken cancellationToken) =>
             {
                 var (clips, collections) =
-                    await SampleData.SeedAsync(db, context.GetProfile(), time.GetUtcNow(), cancellationToken);
+                    await DevelopmentData.SeedAsync(db, context.GetProfile(), time.GetUtcNow(), cancellationToken);
                 return Results.Ok(new { clips, collections });
             })
             .WithSummary("Adds sample clips and collections. Does nothing if they're already there.");
@@ -26,13 +26,13 @@ public static class DevelopmentEndpoints
         // Assets and collections from manual testing pile up. Profiles stay, so the caller keeps their role.
         dev.MapDelete("/data", async (CuratorDbContext db, CancellationToken cancellationToken) =>
             {
-                if (!SampleData.IsLocalDatabase(db))
+                if (!DevelopmentData.IsLocalDatabase(db))
                 {
                     return Results.Problem(
                         "Only a database on this machine can be cleared.", statusCode: StatusCodes.Status403Forbidden);
                 }
 
-                var deleted = await SampleData.ClearAsync(db, cancellationToken);
+                var deleted = await DevelopmentData.ClearAsync(db, cancellationToken);
                 return Results.Ok(new { deleted });
             })
             .WithSummary("Deletes all assets, collections and the sample profiles. Files in storage are left alone.");

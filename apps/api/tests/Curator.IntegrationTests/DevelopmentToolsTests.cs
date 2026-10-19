@@ -1,6 +1,7 @@
 using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Curator.Api.Development;
 using Curator.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
@@ -15,6 +16,7 @@ public class DevelopmentToolsTests(CuratorApiFactory factory)
     {
         var userId = Guid.NewGuid();
         var client = factory.CreateClient(userId);
+        var sample = new SampleData(userId, DateTimeOffset.UtcNow);
         // Another test may have added the samples already.
         (await client.DeleteAsync("/dev/data")).EnsureSuccessStatusCode();
 
@@ -23,14 +25,15 @@ public class DevelopmentToolsTests(CuratorApiFactory factory)
 
         first.EnsureSuccessStatusCode();
         Assert.Equal(
-            new Added(SampleData.ClipCount, SampleData.CollectionCount),
+            new Added(sample.Clips.Count, sample.Collections.Count),
             await first.Content.ReadFromJsonAsync<Added>());
         Assert.Equal(new Added(0, 0), await second.Content.ReadFromJsonAsync<Added>());
         var mine = await client.GetFromJsonAsync<JsonElement>($"/assets?uploadedBy={userId}");
         // The caller's abandoned upload isn't listed.
-        Assert.Equal(SampleData.CallerClipCount, mine.GetProperty("items").GetArrayLength());
+        Assert.Equal(
+            sample.Clips.Count(c => c.UploadedBy == userId), mine.GetProperty("items").GetArrayLength());
         var collections = await client.GetFromJsonAsync<JsonElement>("/collections");
-        Assert.Equal(SampleData.CollectionCount, collections.GetProperty("items").GetArrayLength());
+        Assert.Equal(sample.Collections.Count, collections.GetProperty("items").GetArrayLength());
     }
 
     [Fact]
@@ -53,7 +56,9 @@ public class DevelopmentToolsTests(CuratorApiFactory factory)
         Assert.True(await db.Profiles.AnyAsync(p => p.Id == userId));
         // The sample profiles are gone, so the samples can be added again.
         var again = await client.PostAsync("/dev/sample-data", null);
-        Assert.Equal(SampleData.ClipCount, (await again.Content.ReadFromJsonAsync<Added>())!.Clips);
+        Assert.Equal(
+            new SampleData(userId, DateTimeOffset.UtcNow).Clips.Count,
+            (await again.Content.ReadFromJsonAsync<Added>())!.Clips);
     }
 
     [Fact]
@@ -64,7 +69,8 @@ public class DevelopmentToolsTests(CuratorApiFactory factory)
             .Options;
         await using var db = new CuratorDbContext(options);
 
-        await Assert.ThrowsAsync<InvalidOperationException>(() => SampleData.ClearAsync(db, CancellationToken.None));
+        await Assert.ThrowsAsync<InvalidOperationException>(
+            () => DevelopmentData.ClearAsync(db, CancellationToken.None));
     }
 
     [Fact]
