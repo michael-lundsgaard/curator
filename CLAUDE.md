@@ -4,7 +4,9 @@ Hobby project: media asset manager for videos (bulk upload, collections, search,
 A fresh take on the ideas in `C:\code\asset-vault-api` and `C:\code\asset-vault-app`. Use those for
 reference on _what_ to build, but don't copy their structure by default. This repo is deliberately a new approach.
 
-We build it step by step. Keep changes small and focused on the step at hand; don't scaffold ahead.
+We build it step by step, so each change stays small enough to learn from. A step can hold a few related changes
+and land as one commit (or a couple, when parts stand on their own); don't split it into many tiny commits, and
+don't scaffold ahead of the step.
 
 Design decisions and plans live in `docs/`: `roadmap.md` (next steps), `data-model.md` (draft and open
 questions), `architecture.md` (how a request flows through the layers), `design.md` (the app's brand, colors and
