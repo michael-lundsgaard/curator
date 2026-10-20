@@ -13,6 +13,10 @@ questions), `architecture.md` (how a request flows through the layers), `design.
 themes, with a link to the screen mocks) and `decisions/` (accepted decision records). Read them before starting a step, and update them
 when a decision changes.
 
+A roadmap entry says what was decided and, when it isn't obvious, why in a sentence, not how we got there. A
+decision where alternatives were weighed or tried gets an ADR in `decisions/` (the options and why the others
+lost), linked from the roadmap, so that history stays findable without digging through commit messages.
+
 ## Layout
 
 ```

@@ -70,12 +70,10 @@ Built step by step. Each step is small and shippable. Order may change.
       gaps the mocks revealed are added in the step whose screen first needs them, not all up front: real
       screens settle their open questions and may show gaps the mocks missed. Agent tooling is added the same
       way, at the step that needs it:
-  - [x] OpenAPI document committed as [`apps/api/openapi.json`](../apps/api/openapi.json), so API changes show
-        up as a diff and the app's client is generated from it. A test fails when it's out of date and only
-        writes it on request (`UPDATE_OPENAPI=1`). Not written on every build
-        (`Microsoft.Extensions.ApiDescription.Server`): that runs the app's whole startup in every build, so
-        startup could never need a database. The `/dev` endpoints have their own document, so they never reach
-        the client. The document is shaped for a generated client by transformers in `Curator.Api/OpenApi/`
+  - [x] OpenAPI document committed as [`apps/api/openapi.json`](../apps/api/openapi.json), kept current by a
+        test, with the `/dev` endpoints in a document of their own →
+        [0008](decisions/0008-openapi-document.md). Not written on every build: that runs the app's whole startup
+        in every build, so startup could never need a database
   - [ ] Generated API client from that file: choose between hey-api/openapi-ts (used by asset-vault) and
         openapi-typescript with openapi-fetch
   - [ ] App shell: sidebar and top bar, theme tokens with light and dark (system default, switch in the top
