@@ -47,8 +47,8 @@ public class AssetsController : ControllerBase
 
     /// <summary>Edit an asset</summary>
     /// <remarks>
-    /// Edits the title, description and recording time. Send all three: a missing or <c>null</c> description or
-    /// <c>recordedAt</c> clears it. Only the uploader and admins can edit an asset.
+    /// Edits the title, description and recording time. Send all three: <c>null</c> clears the description or
+    /// <c>recordedAt</c>, and a missing one is a 400. Only the uploader and admins can edit an asset.
     /// </remarks>
     [HttpPatch("{id:guid}", Name = "EditAsset")]
     [ProducesResponseType<EditAsset.Response>(StatusCodes.Status200OK)]

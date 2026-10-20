@@ -21,8 +21,8 @@ public static class CreateCollection
     /// <param name="ParentId">The collection to create it inside, or <c>null</c> for the top level.</param>
     public sealed record Command(
         [Required, MaxLength(MaxNameLength)] string Name,
-        [MaxLength(MaxDescriptionLength)] string? Description,
-        Guid? ParentId);
+        [MaxLength(MaxDescriptionLength)] string? Description = null,
+        Guid? ParentId = null);
 
     /// <param name="Id">The new collection.</param>
     /// <param name="ParentId">The collection it was created inside, or <c>null</c> at the top level.</param>

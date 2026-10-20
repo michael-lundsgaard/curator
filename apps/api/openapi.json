@@ -147,7 +147,7 @@
           "Collections"
         ],
         "summary": "Edit a collection",
-        "description": "Edits the name and description. Send both: a missing or `null` description clears it. Only the creator and admins can edit a collection. Move it with `POST /collections/{id}/move`.",
+        "description": "Edits the name and description. Send both: `null` clears the description, and a missing one is a 400. Only the creator and admins can edit a collection. Move it with `POST /collections/{id}/move`.",
         "operationId": "EditCollection",
         "parameters": [
           {
@@ -654,7 +654,7 @@
           "Assets"
         ],
         "summary": "Edit an asset",
-        "description": "Edits the title, description and recording time. Send all three: a missing or `null` description or `recordedAt` clears it. Only the uploader and admins can edit an asset.",
+        "description": "Edits the title, description and recording time. Send all three: `null` clears the description or `recordedAt`, and a missing one is a 400. Only the uploader and admins can edit an asset.",
         "operationId": "EditAsset",
         "parameters": [
           {
@@ -955,9 +955,7 @@
       },
       "CreateCollectionRequest": {
         "required": [
-          "name",
-          "description",
-          "parentId"
+          "name"
         ],
         "type": "object",
         "properties": {
@@ -1030,8 +1028,7 @@
         "required": [
           "filename",
           "contentType",
-          "sizeBytes",
-          "recordedAt"
+          "sizeBytes"
         ],
         "type": "object",
         "properties": {
@@ -1059,7 +1056,7 @@
               "null",
               "string"
             ],
-            "description": "When the clip was captured, e.g. the browser's `File.lastModified`.",
+            "description": "When the clip was captured, e.g. the browser's `File.lastModified`. Leave it out if unknown.",
             "format": "date-time"
           }
         }

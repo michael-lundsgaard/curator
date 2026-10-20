@@ -59,8 +59,8 @@ public class CollectionsController : ControllerBase
 
     /// <summary>Edit a collection</summary>
     /// <remarks>
-    /// Edits the name and description. Send both: a missing or <c>null</c> description clears it. Only the creator
-    /// and admins can edit a collection. Move it with <c>POST /collections/{id}/move</c>.
+    /// Edits the name and description. Send both: <c>null</c> clears the description, and a missing one is a 400.
+    /// Only the creator and admins can edit a collection. Move it with <c>POST /collections/{id}/move</c>.
     /// </remarks>
     [HttpPatch("{id:guid}", Name = "EditCollection")]
     [ProducesResponseType<EditCollection.Response>(StatusCodes.Status200OK)]

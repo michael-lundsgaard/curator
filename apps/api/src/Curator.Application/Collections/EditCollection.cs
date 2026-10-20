@@ -7,8 +7,8 @@ using Microsoft.EntityFrameworkCore;
 namespace Curator.Application.Collections;
 
 /// <summary>
-/// Edits the name and description of a collection. Its creator and admins may edit it. The body replaces both, so a
-/// missing description clears it. Moving is <see cref="MoveCollection"/>.
+/// Edits the name and description of a collection. Its creator and admins may edit it. The body replaces both: each
+/// must be sent, and <c>null</c> clears the description. Moving is <see cref="MoveCollection"/>.
 /// </summary>
 public static class EditCollection
 {

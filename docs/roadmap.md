@@ -25,9 +25,11 @@ Built step by step. Each step is small and shippable. Order may change.
   - [x] Get one (`GET /assets/{id}`) with signed playback and thumbnail URLs (playback falls back to the
         original until processing exists)
   - [x] Edit title, description and `recorded_at` (`PATCH /assets/{id}`, uploader or admin). The body
-        replaces all three fields (missing or `null` clears), not JSON Merge Patch: the edit form sends them
-        all, and telling a missing field from `null` would need an `Optional<T>` with its own JSON converter,
-        OpenAPI transformer and validation
+        replaces all three fields, not JSON Merge Patch: the edit form sends them all, and telling a missing
+        field from `null` would need an `Optional<T>` with its own JSON converter, OpenAPI transformer and
+        validation. `null` clears a field; a missing one is a `400` (it used to clear too), so a field left out
+        by mistake can't wipe it, and the OpenAPI document's `required` is what the API enforces. Optional fields
+        of create requests have a default instead (`description`, `parentId`, `recordedAt`)
   - [x] Delete (`DELETE /assets/{id}`, uploader or admin, soft delete). Returns `200` with `id` and
         `deletedAt`; deleting again is `404`, since deleted assets are filtered out. Files stay in R2 until
         storage cleanup removes them
@@ -46,7 +48,7 @@ Built step by step. Each step is small and shippable. Order may change.
         Scale: 1,000 collections is about a millisecond in Postgres and 150–200 KB of JSON (40–60 KB gzipped),
         fetched once and cached by the app, so not a concern. If it ever reaches tens of thousands, enable
         response compression first, then fetch one level at a time (`?parentId=`)
-  - [x] Edit name and description (`PATCH /collections/{id}`, replaces both), move
+  - [x] Edit name and description (`PATCH /collections/{id}`, replaces both, like editing an asset), move
         (`POST /collections/{id}/move` with `parentId`; no cycles, depth counts the moved sub-collections) and
         delete with sub-collections (`DELETE /collections/{id}`, returns `deletedCount`). Creator or admin. Moving
         is its own endpoint so an edit that leaves out `parentId` can't move a collection to the top by accident.

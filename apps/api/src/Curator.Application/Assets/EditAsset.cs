@@ -8,7 +8,7 @@ namespace Curator.Application.Assets;
 
 /// <summary>
 /// Edits the title, description and recording time of an asset. Its uploader and admins may edit it. The body
-/// replaces all three, so a missing description or recording time clears it.
+/// replaces all three: each must be sent, and <c>null</c> clears the description or recording time.
 /// </summary>
 public static class EditAsset
 {

@@ -81,8 +81,8 @@ Authorization: Bearer {{token}}
 
 ###
 
-# Edit the first asset of the list above (uploader or admin). Send all three fields: a missing or null description
-# or recordedAt clears it.
+# Edit the first asset of the list above (uploader or admin). Send all three fields: null clears the description or
+# recordedAt, and a missing one is a 400.
 PATCH {{host}}/assets/{{listAssets.response.body.$.items[0].id}}
 Authorization: Bearer {{token}}
 Content-Type: application/json
@@ -138,7 +138,7 @@ Authorization: Bearer {{token}}
 
 ###
 
-# Replaces both: leaving out the description clears it.
+# Replaces both: send "description": null to clear it. Leaving it out is a 400.
 PATCH {{host}}/collections/{{createCollection.response.body.id}}
 Authorization: Bearer {{token}}
 Content-Type: application/json

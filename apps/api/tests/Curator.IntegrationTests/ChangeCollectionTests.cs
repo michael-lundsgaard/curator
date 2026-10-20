@@ -11,12 +11,12 @@ namespace Curator.IntegrationTests;
 public class ChangeCollectionTests(CuratorApiFactory factory)
 {
     [Fact]
-    public async Task Edit_ByCreator_SavesNameAndClearsMissingDescription()
+    public async Task Edit_ByCreator_SavesNameAndClearsNullDescription()
     {
         var (client, _) = await CreateUserAsync();
         var collection = await CreateAsync(client, "Screams", description: "Loud ones");
 
-        var response = await client.PatchAsJsonAsync($"/collections/{collection.Id}", new { name = " Jumpscares " });
+        var response = await client.PatchAsJsonAsync($"/collections/{collection.Id}", Body(" Jumpscares "));
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         var edited = (await response.Content.ReadFromJsonAsync<Created>())!;
@@ -26,6 +26,21 @@ public class ChangeCollectionTests(CuratorApiFactory factory)
         Assert.Equal("Jumpscares", (await db.Collections.SingleAsync(c => c.Id == collection.Id)).Name);
     }
 
+    // The body replaces both, so a description left out by mistake would otherwise clear it.
+    [Fact]
+    public async Task Edit_WithoutDescription_ReturnsBadRequest_AndKeepsIt()
+    {
+        var (client, _) = await CreateUserAsync();
+        var collection = await CreateAsync(client, "Screams", description: "Loud ones");
+
+        var response = await client.PatchAsJsonAsync($"/collections/{collection.Id}", new { name = "Jumpscares" });
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        Assert.Contains("description", await response.Content.ReadAsStringAsync());
+        await using var db = factory.CreateDbContext();
+        Assert.Equal("Loud ones", (await db.Collections.SingleAsync(c => c.Id == collection.Id)).Description);
+    }
+
     [Fact]
     public async Task Edit_ByAdmin_IsAllowed()
     {
@@ -33,7 +48,7 @@ public class ChangeCollectionTests(CuratorApiFactory factory)
         var collection = await CreateAsync(creator, "Screams");
         var (admin, _) = await CreateUserAsync(ProfileRole.Admin);
 
-        var response = await admin.PatchAsJsonAsync($"/collections/{collection.Id}", new { name = "Jumpscares" });
+        var response = await admin.PatchAsJsonAsync($"/collections/{collection.Id}", Body("Jumpscares"));
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }
@@ -45,7 +60,7 @@ public class ChangeCollectionTests(CuratorApiFactory factory)
         var collection = await CreateAsync(creator, "Screams");
         var (other, _) = await CreateUserAsync();
 
-        var response = await other.PatchAsJsonAsync($"/collections/{collection.Id}", new { name = "Mine now" });
+        var response = await other.PatchAsJsonAsync($"/collections/{collection.Id}", Body("Mine now"));
 
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
     }
@@ -56,7 +71,7 @@ public class ChangeCollectionTests(CuratorApiFactory factory)
         var (client, _) = await CreateUserAsync();
         var collection = await CreateAsync(client, "Screams");
 
-        var response = await client.PatchAsJsonAsync($"/collections/{collection.Id}", new { name = " " });
+        var response = await client.PatchAsJsonAsync($"/collections/{collection.Id}", Body(" "));
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }
@@ -66,7 +81,7 @@ public class ChangeCollectionTests(CuratorApiFactory factory)
     {
         var (client, _) = await CreateUserAsync();
 
-        var response = await client.PatchAsJsonAsync($"/collections/{Guid.NewGuid()}", new { name = "Screams" });
+        var response = await client.PatchAsJsonAsync($"/collections/{Guid.NewGuid()}", Body("Screams"));
 
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
@@ -229,6 +244,9 @@ public class ChangeCollectionTests(CuratorApiFactory factory)
 
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
     }
+
+    // Both fields must be sent; null clears the description.
+    private static object Body(string name) => new { name, description = (string?)null };
 
     private async Task<(HttpClient Client, Guid UserId)> CreateUserAsync(ProfileRole role = ProfileRole.Member)
     {

@@ -33,17 +33,33 @@ public class EditAssetTests(CuratorApiFactory factory)
     }
 
     [Fact]
-    public async Task Edit_WithoutDescriptionAndRecordedAt_ClearsThem()
+    public async Task Edit_WithNullDescriptionAndRecordedAt_ClearsThem()
     {
         var (client, userId) = await CreateUserAsync();
         var asset = await SaveAssetAsync(userId, description: "Something", recordedAt: RecordedAt);
 
-        var response = await client.PatchAsJsonAsync($"/assets/{asset.Id}", new { title = "Screams" });
+        var response = await client.PatchAsJsonAsync($"/assets/{asset.Id}", Body("Screams"));
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         var edited = (await response.Content.ReadFromJsonAsync<Edited>())!;
         Assert.Null(edited.Description);
         Assert.Null(edited.RecordedAt);
+    }
+
+    // The body replaces all three, so a field left out by mistake would otherwise clear it.
+    [Fact]
+    public async Task Edit_WithoutDescription_ReturnsBadRequest_AndKeepsIt()
+    {
+        var (client, userId) = await CreateUserAsync();
+        var asset = await SaveAssetAsync(userId, description: "Something", recordedAt: RecordedAt);
+
+        var response = await client.PatchAsJsonAsync(
+            $"/assets/{asset.Id}", new { title = "Screams", recordedAt = RecordedAt });
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        Assert.Contains("description", await response.Content.ReadAsStringAsync());
+        await using var db = factory.CreateDbContext();
+        Assert.Equal("Something", (await db.Assets.SingleAsync(a => a.Id == asset.Id)).Description);
     }
 
     [Fact]
@@ -58,7 +74,7 @@ public class EditAssetTests(CuratorApiFactory factory)
                 .ExecuteUpdateAsync(s => s.SetProperty(p => p.Role, ProfileRole.Admin));
         }
 
-        var response = await client.PatchAsJsonAsync($"/assets/{asset.Id}", new { title = "Screams" });
+        var response = await client.PatchAsJsonAsync($"/assets/{asset.Id}", Body("Screams"));
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }
@@ -70,7 +86,7 @@ public class EditAssetTests(CuratorApiFactory factory)
         var asset = await SaveAssetAsync(uploaderId);
         var (client, _) = await CreateUserAsync();
 
-        var response = await client.PatchAsJsonAsync($"/assets/{asset.Id}", new { title = "Screams" });
+        var response = await client.PatchAsJsonAsync($"/assets/{asset.Id}", Body("Screams"));
 
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
         Assert.Equal("application/problem+json", response.Content.Headers.ContentType?.MediaType);
@@ -83,8 +99,8 @@ public class EditAssetTests(CuratorApiFactory factory)
         var asset = await SaveAssetAsync(uploaderId, uploaded: false);
         var (other, _) = await CreateUserAsync();
 
-        var byUploader = await uploader.PatchAsJsonAsync($"/assets/{asset.Id}", new { title = "Screams" });
-        var byOther = await other.PatchAsJsonAsync($"/assets/{asset.Id}", new { title = "Screams" });
+        var byUploader = await uploader.PatchAsJsonAsync($"/assets/{asset.Id}", Body("Screams"));
+        var byOther = await other.PatchAsJsonAsync($"/assets/{asset.Id}", Body("Screams"));
 
         Assert.Equal(HttpStatusCode.OK, byUploader.StatusCode);
         Assert.Equal(HttpStatusCode.NotFound, byOther.StatusCode);
@@ -96,7 +112,7 @@ public class EditAssetTests(CuratorApiFactory factory)
         var (client, userId) = await CreateUserAsync();
         var asset = await SaveAssetAsync(userId, deleted: true);
 
-        var response = await client.PatchAsJsonAsync($"/assets/{asset.Id}", new { title = "Screams" });
+        var response = await client.PatchAsJsonAsync($"/assets/{asset.Id}", Body("Screams"));
 
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
@@ -109,7 +125,7 @@ public class EditAssetTests(CuratorApiFactory factory)
         var (client, userId) = await CreateUserAsync();
         var asset = await SaveAssetAsync(userId);
 
-        var response = await client.PatchAsJsonAsync($"/assets/{asset.Id}", new { title });
+        var response = await client.PatchAsJsonAsync($"/assets/{asset.Id}", Body(title));
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }
@@ -121,10 +137,15 @@ public class EditAssetTests(CuratorApiFactory factory)
         var asset = await SaveAssetAsync(userId);
 
         var response = await client.PatchAsJsonAsync(
-            $"/assets/{asset.Id}", new { title = "Screams", description = new string('a', 5001) });
+            $"/assets/{asset.Id}",
+            new { title = "Screams", description = new string('a', 5001), recordedAt = (DateTimeOffset?)null });
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }
+
+    // Every field must be sent; null clears the description and recording time.
+    private static object Body(string? title) =>
+        new { title, description = (string?)null, recordedAt = (DateTimeOffset?)null };
 
     private async Task<(HttpClient Client, Guid UserId)> CreateUserAsync()
     {

@@ -13,6 +13,7 @@ public class CreateCollectionTests(CuratorApiFactory factory)
     {
         var (client, userId) = await CreateUserAsync();
 
+        // parentId is left out: optional fields of a create request have a default.
         var response = await client.PostAsJsonAsync(
             "/collections", new { name = " R.E.P.O ", description = "Monster-filled evenings" });
 

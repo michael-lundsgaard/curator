@@ -20,13 +20,15 @@ public static class CreateUpload
     /// <param name="Filename">Name of the file on the user's device. The title defaults to it.</param>
     /// <param name="ContentType">MIME type of the file, e.g. <c>video/mp4</c>. The upload must send it.</param>
     /// <param name="SizeBytes">Size of the file. The upload is rejected if the file has another size.</param>
-    /// <param name="RecordedAt">When the clip was captured, e.g. the browser's <c>File.lastModified</c>.</param>
+    /// <param name="RecordedAt">
+    /// When the clip was captured, e.g. the browser's <c>File.lastModified</c>. Leave it out if unknown.
+    /// </param>
     public sealed record Command(
         [Required, MaxLength(255)] string Filename,
         [Required, MaxLength(255), RegularExpression(@"^video/\S+$", ErrorMessage = "Only videos can be uploaded.")]
         string ContentType,
         [Range(1, MaxSizeBytes)] long SizeBytes,
-        DateTimeOffset? RecordedAt);
+        DateTimeOffset? RecordedAt = null);
 
     /// <param name="AssetId">The new asset.</param>
     /// <param name="UploadUrl">Upload the file here with <c>PUT</c> and the same <c>Content-Type</c>.</param>

@@ -35,5 +35,9 @@ public static class ControllerExtensions
         // The web defaults also accept numbers in quotes ("5"), which the OpenAPI document then types as integer or
         // string.
         options.NumberHandling = JsonNumberHandling.Strict;
+
+        // A request record's parameters without a default must be in the body (400 otherwise), as the OpenAPI
+        // document says. Clearing a field is an explicit null, so a field left out by mistake can't clear it.
+        options.RespectRequiredConstructorParameters = true;
     }
 }
