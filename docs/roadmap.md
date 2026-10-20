@@ -64,7 +64,10 @@ Built step by step. Each step is small and shippable. Order may change.
   - [x] A collection's clips through `GET /assets` with `collectionId` (and `includeSubCollections=true`,
         each clip once), reusing its sorts, filters and cursor. Unknown collection is `404`. See ADR 0005,
         _Filters and visibility_
-- [ ] React app (`apps/app`, Vite, TypeScript), looking like [design.md](design.md) and its mocks:
+- [ ] React app (`apps/app`, Vite, TypeScript), looking like [design.md](design.md) and its mocks. The API
+      gaps the mocks revealed are added in the step whose screen first needs them, not all up front: real
+      screens settle their open questions and may show gaps the mocks missed. Agent tooling is added the same
+      way, at the step that needs it:
   - [ ] OpenAPI document written to a committed file on every `dotnet build`
         (`Microsoft.Extensions.ApiDescription.Server`), so it can't go stale and API changes show up as a diff.
         Generating it runs the API's startup, which must then work without a database connection or R2 keys
@@ -72,22 +75,26 @@ Built step by step. Each step is small and shippable. Order may change.
         openapi-typescript with openapi-fetch
   - [ ] App shell: sidebar and top bar, theme tokens with light and dark (system default, switch in the top
         bar). The Vite dev server proxies the API, so the API needs no CORS until the app is hosted
+    - Tooling: Playwright MCP, so the agent can open the app, click through it and compare screenshots with
+      the mocks in both themes
   - [ ] Sign in and reset password with supabase-js (add the app's reset URL to Supabase's redirect URLs),
         then `GET /me`
+    - Tooling: read-only database lookups against the local Docker Postgres (a Postgres MCP or `psql` through
+      `docker compose exec`). Optionally the Supabase MCP for auth users and redirect URLs: read-only, scoped
+      to the dev project
   - [ ] Library: grid and list, search, sort, "Load more" with the cursor
+    - [ ] API first: list profiles (`GET /profiles`: id and display name) for the "Uploaded by" filter, later
+          also the admin members list. Decide whether members see roles
   - [ ] Clip details: playback, edit, delete
+    - [ ] API first: file size on `GET /assets/{id}` (`source_size_bytes`)
   - [ ] Collections: sidebar tree, collection page with sub-collections, add and remove clips, create, rename,
         move and delete
   - [ ] Upload: bulk queue (create upload, `PUT` to R2, complete), a few files at a time, optionally into a
         collection
-  - [ ] Home: recently added, collections, and one's own uploads that need attention (needs the API step
-        below)
-- [ ] API gaps found in the app mocks:
-  - [ ] List profiles (`GET /profiles`: id and display name) for the library's "Uploaded by" filter and the
-        admin members list. Decide whether members see roles
-  - [ ] File size on `GET /assets/{id}` (`source_size_bytes`)
-  - [ ] One's own `Pending` and `Failed` uploads, for Home's "needs attention" (`GET /assets` hides `Pending`).
-        Retrying needs a new upload URL for the same asset, or the clip is discarded and uploaded again
+  - [ ] Home: recently added, collections, and one's own uploads that need attention
+    - [ ] API first: one's own `Pending` and `Failed` uploads for "needs attention" (`GET /assets` hides
+          `Pending`). Retrying needs a new upload URL for the same asset, or the clip is discarded and uploaded
+          again
 - [ ] Hosting and observability: where the API (and later the processing worker) runs and how it's
       deployed; structured logs with request logging, and somewhere to read logs and errors. Avoid hosts that
       sleep when idle: Render's free tier (used for asset-vault) spins down after 15 minutes without traffic
@@ -104,7 +111,7 @@ Built step by step. Each step is small and shippable. Order may change.
     or an R2 lifecycle rule on `curator-dev` that expires objects after N days
 - [ ] Dashboards: admins see everyone's stuck uploads (`Pending`, `Failed`) to diagnose "missing" clips and
       discard them, and the members list; profile settings for everyone. One's own stuck uploads are on Home
-      (see the API gaps above)
+      (see the app's Home step above)
 - [ ] Invitations (disable sign-up, `inviteUserByEmail`)
 - [ ] Favorites (visible to everyone)
 - [ ] Share links (single assets only)
