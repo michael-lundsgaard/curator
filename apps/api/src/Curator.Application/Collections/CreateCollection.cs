@@ -24,6 +24,11 @@ public static class CreateCollection
         [MaxLength(MaxDescriptionLength)] string? Description,
         Guid? ParentId);
 
+    /// <param name="Id">The new collection.</param>
+    /// <param name="ParentId">The collection it was created inside, or <c>null</c> at the top level.</param>
+    /// <param name="Name">The name.</param>
+    /// <param name="Description">The description, or <c>null</c> for none.</param>
+    /// <param name="CreatedAt">When the collection was created: now.</param>
     public sealed record Response(
         Guid Id,
         Guid? ParentId,

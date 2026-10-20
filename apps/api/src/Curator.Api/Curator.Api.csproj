@@ -1,11 +1,21 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
   <PropertyGroup>
     <UserSecretsId>66d52f22-a606-4241-a8dc-3ee4fed6f32e</UserSecretsId>
+    <!-- See Curator.Application.csproj. -->
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);CS1591;CS1573</NoWarn>
+  </PropertyGroup>
+  <PropertyGroup Label="OpenAPI document">
+    <!-- Written on every build to apps/api/openapi.json, which is committed, so API changes show up as a diff and the
+         app's client is generated from it. Generating it runs the API's startup without a database or R2 keys. -->
+    <OpenApiDocumentsDirectory>$(MSBuildProjectDirectory)/../..</OpenApiDocumentsDirectory>
+    <OpenApiGenerateDocumentsOptions>--file-name openapi</OpenApiGenerateDocumentsOptions>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.Extensions.ApiDescription.Server" PrivateAssets="all" />
     <PackageReference Include="Microsoft.OpenApi" />
     <PackageReference Include="Scalar.AspNetCore" />
   </ItemGroup>

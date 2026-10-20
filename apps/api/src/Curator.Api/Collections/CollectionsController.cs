@@ -9,10 +9,11 @@ namespace Curator.Api.Collections;
 [Route("collections")]
 public class CollectionsController : ControllerBase
 {
-    /// <summary>
+    /// <summary>List collections</summary>
+    /// <remarks>
     /// Lists every collection, sorted by name. The tree comes flat: build it from each item's <c>parentId</c>.
-    /// </summary>
-    [HttpGet]
+    /// </remarks>
+    [HttpGet(Name = "ListCollections")]
     [ProducesResponseType<ListCollections.Response>(StatusCodes.Status200OK)]
     public async Task<IActionResult> List(
         ListCollections.Handler handler,
@@ -21,8 +22,12 @@ public class CollectionsController : ControllerBase
         return Ok(await handler.HandleAsync(new(), cancellationToken));
     }
 
-    /// <summary>Gets one collection.</summary>
-    [HttpGet("{id:guid}")]
+    /// <summary>Get a collection</summary>
+    /// <remarks>
+    /// Gets one collection. Its clips are listed by <c>GET /assets</c> with <c>collectionId</c>, and its
+    /// sub-collections are the items of <c>GET /collections</c> with this <c>parentId</c>.
+    /// </remarks>
+    [HttpGet("{id:guid}", Name = "GetCollection")]
     [ProducesResponseType<GetCollection.Response>(StatusCodes.Status200OK)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Get(
@@ -34,11 +39,12 @@ public class CollectionsController : ControllerBase
         return result.ToActionResult(this, Ok);
     }
 
-    /// <summary>
+    /// <summary>Create a collection</summary>
+    /// <remarks>
     /// Creates a collection at the top level, or inside <c>parentId</c>. Anyone can create one inside any
     /// collection, up to 5 levels deep.
-    /// </summary>
-    [HttpPost]
+    /// </remarks>
+    [HttpPost(Name = "CreateCollection")]
     [ProducesResponseType<CreateCollection.Response>(StatusCodes.Status201Created)]
     [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status409Conflict)]
@@ -51,11 +57,12 @@ public class CollectionsController : ControllerBase
         return result.ToActionResult(this, response => CreatedAtAction(nameof(Get), new { id = response.Id }, response));
     }
 
-    /// <summary>
+    /// <summary>Edit a collection</summary>
+    /// <remarks>
     /// Edits the name and description. Send both: a missing or <c>null</c> description clears it. Only the creator
     /// and admins can edit a collection. Move it with <c>POST /collections/{id}/move</c>.
-    /// </summary>
-    [HttpPatch("{id:guid}")]
+    /// </remarks>
+    [HttpPatch("{id:guid}", Name = "EditCollection")]
     [ProducesResponseType<EditCollection.Response>(StatusCodes.Status200OK)]
     [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden)]
@@ -70,12 +77,13 @@ public class CollectionsController : ControllerBase
         return result.ToActionResult(this, Ok);
     }
 
-    /// <summary>
+    /// <summary>Move a collection</summary>
+    /// <remarks>
     /// Moves a collection, with its sub-collections, inside <c>parentId</c> or to the top level (<c>null</c>). Only the
     /// creator and admins can move it. Moving it into itself or one of its sub-collections, or deeper than 5 levels
     /// in all, is a conflict.
-    /// </summary>
-    [HttpPost("{id:guid}/move")]
+    /// </remarks>
+    [HttpPost("{id:guid}/move", Name = "MoveCollection")]
     [ProducesResponseType<MoveCollection.Response>(StatusCodes.Status200OK)]
     [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden)]
@@ -91,11 +99,12 @@ public class CollectionsController : ControllerBase
         return result.ToActionResult(this, Ok);
     }
 
-    /// <summary>
+    /// <summary>Delete a collection</summary>
+    /// <remarks>
     /// Deletes a collection and all of its sub-collections, also those created by others. Only the creator and
     /// admins can delete it. The clips stay in the library.
-    /// </summary>
-    [HttpDelete("{id:guid}")]
+    /// </remarks>
+    [HttpDelete("{id:guid}", Name = "DeleteCollection")]
     [ProducesResponseType<DeleteCollection.Response>(StatusCodes.Status200OK)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
@@ -108,11 +117,12 @@ public class CollectionsController : ControllerBase
         return result.ToActionResult(this, Ok);
     }
 
-    /// <summary>
+    /// <summary>Add clips to a collection</summary>
+    /// <remarks>
     /// Adds up to 100 clips to a collection. Anyone can add clips to any collection. Clips already in it are skipped,
     /// and a clip that doesn't exist (deleted, or not uploaded yet) fails the whole request.
-    /// </summary>
-    [HttpPost("{id:guid}/assets")]
+    /// </remarks>
+    [HttpPost("{id:guid}/assets", Name = "AddClipsToCollection")]
     [ProducesResponseType<AddClipsToCollection.Response>(StatusCodes.Status200OK)]
     [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
@@ -126,11 +136,12 @@ public class CollectionsController : ControllerBase
         return result.ToActionResult(this, Ok);
     }
 
-    /// <summary>
+    /// <summary>Remove clips from a collection</summary>
+    /// <remarks>
     /// Removes up to 100 clips from a collection. Anyone can remove clips from any collection. Clips that aren't in it
     /// are skipped, and the clips stay in the library. A <c>POST</c>, because a body on <c>DELETE</c> is often dropped.
-    /// </summary>
-    [HttpPost("{id:guid}/assets/remove")]
+    /// </remarks>
+    [HttpPost("{id:guid}/assets/remove", Name = "RemoveClipsFromCollection")]
     [ProducesResponseType<RemoveClipsFromCollection.Response>(StatusCodes.Status200OK)]
     [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]

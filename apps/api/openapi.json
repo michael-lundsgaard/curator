@@ -1,0 +1,1867 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "Curator API",
+    "description": "The shared library of video clips: uploads, collections and search. Every endpoint needs a Supabase access token.",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/me": {
+      "get": {
+        "tags": [
+          "Me"
+        ],
+        "summary": "Get the signed-in user",
+        "description": "Gets the signed-in user's profile. It's created on their first request, named after their email address.",
+        "operationId": "GetMe",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProfileResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/collections": {
+      "get": {
+        "tags": [
+          "Collections"
+        ],
+        "summary": "List collections",
+        "description": "Lists every collection, sorted by name. The tree comes flat: build it from each item's `parentId`.",
+        "operationId": "ListCollections",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListCollectionsResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Collections"
+        ],
+        "summary": "Create a collection",
+        "description": "Creates a collection at the top level, or inside `parentId`. Anyone can create one inside any\r\ncollection, up to 5 levels deep.",
+        "operationId": "CreateCollection",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCollectionRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCollectionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateCollectionResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/collections/{id}": {
+      "get": {
+        "tags": [
+          "Collections"
+        ],
+        "summary": "Get a collection",
+        "description": "Gets one collection. Its clips are listed by `GET /assets` with `collectionId`, and its\r\nsub-collections are the items of `GET /collections` with this `parentId`.",
+        "operationId": "GetCollection",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetCollectionResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Collections"
+        ],
+        "summary": "Edit a collection",
+        "description": "Edits the name and description. Send both: a missing or `null` description clears it. Only the creator\r\nand admins can edit a collection. Move it with `POST /collections/{id}/move`.",
+        "operationId": "EditCollection",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EditCollectionRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/EditCollectionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EditCollectionResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Collections"
+        ],
+        "summary": "Delete a collection",
+        "description": "Deletes a collection and all of its sub-collections, also those created by others. Only the creator and\r\nadmins can delete it. The clips stay in the library.",
+        "operationId": "DeleteCollection",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeleteCollectionResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/collections/{id}/move": {
+      "post": {
+        "tags": [
+          "Collections"
+        ],
+        "summary": "Move a collection",
+        "description": "Moves a collection, with its sub-collections, inside `parentId` or to the top level (`null`). Only the\r\ncreator and admins can move it. Moving it into itself or one of its sub-collections, or deeper than 5 levels\r\nin all, is a conflict.",
+        "operationId": "MoveCollection",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MoveCollectionRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/MoveCollectionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MoveCollectionResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/collections/{id}/assets": {
+      "post": {
+        "tags": [
+          "Collections"
+        ],
+        "summary": "Add clips to a collection",
+        "description": "Adds up to 100 clips to a collection. Anyone can add clips to any collection. Clips already in it are skipped,\r\nand a clip that doesn't exist (deleted, or not uploaded yet) fails the whole request.",
+        "operationId": "AddClipsToCollection",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddClipsToCollectionRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddClipsToCollectionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AddClipsToCollectionResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/collections/{id}/assets/remove": {
+      "post": {
+        "tags": [
+          "Collections"
+        ],
+        "summary": "Remove clips from a collection",
+        "description": "Removes up to 100 clips from a collection. Anyone can remove clips from any collection. Clips that aren't in it\r\nare skipped, and the clips stay in the library. A `POST`, because a body on `DELETE` is often dropped.",
+        "operationId": "RemoveClipsFromCollection",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RemoveClipsFromCollectionRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/RemoveClipsFromCollectionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RemoveClipsFromCollectionResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/assets": {
+      "get": {
+        "tags": [
+          "Assets"
+        ],
+        "summary": "List assets",
+        "description": "Lists the shared library, a page at a time. Pass `nextCursor` as `cursor` for the next page,\r\nwith the same other parameters. Uploads that haven't completed aren't listed. Pass `collectionId` for\r\na collection's clips; 404 if the collection doesn't exist.",
+        "operationId": "ListAssets",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "description": "Words that must all appear in the title or description, e.g. `funny scream`.",
+            "schema": {
+              "maxLength": 200,
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "What to sort by: `Recorded` (when the clip was recorded, or uploaded if that's unknown), `Uploaded` or\r\n`Title` (ignoring case). Defaults to `Recorded`.",
+            "schema": {
+              "$ref": "#/components/schemas/AssetSort"
+            }
+          },
+          {
+            "name": "order",
+            "in": "query",
+            "description": "Sort direction. Defaults to `Desc` for dates and `Asc` for titles.",
+            "schema": {
+              "$ref": "#/components/schemas/SortOrder"
+            }
+          },
+          {
+            "name": "uploadedBy",
+            "in": "query",
+            "description": "Only assets uploaded by this profile.",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "recordedFrom",
+            "in": "query",
+            "description": "Only assets recorded at or after this time.",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "recordedTo",
+            "in": "query",
+            "description": "Only assets recorded before this time.",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "collectionId",
+            "in": "query",
+            "description": "Only the clips in this collection.",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "includeSubCollections",
+            "in": "query",
+            "description": "With `collectionId`: also the clips in its sub-collections, at every level. Each clip is listed once.",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Assets per page, at most 100. Defaults to 50.",
+            "schema": {
+              "maximum": 100,
+              "minimum": 1,
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "description": "`nextCursor` of the previous page. Send the same other parameters as for that page.",
+            "schema": {
+              "maxLength": 1000,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListAssetsResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/assets/{id}": {
+      "get": {
+        "tags": [
+          "Assets"
+        ],
+        "summary": "Get an asset",
+        "description": "Gets one asset, with signed URLs for playing it and showing its thumbnail. Fetch it again for new URLs\r\nafter `urlsExpireAt`. An upload that hasn't completed is only visible to its uploader.",
+        "operationId": "GetAsset",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetAssetResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Assets"
+        ],
+        "summary": "Edit an asset",
+        "description": "Edits the title, description and recording time. Send all three: a missing or `null` description or\r\n`recordedAt` clears it. Only the uploader and admins can edit an asset.",
+        "operationId": "EditAsset",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EditAssetRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/EditAssetRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EditAssetResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Assets"
+        ],
+        "summary": "Delete an asset",
+        "description": "Deletes an asset from the library. Only the uploader and admins can delete it. Deleting it again returns\r\n404, like any asset that doesn't exist.",
+        "operationId": "DeleteAsset",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeleteAssetResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/assets/uploads": {
+      "post": {
+        "tags": [
+          "Assets"
+        ],
+        "summary": "Start an upload",
+        "description": "Starts an upload. Upload the file to `uploadUrl` with `PUT` and the same `Content-Type`. Storage\r\nrejects a file whose size differs from `sizeBytes`.",
+        "operationId": "CreateUpload",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateUploadRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateUploadRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateUploadResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/assets/{id}/complete-upload": {
+      "post": {
+        "tags": [
+          "Assets"
+        ],
+        "summary": "Complete an upload",
+        "description": "Completes an upload after the `PUT` to `uploadUrl` succeeded. Checks that the file is in storage\r\nwith the size the upload was started for. Calling it again is harmless.",
+        "operationId": "CompleteUpload",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompleteUploadResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AddClipsToCollectionRequest": {
+        "required": [
+          "assetIds"
+        ],
+        "type": "object",
+        "properties": {
+          "assetIds": {
+            "maxItems": 100,
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "The clips to add, 1 to 100. They must be uploaded and not deleted."
+          }
+        }
+      },
+      "AddClipsToCollectionResponse": {
+        "required": [
+          "id",
+          "addedCount"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The collection.",
+            "format": "uuid"
+          },
+          "addedCount": {
+            "type": "integer",
+            "description": "How many clips were added, not counting those already in the collection.",
+            "format": "int32"
+          }
+        }
+      },
+      "AssetSort": {
+        "enum": [
+          "Recorded",
+          "Uploaded",
+          "Title"
+        ],
+        "type": "string"
+      },
+      "AssetStatus": {
+        "enum": [
+          "Pending",
+          "Uploaded",
+          "Processing",
+          "Ready",
+          "Failed"
+        ],
+        "type": "string"
+      },
+      "CompleteUploadResponse": {
+        "required": [
+          "assetId",
+          "status"
+        ],
+        "type": "object",
+        "properties": {
+          "assetId": {
+            "type": "string",
+            "description": "The asset.",
+            "format": "uuid"
+          },
+          "status": {
+            "description": "Its status: `Uploaded`, or later if it was already completed.",
+            "$ref": "#/components/schemas/AssetStatus"
+          }
+        }
+      },
+      "CreateCollectionRequest": {
+        "required": [
+          "name",
+          "description",
+          "parentId"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "maxLength": 255,
+            "type": "string",
+            "description": "The name, e.g. a game or an occasion. Required."
+          },
+          "description": {
+            "maxLength": 5000,
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "What the collection is for, or `null` for none."
+          },
+          "parentId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "The collection to create it inside, or `null` for the top level.",
+            "format": "uuid"
+          }
+        }
+      },
+      "CreateCollectionResponse": {
+        "required": [
+          "id",
+          "parentId",
+          "name",
+          "description",
+          "createdAt"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The new collection.",
+            "format": "uuid"
+          },
+          "parentId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "The collection it was created inside, or `null` at the top level.",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string",
+            "description": "The name."
+          },
+          "description": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "The description, or `null` for none."
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "When the collection was created: now.",
+            "format": "date-time"
+          }
+        }
+      },
+      "CreateUploadRequest": {
+        "required": [
+          "filename",
+          "contentType",
+          "sizeBytes",
+          "recordedAt"
+        ],
+        "type": "object",
+        "properties": {
+          "filename": {
+            "maxLength": 255,
+            "type": "string",
+            "description": "Name of the file on the user's device. The title defaults to it."
+          },
+          "contentType": {
+            "maxLength": 255,
+            "type": "string",
+            "description": "MIME type of the file, e.g. `video/mp4`. The upload must send it."
+          },
+          "sizeBytes": {
+            "maximum": 5000000000,
+            "minimum": 1,
+            "type": "integer",
+            "description": "Size of the file. The upload is rejected if the file has another size.",
+            "format": "int64"
+          },
+          "recordedAt": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "When the clip was captured, e.g. the browser's `File.lastModified`.",
+            "format": "date-time"
+          }
+        }
+      },
+      "CreateUploadResponse": {
+        "required": [
+          "assetId",
+          "uploadUrl",
+          "uploadUrlExpiresAt"
+        ],
+        "type": "object",
+        "properties": {
+          "assetId": {
+            "type": "string",
+            "description": "The new asset.",
+            "format": "uuid"
+          },
+          "uploadUrl": {
+            "type": "string",
+            "description": "Upload the file here with `PUT` and the same `Content-Type`."
+          },
+          "uploadUrlExpiresAt": {
+            "type": "string",
+            "description": "Start the upload before this.",
+            "format": "date-time"
+          }
+        }
+      },
+      "Creator": {
+        "required": [
+          "id",
+          "displayName"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The creator's profile.",
+            "format": "uuid"
+          },
+          "displayName": {
+            "type": "string",
+            "description": "The creator's name."
+          }
+        },
+        "description": "Who created a collection, as shown next to it."
+      },
+      "DeleteAssetResponse": {
+        "required": [
+          "id",
+          "deletedAt"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The asset that was deleted.",
+            "format": "uuid"
+          },
+          "deletedAt": {
+            "type": "string",
+            "description": "When the clip was deleted: now.",
+            "format": "date-time"
+          }
+        }
+      },
+      "DeleteCollectionResponse": {
+        "required": [
+          "id",
+          "deletedCount"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The collection that was deleted.",
+            "format": "uuid"
+          },
+          "deletedCount": {
+            "type": "integer",
+            "description": "How many collections were deleted: this one and its sub-collections.",
+            "format": "int32"
+          }
+        }
+      },
+      "EditAssetRequest": {
+        "required": [
+          "title",
+          "description",
+          "recordedAt"
+        ],
+        "type": "object",
+        "properties": {
+          "title": {
+            "maxLength": 255,
+            "type": "string",
+            "description": "The new title. Required."
+          },
+          "description": {
+            "maxLength": 5000,
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "The new description, or `null` for none."
+          },
+          "recordedAt": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "When the clip was captured, or `null` if unknown.",
+            "format": "date-time"
+          }
+        }
+      },
+      "EditAssetResponse": {
+        "required": [
+          "id",
+          "title",
+          "description",
+          "recordedAt",
+          "updatedAt"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The asset.",
+            "format": "uuid"
+          },
+          "title": {
+            "type": "string",
+            "description": "The new title."
+          },
+          "description": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "The new description, or `null` for none."
+          },
+          "recordedAt": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "When the clip was captured, or `null` if unknown.",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "description": "When the clip last changed: now.",
+            "format": "date-time"
+          }
+        }
+      },
+      "EditCollectionRequest": {
+        "required": [
+          "name",
+          "description"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "maxLength": 255,
+            "type": "string",
+            "description": "The new name. Required."
+          },
+          "description": {
+            "maxLength": 5000,
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "The new description, or `null` for none."
+          }
+        }
+      },
+      "EditCollectionResponse": {
+        "required": [
+          "id",
+          "name",
+          "description",
+          "updatedAt"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The collection.",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string",
+            "description": "The new name."
+          },
+          "description": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "The new description, or `null` for none."
+          },
+          "updatedAt": {
+            "type": "string",
+            "description": "When the collection last changed: now.",
+            "format": "date-time"
+          }
+        }
+      },
+      "GetAssetResponse": {
+        "required": [
+          "id",
+          "title",
+          "description",
+          "originalFilename",
+          "contentType",
+          "status",
+          "uploadedBy",
+          "recordedAt",
+          "createdAt",
+          "updatedAt",
+          "durationMs",
+          "width",
+          "height",
+          "playbackUrl",
+          "thumbnailUrl",
+          "urlsExpireAt"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The asset.",
+            "format": "uuid"
+          },
+          "title": {
+            "type": "string",
+            "description": "The title: the file name without its extension, until someone edits it."
+          },
+          "description": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "The description, or `null` for none."
+          },
+          "originalFilename": {
+            "type": "string",
+            "description": "Name of the uploaded file on the uploader's device."
+          },
+          "contentType": {
+            "type": "string",
+            "description": "MIME type of the original."
+          },
+          "status": {
+            "description": "`Uploaded` once the file is in storage. `Processing`, `Ready` and `Failed` are for video\r\n        processing, which doesn't exist yet. `Pending` until the upload is completed, which only its uploader\r\n        sees.",
+            "$ref": "#/components/schemas/AssetStatus"
+          },
+          "uploadedBy": {
+            "description": "Who uploaded the clip.",
+            "$ref": "#/components/schemas/Uploader"
+          },
+          "recordedAt": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "When the clip was captured, if known.",
+            "format": "date-time"
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "When the clip was uploaded.",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "description": "When the clip last changed.",
+            "format": "date-time"
+          },
+          "durationMs": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "description": "Length in milliseconds. `null` until processing has read it.",
+            "format": "int64"
+          },
+          "width": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "description": "Width in pixels. `null` until processing has read it.",
+            "format": "int32"
+          },
+          "height": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "description": "Height in pixels. `null` until processing has read it.",
+            "format": "int32"
+          },
+          "playbackUrl": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "Signed URL of the video to play: the playback version, or the original until processing has created one.\r\n`null` while the upload is pending."
+          },
+          "thumbnailUrl": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "Signed URL of the thumbnail. `null` until processing has created one."
+          },
+          "urlsExpireAt": {
+            "type": "string",
+            "description": "When the signed URLs stop working.",
+            "format": "date-time"
+          }
+        }
+      },
+      "GetCollectionResponse": {
+        "required": [
+          "id",
+          "parentId",
+          "name",
+          "description",
+          "createdBy",
+          "createdAt",
+          "updatedAt"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The collection.",
+            "format": "uuid"
+          },
+          "parentId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "The collection this one is inside, or `null` at the top level.",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string",
+            "description": "The name."
+          },
+          "description": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "What the collection is for, or `null` for none."
+          },
+          "createdBy": {
+            "description": "Who created the collection.",
+            "$ref": "#/components/schemas/Creator"
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "When the collection was created.",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "description": "When the collection last changed: its name, description or place in the tree.",
+            "format": "date-time"
+          }
+        }
+      },
+      "ListAssetsItem": {
+        "required": [
+          "id",
+          "title",
+          "description",
+          "status",
+          "uploadedBy",
+          "recordedAt",
+          "createdAt",
+          "durationMs",
+          "width",
+          "height"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The asset.",
+            "format": "uuid"
+          },
+          "title": {
+            "type": "string",
+            "description": "The title: the file name without its extension, until someone edits it."
+          },
+          "description": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "The description, or `null` for none."
+          },
+          "status": {
+            "description": "`Uploaded` once the file is in storage. `Processing`, `Ready` and `Failed` are for video\r\n        processing, which doesn't exist yet. Uploads that haven't completed aren't listed.",
+            "$ref": "#/components/schemas/AssetStatus"
+          },
+          "uploadedBy": {
+            "description": "Who uploaded the clip.",
+            "$ref": "#/components/schemas/Uploader"
+          },
+          "recordedAt": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "When the clip was captured, if known.",
+            "format": "date-time"
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "When the clip was uploaded.",
+            "format": "date-time"
+          },
+          "durationMs": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "description": "Length in milliseconds. `null` until processing has read it.",
+            "format": "int64"
+          },
+          "width": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "description": "Width in pixels. `null` until processing has read it.",
+            "format": "int32"
+          },
+          "height": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "description": "Height in pixels. `null` until processing has read it.",
+            "format": "int32"
+          }
+        }
+      },
+      "ListAssetsResponse": {
+        "required": [
+          "items",
+          "nextCursor"
+        ],
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ListAssetsItem"
+            },
+            "description": "The assets on this page."
+          },
+          "nextCursor": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "Pass as `cursor` to get the next page. `null` on the last page."
+          }
+        }
+      },
+      "ListCollectionsItem": {
+        "required": [
+          "id",
+          "parentId",
+          "name",
+          "clipCount"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The collection.",
+            "format": "uuid"
+          },
+          "parentId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "The collection this one is inside, or `null` at the top level.",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string",
+            "description": "The name."
+          },
+          "clipCount": {
+            "type": "integer",
+            "description": "How many clips were added to this collection itself, not counting its sub-collections' or deleted ones.",
+            "format": "int32"
+          }
+        }
+      },
+      "ListCollectionsResponse": {
+        "required": [
+          "items"
+        ],
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ListCollectionsItem"
+            },
+            "description": "Every collection, sorted by name ignoring case."
+          }
+        }
+      },
+      "MoveCollectionRequest": {
+        "required": [
+          "parentId"
+        ],
+        "type": "object",
+        "properties": {
+          "parentId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "The collection to move it into, or `null` for the top level.",
+            "format": "uuid"
+          }
+        }
+      },
+      "MoveCollectionResponse": {
+        "required": [
+          "id",
+          "parentId",
+          "updatedAt"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The collection.",
+            "format": "uuid"
+          },
+          "parentId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "The collection it is now inside, or `null` at the top level.",
+            "format": "uuid"
+          },
+          "updatedAt": {
+            "type": "string",
+            "description": "When the collection last changed: now.",
+            "format": "date-time"
+          }
+        }
+      },
+      "ProblemDetails": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "title": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "status": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "detail": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "instance": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "ProfileResponse": {
+        "required": [
+          "id",
+          "displayName",
+          "role"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The profile, the same as the Supabase user ID.",
+            "format": "uuid"
+          },
+          "displayName": {
+            "type": "string",
+            "description": "The name shown next to the user's clips and collections."
+          },
+          "role": {
+            "description": "An `Admin` can edit and delete anything, a `Member` only what they created.",
+            "$ref": "#/components/schemas/ProfileRole"
+          }
+        }
+      },
+      "ProfileRole": {
+        "enum": [
+          "Member",
+          "Admin"
+        ],
+        "type": "string"
+      },
+      "RemoveClipsFromCollectionRequest": {
+        "required": [
+          "assetIds"
+        ],
+        "type": "object",
+        "properties": {
+          "assetIds": {
+            "maxItems": 100,
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "The clips to remove, 1 to 100."
+          }
+        }
+      },
+      "RemoveClipsFromCollectionResponse": {
+        "required": [
+          "id",
+          "removedCount"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The collection.",
+            "format": "uuid"
+          },
+          "removedCount": {
+            "type": "integer",
+            "description": "How many clips were removed, not counting those that weren't in it.",
+            "format": "int32"
+          }
+        }
+      },
+      "SortOrder": {
+        "enum": [
+          "Asc",
+          "Desc"
+        ],
+        "type": "string"
+      },
+      "Uploader": {
+        "required": [
+          "id",
+          "displayName"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The uploader's profile.",
+            "format": "uuid"
+          },
+          "displayName": {
+            "type": "string",
+            "description": "The uploader's name."
+          }
+        },
+        "description": "Who uploaded a clip, as shown next to it."
+      },
+      "ValidationProblemDetails": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "title": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "status": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "detail": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "instance": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "Bearer": {
+        "type": "http",
+        "description": "A Supabase access token, e.g. access_token from the signIn request in Curator.Api.http.",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  },
+  "security": [
+    {
+      "Bearer": [ ]
+    }
+  ],
+  "tags": [
+    {
+      "name": "Me"
+    },
+    {
+      "name": "Collections"
+    },
+    {
+      "name": "Assets"
+    }
+  ]
+}

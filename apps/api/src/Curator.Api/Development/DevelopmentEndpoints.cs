@@ -21,7 +21,9 @@ public static class DevelopmentEndpoints
                     await DevelopmentData.SeedAsync(db, context.GetProfile(), time.GetUtcNow(), cancellationToken);
                 return Results.Ok(new { clips, collections });
             })
-            .WithSummary("Adds sample clips and collections. Does nothing if they're already there.");
+            .WithName("AddSampleData")
+            .WithSummary("Add sample data")
+            .WithDescription("Adds sample clips and collections. Does nothing if they're already there.");
 
         // Assets and collections from manual testing pile up. Profiles stay, so the caller keeps their role.
         dev.MapDelete("/data", async (CuratorDbContext db, CancellationToken cancellationToken) =>
@@ -35,6 +37,8 @@ public static class DevelopmentEndpoints
                 var deleted = await DevelopmentData.ClearAsync(db, cancellationToken);
                 return Results.Ok(new { deleted });
             })
-            .WithSummary("Deletes all assets, collections and the sample profiles. Files in storage are left alone.");
+            .WithName("ClearData")
+            .WithSummary("Clear data")
+            .WithDescription("Deletes all assets, collections and the sample profiles. Files in storage are left alone.");
     }
 }

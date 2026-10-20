@@ -1,22 +1,17 @@
-using System.Text.Json.Serialization;
 using Curator.Api.Authentication;
+using Curator.Api.Common;
 using Curator.Api.Development;
+using Curator.Api.OpenApi;
 using Curator.Application;
 using Curator.Infrastructure;
-using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers()
-    .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
-
-// The OpenAPI document reads these options, not the controllers' above, so enums are described by name there too.
-builder.Services.ConfigureHttpJsonOptions(options =>
-    options.SerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+builder.Services.AddCuratorControllers();
 
 // Every error is ProblemDetails (RFC 9457), also those ASP.NET Core answers itself, so clients handle errors one way.
 builder.Services.AddProblemDetails();
-builder.Services.AddOpenApi(options => options.AddDocumentTransformer<BearerSecuritySchemeTransformer>());
+builder.Services.AddCuratorOpenApi();
 builder.Services.AddHealthChecks();
 builder.Services.AddSupabaseAuthentication();
 builder.Services.AddApplication();
@@ -35,11 +30,7 @@ app.UseStatusCodePages();
 
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi().AllowAnonymous();
-    app.MapScalarApiReference(options => options
-            .AddPreferredSecuritySchemes(BearerSecuritySchemeTransformer.SchemeName)
-            .EnablePersistentAuthentication())
-        .AllowAnonymous();
+    app.MapCuratorApiReference();
     app.MapDevelopmentEndpoints();
 }
 

@@ -24,6 +24,7 @@ public static class AddClipsToCollection
     /// <param name="AssetIds">The clips to add, 1 to 100. They must be uploaded and not deleted.</param>
     public sealed record Command([Required, Length(1, MaxClips)] IReadOnlyList<Guid> AssetIds);
 
+    /// <param name="Id">The collection.</param>
     /// <param name="AddedCount">How many clips were added, not counting those already in the collection.</param>
     public sealed record Response(Guid Id, int AddedCount);
 

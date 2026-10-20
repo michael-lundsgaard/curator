@@ -20,6 +20,9 @@ public static class MoveCollection
     /// <param name="ParentId">The collection to move it into, or <c>null</c> for the top level.</param>
     public sealed record Command(Guid? ParentId);
 
+    /// <param name="Id">The collection.</param>
+    /// <param name="ParentId">The collection it is now inside, or <c>null</c> at the top level.</param>
+    /// <param name="UpdatedAt">When the collection last changed: now.</param>
     public sealed record Response(Guid Id, Guid? ParentId, DateTimeOffset UpdatedAt);
 
     public sealed class Handler(ICuratorDbContext db, TimeProvider time)

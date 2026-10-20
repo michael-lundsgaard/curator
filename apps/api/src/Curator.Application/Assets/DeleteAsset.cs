@@ -13,6 +13,7 @@ public static class DeleteAsset
 {
     public sealed record Command(Guid AssetId);
 
+    /// <param name="Id">The asset that was deleted.</param>
     /// <param name="DeletedAt">When the clip was deleted: now.</param>
     public sealed record Response(Guid Id, DateTimeOffset DeletedAt);
 

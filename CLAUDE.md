@@ -51,6 +51,9 @@ dotnet ef database update --project src/Curator.Infrastructure --startup-project
   there" from `factory.StoredObjects`.
 
 - API docs (Development only): http://localhost:5238/scalar
+- `apps/api/openapi.json` is written by every build and committed. Commit it with the API change that caused it;
+  never edit it by hand. How it's shaped (schema names, enums, limits, query parameter names) is in
+  `src/Curator.Api/OpenApi/`, and `OpenApiDocumentTests` checks it.
 - Health: http://localhost:5238/health
 
 If the API is already running (debugger/watch), it locks `bin/`. To build or test in that case, pass
@@ -69,6 +72,10 @@ If the API is already running (debugger/watch), it locks `bin/`. To build or tes
   (no repositories) and validate with data annotations on the command. Expected failures (not found,
   forbidden, conflict) are returned as `Result<T>` and mapped with `result.ToActionResult(this, Ok)`;
   exceptions are for bugs. See `docs/decisions/0004-application-structure.md`.
+- API documentation: the request and response records are the public contract, so every parameter gets a
+  `<param>` (a test fails otherwise). Each action has a short `<summary>` (the label in Scalar), the details in
+  `<remarks>`, and the use case as route name for the operation ID: `[HttpPatch("{id:guid}", Name = "EditAsset")]`.
+  Other code is commented where it explains a reason or a rule, not on every member (CS1591 and CS1573 are off).
 - Auth: every endpoint requires a signed-in user unless marked `AllowAnonymous`. Read the user with
   `HttpContext.GetProfile()`. Integration tests sign in with `factory.CreateClient(userId)`, never real
   Supabase tokens. See `docs/decisions/0003-authentication-and-permissions.md`.

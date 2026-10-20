@@ -61,6 +61,7 @@ HTTP ─► JWT bearer ─► ProfileMiddleware ─► authorization ─► Cont
 ## Where to add things
 
 - A new endpoint: a use case file in `Curator.Application/<Feature>/` (`Command` or `Query`, `Response`,
-  `Handler`), registered in `AddApplication()`, called from a controller action, and an integration test.
+  `Handler`), registered in `AddApplication()`, called from a controller action, and an integration test. Document every
+  parameter of its request and response records: they become the models in the OpenAPI document.
 - A new rule about who may do what: a method on the entity, with a unit test.
 - A new outside system: an interface in Application, the implementation in Infrastructure.

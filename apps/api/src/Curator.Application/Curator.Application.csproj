@@ -1,4 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <!-- The XML comments describe the endpoints and their fields in the OpenAPI document. Not every public type
+         (CS1591) or record parameter (CS1573) needs one. -->
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);CS1591;CS1573</NoWarn>
+  </PropertyGroup>
   <ItemGroup>
     <!-- DbSet and the async LINQ extensions only. Nothing Postgres-specific (see ADR 0004). -->
     <PackageReference Include="Microsoft.EntityFrameworkCore" />

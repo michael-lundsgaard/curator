@@ -68,9 +68,16 @@ Built step by step. Each step is small and shippable. Order may change.
       gaps the mocks revealed are added in the step whose screen first needs them, not all up front: real
       screens settle their open questions and may show gaps the mocks missed. Agent tooling is added the same
       way, at the step that needs it:
-  - [ ] OpenAPI document written to a committed file on every `dotnet build`
-        (`Microsoft.Extensions.ApiDescription.Server`), so it can't go stale and API changes show up as a diff.
-        Generating it runs the API's startup, which must then work without a database connection or R2 keys
+  - [x] OpenAPI document written to a committed file on every `dotnet build`
+        (`Microsoft.Extensions.ApiDescription.Server`), so it can't go stale and API changes show up as a diff:
+        [`apps/api/openapi.json`](../apps/api/openapi.json). Generating it runs the API's startup, which already
+        works without a database or R2 keys (both are resolved lazily). Making the document right for a generated
+        client took more than writing it: distinct schema names (`EditAssetRequest`; every `Command` had collapsed
+        into one), operation IDs (`EditAsset`), enums typed as strings, numbers as numbers (JSON bodies no longer
+        accept `"5"`), camelCase query parameters, errors as `application/problem+json`, JSON-only bodies, and
+        the `[MaxLength]`/`[Range]` limits, which the generator doesn't read from record parameters. Upgrading
+        `Microsoft.AspNetCore.OpenApi` to 10.0.13 fixed none of these, so they're transformers in
+        `Curator.Api/OpenApi/`. Every field is documented, with short summaries and the details in `<remarks>`
   - [ ] Generated API client from that file: choose between hey-api/openapi-ts (used by asset-vault) and
         openapi-typescript with openapi-fetch
   - [ ] App shell: sidebar and top bar, theme tokens with light and dark (system default, switch in the top

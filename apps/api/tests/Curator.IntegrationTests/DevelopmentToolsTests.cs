@@ -76,27 +76,6 @@ public class DevelopmentToolsTests(CuratorApiFactory factory)
             () => DevelopmentData.ClearAsync(db, CancellationToken.None));
     }
 
-    [Fact]
-    public async Task OpenApiDocument_DeclaresBearerTokens_SoScalarCanSendThem()
-    {
-        var document = await factory.CreateClient().GetFromJsonAsync<JsonElement>("/openapi/v1.json");
-
-        var scheme = document.GetProperty("components").GetProperty("securitySchemes").GetProperty("Bearer");
-        Assert.Equal("http", scheme.GetProperty("type").GetString());
-        Assert.Equal("bearer", scheme.GetProperty("scheme").GetString());
-    }
-
-    [Fact]
-    public async Task OpenApiDocument_DescribesEnumsByName_SoScalarSuggestsReadableValues()
-    {
-        var document = await factory.CreateClient().GetFromJsonAsync<JsonElement>("/openapi/v1.json");
-
-        var sort = document.GetProperty("components").GetProperty("schemas").GetProperty("AssetSort");
-        Assert.Equal(
-            ["Recorded", "Uploaded", "Title"],
-            sort.GetProperty("enum").EnumerateArray().Select(v => v.GetString()));
-    }
-
     private sealed record Added(int Clips, int Collections);
 
     private sealed record Deleted([property: JsonPropertyName("deleted")] int Count);
