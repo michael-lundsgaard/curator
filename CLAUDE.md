@@ -51,9 +51,11 @@ dotnet ef database update --project src/Curator.Infrastructure --startup-project
   there" from `factory.StoredObjects`.
 
 - API docs (Development only): http://localhost:5238/scalar
-- `apps/api/openapi.json` is written by every build and committed. Commit it with the API change that caused it;
-  never edit it by hand. How it's shaped (schema names, enums, limits, query parameter names) is in
-  `src/Curator.Api/OpenApi/`, and `OpenApiDocumentTests` checks it.
+- `apps/api/openapi.json` is the committed public OpenAPI document; never edit it by hand. `OpenApiDocumentTests`
+  fails when it's out of date: update it from `apps/api` with
+  `dotnet test tests/Curator.IntegrationTests --filter MatchesTheCommittedFile -e UPDATE_OPENAPI=1` and commit it
+  with the API change that caused it. How it's shaped (schema names, enums, limits, query parameter names) is in
+  `src/Curator.Api/OpenApi/`.
 - Health: http://localhost:5238/health
 
 If the API is already running (debugger/watch), it locks `bin/`. To build or test in that case, pass
@@ -73,7 +75,8 @@ If the API is already running (debugger/watch), it locks `bin/`. To build or tes
   forbidden, conflict) are returned as `Result<T>` and mapped with `result.ToActionResult(this, Ok)`;
   exceptions are for bugs. See `docs/decisions/0004-application-structure.md`.
 - API documentation: the request and response records are the public contract, so every parameter gets a
-  `<param>` (a test fails otherwise), saying what the schema can't: meaning, defaults, behaviour. Not "required" or
+  `<param>` (a test fails otherwise; path parameters like `{id}` are exempt, since the path says what they are),
+  saying what the schema can't: meaning, defaults, behaviour. Not "required" or
   limits, which the document already shows. Each action has a short `<summary>` (the label in Scalar), the details in
   `<remarks>`, and the use case as route name for the operation ID: `[HttpPatch("{id:guid}", Name = "EditAsset")]`.
   Other code is commented where it explains a reason or a rule, not on every member (CS1591 and CS1573 are off).

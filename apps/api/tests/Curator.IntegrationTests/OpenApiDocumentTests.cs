@@ -1,15 +1,51 @@
 using System.Net.Http.Json;
+using System.Runtime.CompilerServices;
 using System.Text.Json;
 
 namespace Curator.IntegrationTests;
 
 /// <summary>
-/// The OpenAPI document, served in Development (the test host's environment). The same document is written to
-/// <c>apps/api/openapi.json</c> on build, and the app's API client is generated from it.
+/// The public OpenAPI document (<c>v1</c>), served in Development (the test host's environment). It's committed as
+/// <c>apps/api/openapi.json</c>, which the app's API client is generated from.
 /// </summary>
 [Collection(ApiCollection.Name)]
 public class OpenApiDocumentTests(CuratorApiFactory factory)
 {
+    private const string UpdateVariable = "UPDATE_OPENAPI";
+
+    // Only compares, so a stale file keeps failing until it's updated on purpose and committed.
+    [Fact]
+    public async Task MatchesTheCommittedFile()
+    {
+        var served = Normalize(await factory.CreateClient().GetStringAsync("/openapi/v1.json"));
+        var path = CommittedFilePath();
+
+        if (Environment.GetEnvironmentVariable(UpdateVariable) == "1")
+        {
+            await File.WriteAllTextAsync(path, served);
+            return;
+        }
+
+        var committed = File.Exists(path) ? Normalize(await File.ReadAllTextAsync(path)) : "";
+        Assert.True(
+            served == committed,
+            $"apps/api/openapi.json is out of date. Update it with `dotnet test tests/Curator.IntegrationTests " +
+            $"--filter {nameof(MatchesTheCommittedFile)} -e {UpdateVariable}=1` (from apps/api), check the diff and " +
+            "commit it with the API change.");
+    }
+
+    [Fact]
+    public async Task LeavesTheDevelopmentEndpointsToTheirOwnDocument()
+    {
+        var client = factory.CreateClient();
+        var v1 = await client.GetFromJsonAsync<JsonElement>("/openapi/v1.json");
+        var dev = await client.GetFromJsonAsync<JsonElement>("/openapi/dev.json");
+
+        Assert.DoesNotContain(v1.GetProperty("paths").EnumerateObject(), path => path.Name.StartsWith("/dev"));
+        Assert.All(dev.GetProperty("paths").EnumerateObject(), path => Assert.StartsWith("/dev", path.Name));
+        Assert.NotEmpty(dev.GetProperty("paths").EnumerateObject());
+    }
+
     [Fact]
     public async Task DeclaresBearerTokens_SoScalarCanSendThem()
     {
@@ -71,6 +107,32 @@ public class OpenApiDocumentTests(CuratorApiFactory factory)
         Assert.Empty(undocumented);
     }
 
+    // Path parameters are exempt: the path already says what they are (/assets/{id}).
+    [Fact]
+    public async Task DescribesEveryParameter_ExceptPathParameters()
+    {
+        var document = await GetDocumentAsync();
+
+        var undocumented = Operations(document)
+            .SelectMany(o => o.Operation.TryGetProperty("parameters", out var parameters)
+                ? parameters.EnumerateArray()
+                    .Where(parameter => parameter.GetProperty("in").GetString() != "path"
+                        && !parameter.TryGetProperty("description", out _))
+                    .Select(parameter => $"{o.Method} {o.Path} {parameter.GetProperty("name").GetString()}")
+                : [])
+            .ToList();
+        Assert.Empty(undocumented);
+    }
+
+    [Fact]
+    public async Task KeepsSummariesAndDescriptionsOnOneLine_SoTheFileIsTheSameOnEveryOs()
+    {
+        var document = await GetDocumentAsync();
+
+        var multiline = Texts(document).Where(text => text.Contains('\n') || text.Contains('\r')).ToList();
+        Assert.Empty(multiline);
+    }
+
     [Fact]
     public async Task IncludesValidationLimits_OfBodiesAndQueryParameters()
     {
@@ -110,6 +172,15 @@ public class OpenApiDocumentTests(CuratorApiFactory factory)
     {
         var document = await GetDocumentAsync();
 
+        var requests = Operations(document)
+            .Where(o => o.Operation.TryGetProperty("requestBody", out _))
+            .ToList();
+        Assert.NotEmpty(requests);
+        Assert.All(requests, r => Assert.Equal(
+            ["application/json"],
+            r.Operation.GetProperty("requestBody").GetProperty("content").EnumerateObject()
+                .Select(content => content.Name)));
+
         var responses = Operations(document)
             .SelectMany(o => o.Operation.GetProperty("responses").EnumerateObject()
                 .Where(response => response.Value.TryGetProperty("content", out _))
@@ -124,6 +195,14 @@ public class OpenApiDocumentTests(CuratorApiFactory factory)
         });
     }
 
+    // LF and one final newline, however the file was checked out.
+    private static string Normalize(string json) => json.ReplaceLineEndings("\n").TrimEnd() + "\n";
+
+    // From this file's path at compile time, since the test runs from bin/ or a custom --artifacts-path. A
+    // deterministic CI build (ContinuousIntegrationBuild, PathMap) maps that path to /_/, which would break this.
+    private static string CommittedFilePath([CallerFilePath] string thisFile = "") =>
+        Path.GetFullPath(Path.Combine(Path.GetDirectoryName(thisFile)!, "..", "..", "openapi.json"));
+
     private async Task<JsonElement> GetDocumentAsync() =>
         await factory.CreateClient().GetFromJsonAsync<JsonElement>("/openapi/v1.json");
 
@@ -133,6 +212,17 @@ public class OpenApiDocumentTests(CuratorApiFactory factory)
     private static IEnumerable<(string Method, string Path, JsonElement Operation)> Operations(JsonElement document) =>
         document.GetProperty("paths").EnumerateObject().SelectMany(path => path.Value.EnumerateObject()
             .Select(operation => (operation.Name.ToUpperInvariant(), path.Name, operation.Value)));
+
+    // Every summary and description anywhere in the document.
+    private static IEnumerable<string> Texts(JsonElement element) => element.ValueKind switch
+    {
+        JsonValueKind.Object => element.EnumerateObject().SelectMany(property =>
+            property.Name is "summary" or "description" && property.Value.ValueKind == JsonValueKind.String
+                ? [property.Value.GetString()!]
+                : Texts(property.Value)),
+        JsonValueKind.Array => element.EnumerateArray().SelectMany(Texts),
+        _ => [],
+    };
 
     private static JsonElement QueryParameter(JsonElement document, string path, string name) =>
         document.GetProperty("paths").GetProperty(path).GetProperty("get").GetProperty("parameters").EnumerateArray()

@@ -54,16 +54,11 @@
           "Collections"
         ],
         "summary": "Create a collection",
-        "description": "Creates a collection at the top level, or inside `parentId`. Anyone can create one inside any\r\ncollection, up to 5 levels deep.",
+        "description": "Creates a collection at the top level, or inside `parentId`. Anyone can create one inside any collection, up to 5 levels deep.",
         "operationId": "CreateCollection",
         "requestBody": {
           "content": {
             "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateCollectionRequest"
-              }
-            },
-            "application/*+json": {
               "schema": {
                 "$ref": "#/components/schemas/CreateCollectionRequest"
               }
@@ -111,7 +106,7 @@
           "Collections"
         ],
         "summary": "Get a collection",
-        "description": "Gets one collection. Its clips are listed by `GET /assets` with `collectionId`, and its\r\nsub-collections are the items of `GET /collections` with this `parentId`.",
+        "description": "Gets one collection. Its clips are listed by `GET /assets` with `collectionId`, and its sub-collections are the items of `GET /collections` with this `parentId`.",
         "operationId": "GetCollection",
         "parameters": [
           {
@@ -152,7 +147,7 @@
           "Collections"
         ],
         "summary": "Edit a collection",
-        "description": "Edits the name and description. Send both: a missing or `null` description clears it. Only the creator\r\nand admins can edit a collection. Move it with `POST /collections/{id}/move`.",
+        "description": "Edits the name and description. Send both: a missing or `null` description clears it. Only the creator and admins can edit a collection. Move it with `POST /collections/{id}/move`.",
         "operationId": "EditCollection",
         "parameters": [
           {
@@ -168,11 +163,6 @@
         "requestBody": {
           "content": {
             "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/EditCollectionRequest"
-              }
-            },
-            "application/*+json": {
               "schema": {
                 "$ref": "#/components/schemas/EditCollectionRequest"
               }
@@ -228,7 +218,7 @@
           "Collections"
         ],
         "summary": "Delete a collection",
-        "description": "Deletes a collection and all of its sub-collections, also those created by others. Only the creator and\r\nadmins can delete it. The clips stay in the library.",
+        "description": "Deletes a collection and all of its sub-collections, also those created by others. Only the creator and admins can delete it. The clips stay in the library.",
         "operationId": "DeleteCollection",
         "parameters": [
           {
@@ -281,7 +271,7 @@
           "Collections"
         ],
         "summary": "Move a collection",
-        "description": "Moves a collection, with its sub-collections, inside `parentId` or to the top level (`null`). Only the\r\ncreator and admins can move it. Moving it into itself or one of its sub-collections, or deeper than 5 levels\r\nin all, is a conflict.",
+        "description": "Moves a collection, with its sub-collections, inside `parentId` or to the top level (`null`). Only the creator and admins can move it. Moving it into itself or one of its sub-collections, or deeper than 5 levels in all, is a conflict.",
         "operationId": "MoveCollection",
         "parameters": [
           {
@@ -297,11 +287,6 @@
         "requestBody": {
           "content": {
             "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/MoveCollectionRequest"
-              }
-            },
-            "application/*+json": {
               "schema": {
                 "$ref": "#/components/schemas/MoveCollectionRequest"
               }
@@ -369,7 +354,7 @@
           "Collections"
         ],
         "summary": "Add clips to a collection",
-        "description": "Adds up to 100 clips to a collection. Anyone can add clips to any collection. Clips already in it are skipped,\r\nand a clip that doesn't exist (deleted, or not uploaded yet) fails the whole request.",
+        "description": "Adds up to 100 clips to a collection. Anyone can add clips to any collection. Clips already in it are skipped, and a clip that doesn't exist (deleted, or not uploaded yet) fails the whole request.",
         "operationId": "AddClipsToCollection",
         "parameters": [
           {
@@ -385,11 +370,6 @@
         "requestBody": {
           "content": {
             "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/AddClipsToCollectionRequest"
-              }
-            },
-            "application/*+json": {
               "schema": {
                 "$ref": "#/components/schemas/AddClipsToCollectionRequest"
               }
@@ -437,7 +417,7 @@
           "Collections"
         ],
         "summary": "Remove clips from a collection",
-        "description": "Removes up to 100 clips from a collection. Anyone can remove clips from any collection. Clips that aren't in it\r\nare skipped, and the clips stay in the library. A `POST`, because a body on `DELETE` is often dropped.",
+        "description": "Removes up to 100 clips from a collection. Anyone can remove clips from any collection. Clips that aren't in it are skipped, and the clips stay in the library. A `POST`, because a body on `DELETE` is often dropped.",
         "operationId": "RemoveClipsFromCollection",
         "parameters": [
           {
@@ -453,11 +433,6 @@
         "requestBody": {
           "content": {
             "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/RemoveClipsFromCollectionRequest"
-              }
-            },
-            "application/*+json": {
               "schema": {
                 "$ref": "#/components/schemas/RemoveClipsFromCollectionRequest"
               }
@@ -505,7 +480,7 @@
           "Assets"
         ],
         "summary": "List assets",
-        "description": "Lists the shared library, a page at a time. Pass `nextCursor` as `cursor` for the next page,\r\nwith the same other parameters. Uploads that haven't completed aren't listed. Pass `collectionId` for\r\na collection's clips; 404 if the collection doesn't exist.",
+        "description": "Lists the shared library, a page at a time. Pass `nextCursor` as `cursor` for the next page, with the same other parameters. Uploads that haven't completed aren't listed. Pass `collectionId` for a collection's clips; 404 if the collection doesn't exist.",
         "operationId": "ListAssets",
         "parameters": [
           {
@@ -520,7 +495,7 @@
           {
             "name": "sort",
             "in": "query",
-            "description": "What to sort by: `Recorded` (when the clip was recorded, or uploaded if that's unknown), `Uploaded` or\r\n`Title` (ignoring case). Defaults to `Recorded`.",
+            "description": "What to sort by: `Recorded` (when the clip was recorded, or uploaded if that's unknown), `Uploaded` or `Title` (ignoring case). Defaults to `Recorded`.",
             "schema": {
               "$ref": "#/components/schemas/AssetSort"
             }
@@ -638,7 +613,7 @@
           "Assets"
         ],
         "summary": "Get an asset",
-        "description": "Gets one asset, with signed URLs for playing it and showing its thumbnail. Fetch it again for new URLs\r\nafter `urlsExpireAt`. An upload that hasn't completed is only visible to its uploader.",
+        "description": "Gets one asset, with signed URLs for playing it and showing its thumbnail. Fetch it again for new URLs after `urlsExpireAt`. An upload that hasn't completed is only visible to its uploader.",
         "operationId": "GetAsset",
         "parameters": [
           {
@@ -679,7 +654,7 @@
           "Assets"
         ],
         "summary": "Edit an asset",
-        "description": "Edits the title, description and recording time. Send all three: a missing or `null` description or\r\n`recordedAt` clears it. Only the uploader and admins can edit an asset.",
+        "description": "Edits the title, description and recording time. Send all three: a missing or `null` description or `recordedAt` clears it. Only the uploader and admins can edit an asset.",
         "operationId": "EditAsset",
         "parameters": [
           {
@@ -695,11 +670,6 @@
         "requestBody": {
           "content": {
             "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/EditAssetRequest"
-              }
-            },
-            "application/*+json": {
               "schema": {
                 "$ref": "#/components/schemas/EditAssetRequest"
               }
@@ -755,7 +725,7 @@
           "Assets"
         ],
         "summary": "Delete an asset",
-        "description": "Deletes an asset from the library. Only the uploader and admins can delete it. Deleting it again returns\r\n404, like any asset that doesn't exist.",
+        "description": "Deletes an asset from the library. Only the uploader and admins can delete it. Deleting it again returns 404, like any asset that doesn't exist.",
         "operationId": "DeleteAsset",
         "parameters": [
           {
@@ -808,16 +778,11 @@
           "Assets"
         ],
         "summary": "Start an upload",
-        "description": "Starts an upload. Upload the file to `uploadUrl` with `PUT` and the same `Content-Type`. Storage\r\nrejects a file whose size differs from `sizeBytes`.",
+        "description": "Starts an upload. Upload the file to `uploadUrl` with `PUT` and the same `Content-Type`. Storage rejects a file whose size differs from `sizeBytes`.",
         "operationId": "CreateUpload",
         "requestBody": {
           "content": {
             "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateUploadRequest"
-              }
-            },
-            "application/*+json": {
               "schema": {
                 "$ref": "#/components/schemas/CreateUploadRequest"
               }
@@ -855,7 +820,7 @@
           "Assets"
         ],
         "summary": "Complete an upload",
-        "description": "Completes an upload after the `PUT` to `uploadUrl` succeeded. Checks that the file is in storage\r\nwith the size the upload was started for. Calling it again is harmless.",
+        "description": "Completes an upload after the `PUT` to `uploadUrl` succeeded. Checks that the file is in storage with the size the upload was started for. Calling it again is harmless.",
         "operationId": "CompleteUpload",
         "parameters": [
           {
@@ -1354,7 +1319,7 @@
             "description": "MIME type of the original."
           },
           "status": {
-            "description": "`Uploaded` once the file is in storage. `Processing`, `Ready` and `Failed` are for video\r\n        processing, which doesn't exist yet. `Pending` until the upload is completed, which only its uploader\r\n        sees.",
+            "description": "`Uploaded` once the file is in storage. `Processing`, `Ready` and `Failed` are for video processing, which doesn't exist yet. `Pending` until the upload is completed, which only its uploader sees.",
             "$ref": "#/components/schemas/AssetStatus"
           },
           "uploadedBy": {
@@ -1408,7 +1373,7 @@
               "null",
               "string"
             ],
-            "description": "Signed URL of the video to play: the playback version, or the original until processing has created one.\r\n`null` while the upload is pending."
+            "description": "Signed URL of the video to play: the playback version, or the original until processing has created one. `null` while the upload is pending."
           },
           "thumbnailUrl": {
             "type": [
@@ -1508,7 +1473,7 @@
             "description": "The description, or `null` for none."
           },
           "status": {
-            "description": "`Uploaded` once the file is in storage. `Processing`, `Ready` and `Failed` are for video\r\n        processing, which doesn't exist yet. Uploads that haven't completed aren't listed.",
+            "description": "`Uploaded` once the file is in storage. `Processing`, `Ready` and `Failed` are for video processing, which doesn't exist yet. Uploads that haven't completed aren't listed.",
             "$ref": "#/components/schemas/AssetStatus"
           },
           "uploadedBy": {

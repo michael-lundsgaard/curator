@@ -11,10 +11,12 @@ public static class ControllerExtensions
     {
         services.AddControllers(options =>
             {
-                // JSON only, so the OpenAPI document doesn't list each body as text/plain and text/json too.
+                // JSON only, so the OpenAPI document doesn't list each body as text/plain, text/json and
+                // application/*+json too.
                 options.OutputFormatters.RemoveType<StringOutputFormatter>();
-                options.InputFormatters.OfType<SystemTextJsonInputFormatter>().Single()
-                    .SupportedMediaTypes.Remove("text/json");
+                var input = options.InputFormatters.OfType<SystemTextJsonInputFormatter>().Single();
+                input.SupportedMediaTypes.Remove("text/json");
+                input.SupportedMediaTypes.Remove("application/*+json");
                 options.OutputFormatters.OfType<SystemTextJsonOutputFormatter>().Single()
                     .SupportedMediaTypes.Remove("text/json");
             })

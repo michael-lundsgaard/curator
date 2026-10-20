@@ -1,4 +1,5 @@
 using Curator.Api.Authentication;
+using Curator.Api.OpenApi;
 using Curator.Infrastructure.Persistence;
 
 namespace Curator.Api.Development;
@@ -8,7 +9,7 @@ public static class DevelopmentEndpoints
 {
     public static void MapDevelopmentEndpoints(this IEndpointRouteBuilder app)
     {
-        var dev = app.MapGroup("/dev").WithTags("Development");
+        var dev = app.MapGroup("/dev").WithTags("Development").WithGroupName(OpenApiExtensions.DevDocument);
 
         // Sample profiles, clips and collections. Some are by the caller.
         dev.MapPost("/sample-data", async (

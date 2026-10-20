@@ -67,9 +67,16 @@ dotnet ef migrations add <Name> --project src/Curator.Infrastructure --startup-p
 | http://localhost:5238/scalar          | API reference (Development)    |
 | http://localhost:5238/openapi/v1.json | OpenAPI document (Development) |
 
-Every build also writes the OpenAPI document to [`apps/api/openapi.json`](apps/api/openapi.json), which is
-committed: API changes show up in the diff, and the app's API client is generated from it. Commit it with the
-change that caused it. It leaves out the Development endpoints (`/dev`).
+The OpenAPI document is committed as [`apps/api/openapi.json`](apps/api/openapi.json): API changes show up in
+the diff, and the app's API client is generated from it. A test fails when it's out of date; update it from
+`apps/api` with
+
+```bash
+dotnet test tests/Curator.IntegrationTests --filter MatchesTheCommittedFile -e UPDATE_OPENAPI=1
+```
+
+and commit it with the change that caused it. The Development endpoints (`/dev`) are in a separate document
+(`/openapi/dev.json`, also in Scalar), so they're never in the committed one.
 
 The `.http` files run with the REST Client extension.
 
