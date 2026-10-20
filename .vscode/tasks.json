@@ -19,7 +19,39 @@
       "command": "dotnet",
       "args": ["watch", "run", "--project", "${workspaceFolder}/apps/api/src/Curator.Api"],
       "isBackground": true,
-      "problemMatcher": "$msCompile"
+      // The background patterns tell VS Code when the API is up, so "dev" can run both side by side
+      "problemMatcher": {
+        "base": "$msCompile",
+        "background": {
+          "activeOrBegins": true,
+          "beginsPattern": "dotnet watch",
+          "endsPattern": "Now listening on"
+        }
+      }
+    },
+
+    // App tasks (the npm scripts in apps/app also show up under Run Task on their own)
+    {
+      "label": "dev app",
+      "type": "npm",
+      "script": "dev",
+      "path": "apps/app",
+      "isBackground": true,
+      "problemMatcher": {
+        "owner": "vite",
+        "pattern": { "regexp": "^never matches$" },
+        "background": {
+          "activeOrBegins": true,
+          "beginsPattern": "VITE",
+          "endsPattern": "Local:"
+        }
+      }
+    },
+    {
+      "label": "dev",
+      "detail": "API (dotnet watch) and app (Vite) together",
+      "dependsOn": ["watch api", "dev app"],
+      "problemMatcher": []
     },
     {
       "label": "test",

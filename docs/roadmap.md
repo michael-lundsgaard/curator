@@ -77,11 +77,14 @@ Built step by step. Each step is small and shippable. Order may change.
   - [x] Bare Vite app (React, TypeScript, oxlint) with a client generated from that file: openapi-typescript
         types and openapi-fetch, kept current by `npm run check:api` →
         [0009](decisions/0009-generated-api-client.md). openapi-react-query adds TanStack Query at the Library step
-  - [ ] App shell: sidebar and top bar, theme tokens with light and dark (system default, switch in the top
-        bar). The Vite dev server proxies `/api` to the API, so the API needs no CORS until the app is hosted.
-        A VS Code task that starts the API and the app together (npm scripts show up in _Run Task_ on their own)
-    - Tooling: Playwright MCP, so the agent can open the app, click through it and compare screenshots with
-      the mocks in both themes
+  - [x] App shell: sidebar and top bar, theme tokens with light and dark (follows the OS; one light/dark button
+        in the top bar remembers only a choice that differs from the OS, see [design.md](design.md)), Lucide
+        icons. Styled with Tailwind CSS → [0010](decisions/0010-tailwind-css.md), routed with TanStack Router's
+        file-based routes → [0011](decisions/0011-tanstack-router.md); Home, Library and Upload are placeholder
+        routes. The Vite dev server proxies `/api` to the API, so the API needs no CORS
+        until the app is hosted. The VS Code task `dev` starts the API and the app together
+    - Tooling: Playwright MCP (`.mcp.json`), so the agent can open the app, click through it and compare
+      screenshots with the mocks in both themes
   - [ ] Sign in and reset password with supabase-js (add the app's reset URL to Supabase's redirect URLs),
         then `GET /me`
     - Tooling: read-only database lookups against the local Docker Postgres (a Postgres MCP or `psql` through

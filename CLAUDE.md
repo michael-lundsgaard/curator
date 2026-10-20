@@ -32,6 +32,8 @@ apps/
       Curator.IntegrationTests  WebApplicationFactory<Program> tests against the API
   app/            React app (Vite, TypeScript)
     src/api/      generated API types (schema.d.ts) and the openapi-fetch client
+    src/routes/   TanStack Router file-based routes (__root.tsx is the shell); routeTree.gen.ts is generated
+    src/shell/    sidebar, top bar, theme switch
 ```
 
 Dependency rule: Api → Application → Domain; Infrastructure → Application.
@@ -67,12 +69,20 @@ dotnet ef database update --project src/Curator.Infrastructure --startup-project
 Run from `apps/app`:
 
 ```bash
-npm run dev            # http://localhost:5173
+npm run dev            # http://localhost:5173, proxies /api to the API on :5238
 npm run typecheck
 npm run lint           # oxlint
 npm run generate:api   # src/api/schema.d.ts from ../api/openapi.json, after every openapi.json change
 npm run check:api      # fails when the committed schema.d.ts is out of date
 ```
+
+- `npm run dev` and `npm run build` regenerate `src/routeTree.gen.ts` when a route file is added, renamed or
+  removed; commit it with that change.
+- Styling: Tailwind with the design tokens (`bg-surface`, `text-meta`, `border-line`; `src/index.css`), never raw
+  colors or `dark:` variants: the tokens switch with the theme. See `docs/decisions/0010-tailwind-css.md`.
+- Routing: `Link` and `navigate` from TanStack Router, typed against the routes. See
+  `docs/decisions/0011-tanstack-router.md`.
+- To look at the app, use the Playwright MCP (`.mcp.json`) against `npm run dev`, in both themes.
 
 - Call the API through `api` in `src/api/client.ts`, not a hand-written `fetch`. See
   `docs/decisions/0009-generated-api-client.md`.

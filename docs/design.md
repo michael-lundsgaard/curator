@@ -21,32 +21,42 @@ screen does, not final copy or exact spacing.
 - Type: **Schibsted Grotesk** (400, 600, 800) for headings and interface, **IBM Plex Mono** (400, 500) for
   metadata: dates, lengths, sizes, counts, status badges. Both from Google Fonts.
 - One accent per screen: cobalt for the main action.
+- Icons: [Lucide](https://lucide.dev) (`lucide-react`), the style the mocks are drawn in (24px grid, 2px stroke,
+  round caps), at 18px next to text. The logo mark is our own SVG.
 
 ## Colors
 
 Defined once as CSS variables per theme. The light theme is the brand board's palette (Gallery, Frame, Slate,
 Ink, Cobalt); the dark theme is derived from it. Text colors pass 4.5:1 on their backgrounds.
 
-| Token           | Light     | Dark      | Use                                       |
-| --------------- | --------- | --------- | ----------------------------------------- |
-| `--bg`          | `#F3F4F1` | `#0E1116` | Page background                           |
-| `--surface`     | `#FFFFFF` | `#171A21` | Cards, sidebar, inputs                    |
-| `--sunken`      | `#E9EAE6` | `#1E222B` | Hover, progress tracks, segmented control |
-| `--line`        | `#DCDFE3` | `#2A2F39` | Borders and dividers                      |
-| `--text`        | `#0E1116` | `#F3F4F1` | Text                                      |
-| `--meta`        | `#5C6068` | `#9AA0A8` | Secondary text and metadata               |
-| `--accent`      | `#2F4BFF` | `#3D57FF` | Primary buttons (white text)              |
-| `--accent-soft` | `#E4E8FF` | `#1C2453` | Selected nav item, chips                  |
-| `--link`        | `#2F4BFF` | `#8C9BFF` | Links and text on `--accent-soft`         |
-| `--warn`        | `#8A5200` | `#F2B35B` | `Pending` (on `--warn-soft`)              |
-| `--warn-soft`   | `#FBEBD3` | `#3A2B12` |                                           |
-| `--danger`      | `#B42318` | `#FF8A80` | `Failed`, delete (on `--danger-soft`)     |
-| `--danger-soft` | `#FDE7E5` | `#3D1715` |                                           |
-| `--ok`          | `#1D7A4A` | `#5CC98E` | Done, success messages (on `--ok-soft`)   |
-| `--ok-soft`     | `#DDF3E6` | `#14301F` |                                           |
+| Token            | Light     | Dark      | Use                                       |
+| ---------------- | --------- | --------- | ----------------------------------------- |
+| `--bg`           | `#F3F4F1` | `#0E1116` | Page background                           |
+| `--surface`      | `#FFFFFF` | `#171A21` | Cards, sidebar, inputs                    |
+| `--sunken`       | `#E9EAE6` | `#1E222B` | Hover, progress tracks, segmented control |
+| `--line`         | `#DCDFE3` | `#2A2F39` | Borders and dividers                      |
+| `--text`         | `#0E1116` | `#F3F4F1` | Text                                      |
+| `--meta`         | `#5C6068` | `#9AA0A8` | Secondary text and metadata               |
+| `--accent`       | `#2F4BFF` | `#3D57FF` | Primary buttons (white text)              |
+| `--accent-hover` | `#1F35C9` | `#5A70FF` | Primary buttons on hover                  |
+| `--accent-soft`  | `#E4E8FF` | `#1C2453` | Selected nav item, chips                  |
+| `--link`         | `#2F4BFF` | `#8C9BFF` | Links and text on `--accent-soft`         |
+| `--warn`         | `#8A5200` | `#F2B35B` | `Pending` (on `--warn-soft`)              |
+| `--warn-soft`    | `#FBEBD3` | `#3A2B12` |                                           |
+| `--danger`       | `#B42318` | `#FF8A80` | `Failed`, delete (on `--danger-soft`)     |
+| `--danger-soft`  | `#FDE7E5` | `#3D1715` |                                           |
+| `--ok`           | `#1D7A4A` | `#5CC98E` | Done, success messages (on `--ok-soft`)   |
+| `--ok-soft`      | `#DDF3E6` | `#14301F` |                                           |
 
 ## Light and dark
 
-The theme follows the operating system (`prefers-color-scheme`) until the user picks one with the switch in the
-top bar: System, Light or Dark. The choice is remembered in the browser (`localStorage`), since it's a preference
-for that device, not part of the profile.
+The theme follows the operating system (`prefers-color-scheme`). The top bar has one button, as in the mocks, that
+switches between light and dark; its icon shows the theme a click switches to. A choice that differs from the OS
+theme is remembered in the browser (`localStorage`), since it's a preference for that device, not part of the
+profile. A click back to the OS theme forgets it, so the app follows the OS again (say, one that turns dark at
+sunset). System is the default, not an option: a System / Light / Dark menu or three buttons were weighed, but
+cost a second click or the room of three buttons for something rarely changed.
+
+In the app, the tokens are Tailwind theme variables (`--color-surface` makes `bg-surface`, `text-surface`, …) in
+`apps/app/src/index.css`, with the dark values under `[data-theme="dark"]`. See
+[0010](decisions/0010-tailwind-css.md).

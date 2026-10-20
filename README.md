@@ -35,6 +35,14 @@ dotnet test Curator.slnx      # integration tests start their own Postgres conta
 dotnet watch run --project src/Curator.Api
 ```
 
+Then the app, in another terminal (or both at once with the VS Code task `dev`):
+
+```bash
+cd apps/app
+npm install
+npm run dev                   # http://localhost:5173, /api is proxied to the API on :5238
+```
+
 Uploads go to a Cloudflare R2 bucket (`curator-dev` in Development, set in `appsettings.Development.json`).
 Create an R2 API token with _Object Read & Write_ on that bucket only, and store its S3 keys as user
 secrets (not the `cfat_` token value):
@@ -124,7 +132,9 @@ Tasks (`Ctrl+Shift+P` → _Tasks: Run Task_):
 | ------------- | -------------------------------------------------- |
 | `build`       | Build the solution (default build, `Ctrl+Shift+B`) |
 | `test`        | Run all tests (default test task)                  |
+| `dev`         | `watch api` and `dev app` side by side             |
 | `watch api`   | Run the API with hot reload                        |
+| `dev app`     | Run the app's Vite dev server                      |
 | `format all`  | Run `format api` + `format rest`                   |
 | `format api`  | `dotnet format` the solution                       |
 | `format rest` | Prettier over everything else                      |
@@ -138,6 +148,11 @@ Project context lives in [CLAUDE.md](CLAUDE.md), and shared settings and skills 
 | Command   | What                                                          |
 | --------- | ------------------------------------------------------------- |
 | `/verify` | Build, lint, check formatting and run all tests (API and app) |
+
+[.mcp.json](.mcp.json) adds the Playwright MCP server, so Claude can open the app (`npm run dev`), click through
+it and take screenshots to compare with the mocks. Claude Code asks once whether to enable it. It drives the
+installed Edge (so there's no browser to download), and starts through `cmd /c npx`, the form Claude Code needs
+on Windows.
 
 ## License
 

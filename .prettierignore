@@ -3,3 +3,6 @@ apps/api/openapi.json
 
 # Generated from openapi.json by openapi-typescript (npm run generate:api)
 apps/app/src/api/schema.d.ts
+
+# Generated from src/routes by the TanStack Router Vite plugin (on npm run dev and build)
+apps/app/src/routeTree.gen.ts

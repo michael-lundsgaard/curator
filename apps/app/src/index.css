@@ -1,0 +1,66 @@
+@import "tailwindcss";
+
+/*
+  The design tokens from docs/design.md. Each --color-x makes utilities like bg-x, text-x and border-x, which read
+  the variable, so overriding the variables for [data-theme="dark"] switches every utility at once. The default
+  palette is cleared, so only these colors exist.
+*/
+@theme {
+  --color-*: initial;
+  --color-white: #ffffff;
+
+  --color-bg: #f3f4f1;
+  --color-surface: #ffffff;
+  --color-sunken: #e9eae6;
+  --color-line: #dcdfe3;
+  --color-text: #0e1116;
+  --color-meta: #5c6068;
+  --color-accent: #2f4bff;
+  --color-accent-hover: #1f35c9;
+  --color-accent-soft: #e4e8ff;
+  --color-link: #2f4bff;
+  --color-warn: #8a5200;
+  --color-warn-soft: #fbebd3;
+  --color-danger: #b42318;
+  --color-danger-soft: #fde7e5;
+  --color-ok: #1d7a4a;
+  --color-ok-soft: #ddf3e6;
+
+  --font-sans: "Schibsted Grotesk", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+}
+
+/* index.html sets data-theme before the first paint; src/theme.ts keeps it in step with the switch. */
+[data-theme="dark"] {
+  color-scheme: dark;
+  --color-bg: #0e1116;
+  --color-surface: #171a21;
+  --color-sunken: #1e222b;
+  --color-line: #2a2f39;
+  --color-text: #f3f4f1;
+  --color-meta: #9aa0a8;
+  --color-accent: #3d57ff;
+  --color-accent-hover: #5a70ff;
+  --color-accent-soft: #1c2453;
+  --color-link: #8c9bff;
+  --color-warn: #f2b35b;
+  --color-warn-soft: #3a2b12;
+  --color-danger: #ff8a80;
+  --color-danger-soft: #3d1715;
+  --color-ok: #5cc98e;
+  --color-ok-soft: #14301f;
+}
+
+@layer base {
+  :root {
+    color-scheme: light;
+  }
+
+  body {
+    @apply bg-bg font-sans text-text;
+  }
+
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-accent;
+  }
+}
