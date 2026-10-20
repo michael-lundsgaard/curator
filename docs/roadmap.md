@@ -111,6 +111,10 @@ Built step by step. Each step is small and shippable. Order may change.
       deployed; structured logs with request logging, and somewhere to read logs and errors. Avoid hosts that
       sleep when idle: Render's free tier (used for asset-vault) spins down after 15 minutes without traffic
       and the next request waits for a cold start
+  - API versioning: none while our app is the only client, since both deploy together and change in the same
+    commit. When an outside client appears (an agent, a script, a mobile app), choose a scheme in an ADR (likely
+    `Asp.Versioning` with `/v1` routes, keeping today's routes as v1). The committed `openapi.json` shows every
+    breaking change as a diff; in CI, a tool like `oasdiff` could flag them
 - [ ] Video processing: transcode to playback version and generate thumbnail
   - Choose between options A (public bucket on a custom domain) and B (presigned URLs per response) in
     [0006](decisions/0006-serving-thumbnails.md): find out what a domain and the rest of A cost. Then store
