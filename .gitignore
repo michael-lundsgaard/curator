@@ -429,3 +429,12 @@ FodyWeavers.xsd
 
 # Wrangler local state
 .wrangler/
+
+# Node / Vite (apps/app)
+dist/
+dist-ssr/
+# Local env files (.env.local, .env.development.local) hold secrets
+*.local
+.idea/
+.DS_Store
+*.sw?

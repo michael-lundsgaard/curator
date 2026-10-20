@@ -3,6 +3,3 @@ apps/api/openapi.json
 
 # Generated from openapi.json by openapi-typescript (npm run generate:api)
 apps/app/src/api/schema.d.ts
-
-# Build output (ignored by apps/app/.gitignore, which Prettier does not read)
-apps/app/dist/

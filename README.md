@@ -135,9 +135,9 @@ Tasks (`Ctrl+Shift+P` → _Tasks: Run Task_):
 
 Project context lives in [CLAUDE.md](CLAUDE.md), and shared settings and skills live in [.claude/](.claude/).
 
-| Command   | What                                      |
-| --------- | ----------------------------------------- |
-| `/verify` | Build, check formatting and run all tests |
+| Command   | What                                                          |
+| --------- | ------------------------------------------------------------- |
+| `/verify` | Build, lint, check formatting and run all tests (API and app) |
 
 ## License
 
