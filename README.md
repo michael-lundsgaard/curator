@@ -9,6 +9,7 @@ Media asset manager for videos. Upload in bulk, organize into collections, searc
 | Path       | What                                              |
 | ---------- | ------------------------------------------------- |
 | `apps/api` | .NET 10 Web API (Clean Architecture-style layers) |
+| `apps/app` | React app (Vite, TypeScript)                      |
 | `infra`    | Cloud configuration (R2 bucket CORS)              |
 | `docs`     | Roadmap, data model, architecture, design, ADRs   |
 
@@ -19,7 +20,7 @@ New here? [docs/architecture.md](docs/architecture.md) shows how a request flows
 
 - [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0) (pinned in `apps/api/global.json`)
 - [Docker Desktop](https://www.docker.com/products/docker-desktop/) (local Postgres and integration tests)
-- [Node.js](https://nodejs.org/) for `npx` (Prettier, and wrangler for the R2 CORS policy)
+- [Node.js](https://nodejs.org/) for the app, and `npx` (Prettier, and wrangler for the R2 CORS policy)
 - VS Code with the recommended extensions (`.vscode/extensions.json`)
 
 ## Getting started
@@ -75,7 +76,14 @@ the diff, and the app's API client is generated from it. A test fails when it's 
 dotnet test tests/Curator.IntegrationTests --filter MatchesTheCommittedFile -e UPDATE_OPENAPI=1
 ```
 
-and commit it with the change that caused it. The Development endpoints (`/dev`) are in a separate document
+and commit it with the change that caused it, together with the app's types regenerated from it (from
+`apps/app`, after `npm install`):
+
+```bash
+npm run generate:api   # npm run check:api fails while they're out of date
+```
+
+The Development endpoints (`/dev`) are in a separate document
 (`/openapi/dev.json`, also in Scalar), so they're never in the committed one.
 
 The `.http` files run with the REST Client extension.

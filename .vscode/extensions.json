@@ -4,7 +4,7 @@
     "ms-azuretools.vscode-containers",
     "humao.rest-client",
     "editorconfig.editorconfig",
-    "dbaeumer.vscode-eslint",
+    "oxc.oxc-vscode",
     "esbenp.prettier-vscode",
     "bradlc.vscode-tailwindcss"
   ]

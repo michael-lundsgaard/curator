@@ -30,6 +30,8 @@ apps/
     tests/
       Curator.UnitTests         Application/Domain tests
       Curator.IntegrationTests  WebApplicationFactory<Program> tests against the API
+  app/            React app (Vite, TypeScript)
+    src/api/      generated API types (schema.d.ts) and the openapi-fetch client
 ```
 
 Dependency rule: Api → Application → Domain; Infrastructure → Application.
@@ -61,6 +63,19 @@ dotnet ef database update --project src/Curator.Infrastructure --startup-project
   with the API change that caused it. How it's shaped (schema names, enums, limits, query parameter names) is in
   `src/Curator.Api/OpenApi/`.
 - Health: http://localhost:5238/health
+
+Run from `apps/app`:
+
+```bash
+npm run dev            # http://localhost:5173
+npm run typecheck
+npm run lint           # oxlint
+npm run generate:api   # src/api/schema.d.ts from ../api/openapi.json, after every openapi.json change
+npm run check:api      # fails when the committed schema.d.ts is out of date
+```
+
+- Call the API through `api` in `src/api/client.ts`, not a hand-written `fetch`. See
+  `docs/decisions/0009-generated-api-client.md`.
 
 If the API is already running (debugger/watch), it locks `bin/`. To build or test in that case, pass
 `--artifacts-path <temp dir>` rather than killing the user's process.

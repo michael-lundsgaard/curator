@@ -74,10 +74,12 @@ Built step by step. Each step is small and shippable. Order may change.
         test, with the `/dev` endpoints in a document of their own →
         [0008](decisions/0008-openapi-document.md). Not written on every build: that runs the app's whole startup
         in every build, so startup could never need a database
-  - [ ] Generated API client from that file: choose between hey-api/openapi-ts (used by asset-vault) and
-        openapi-typescript with openapi-fetch
+  - [x] Bare Vite app (React, TypeScript, oxlint) with a client generated from that file: openapi-typescript
+        types and openapi-fetch, kept current by `npm run check:api` →
+        [0009](decisions/0009-generated-api-client.md). openapi-react-query adds TanStack Query at the Library step
   - [ ] App shell: sidebar and top bar, theme tokens with light and dark (system default, switch in the top
-        bar). The Vite dev server proxies the API, so the API needs no CORS until the app is hosted
+        bar). The Vite dev server proxies `/api` to the API, so the API needs no CORS until the app is hosted.
+        A VS Code task that starts the API and the app together (npm scripts show up in _Run Task_ on their own)
     - Tooling: Playwright MCP, so the agent can open the app, click through it and compare screenshots with
       the mocks in both themes
   - [ ] Sign in and reset password with supabase-js (add the app's reset URL to Supabase's redirect URLs),
