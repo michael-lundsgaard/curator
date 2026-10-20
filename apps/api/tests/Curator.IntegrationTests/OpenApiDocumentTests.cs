@@ -77,6 +77,7 @@ public class OpenApiDocumentTests(CuratorApiFactory factory)
         var document = await GetDocumentAsync();
 
         var title = Schemas(document).GetProperty("EditAssetRequest").GetProperty("properties").GetProperty("title");
+        Assert.Equal(1, title.GetProperty("minLength").GetInt32());
         Assert.Equal(255, title.GetProperty("maxLength").GetInt32());
 
         var assetIds = Schemas(document).GetProperty("AddClipsToCollectionRequest")

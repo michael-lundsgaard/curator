@@ -73,7 +73,8 @@ If the API is already running (debugger/watch), it locks `bin/`. To build or tes
   forbidden, conflict) are returned as `Result<T>` and mapped with `result.ToActionResult(this, Ok)`;
   exceptions are for bugs. See `docs/decisions/0004-application-structure.md`.
 - API documentation: the request and response records are the public contract, so every parameter gets a
-  `<param>` (a test fails otherwise). Each action has a short `<summary>` (the label in Scalar), the details in
+  `<param>` (a test fails otherwise), saying what the schema can't: meaning, defaults, behaviour. Not "required" or
+  limits, which the document already shows. Each action has a short `<summary>` (the label in Scalar), the details in
   `<remarks>`, and the use case as route name for the operation ID: `[HttpPatch("{id:guid}", Name = "EditAsset")]`.
   Other code is commented where it explains a reason or a rule, not on every member (CS1591 and CS1573 are off).
 - Auth: every endpoint requires a signed-in user unless marked `AllowAnonymous`. Read the user with

@@ -21,7 +21,7 @@ public static class AddClipsToCollection
 {
     public const int MaxClips = 100;
 
-    /// <param name="AssetIds">The clips to add, 1 to 100. They must be uploaded and not deleted.</param>
+    /// <param name="AssetIds">The clips to add. They must be uploaded and not deleted.</param>
     public sealed record Command([Required, Length(1, MaxClips)] IReadOnlyList<Guid> AssetIds);
 
     /// <param name="Id">The collection.</param>

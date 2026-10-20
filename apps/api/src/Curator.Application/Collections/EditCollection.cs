@@ -12,7 +12,7 @@ namespace Curator.Application.Collections;
 /// </summary>
 public static class EditCollection
 {
-    /// <param name="Name">The new name. Required.</param>
+    /// <param name="Name">The new name.</param>
     /// <param name="Description">The new description, or <c>null</c> for none.</param>
     public sealed record Command(
         [Required, MaxLength(CreateCollection.MaxNameLength)] string Name,

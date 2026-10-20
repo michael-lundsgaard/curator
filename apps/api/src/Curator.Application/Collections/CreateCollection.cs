@@ -16,7 +16,7 @@ public static class CreateCollection
     public const int MaxNameLength = 255;
     public const int MaxDescriptionLength = 5000;
 
-    /// <param name="Name">The name, e.g. a game or an occasion. Required.</param>
+    /// <param name="Name">The name, e.g. a game or an occasion.</param>
     /// <param name="Description">What the collection is for, or <c>null</c> for none.</param>
     /// <param name="ParentId">The collection to create it inside, or <c>null</c> for the top level.</param>
     public sealed record Command(

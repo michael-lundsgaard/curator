@@ -50,7 +50,7 @@ public static class ListAssets
     /// <param name="IncludeSubCollections">
     /// With <c>collectionId</c>: also the clips in its sub-collections, at every level. Each clip is listed once.
     /// </param>
-    /// <param name="Limit">Assets per page, at most 100. Defaults to 50.</param>
+    /// <param name="Limit">Assets per page. Defaults to 50.</param>
     /// <param name="Cursor">
     /// <c>nextCursor</c> of the previous page. Send the same other parameters as for that page.
     /// </param>

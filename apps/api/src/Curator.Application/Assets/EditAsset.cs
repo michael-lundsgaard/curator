@@ -15,7 +15,7 @@ public static class EditAsset
     public const int MaxTitleLength = 255;
     public const int MaxDescriptionLength = 5000;
 
-    /// <param name="Title">The new title. Required.</param>
+    /// <param name="Title">The new title.</param>
     /// <param name="Description">The new description, or <c>null</c> for none.</param>
     /// <param name="RecordedAt">When the clip was captured, or <c>null</c> if unknown.</param>
     public sealed record Command(

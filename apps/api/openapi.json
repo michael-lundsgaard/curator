@@ -580,7 +580,7 @@
           {
             "name": "limit",
             "in": "query",
-            "description": "Assets per page, at most 100. Defaults to 50.",
+            "description": "Assets per page. Defaults to 50.",
             "schema": {
               "maximum": 100,
               "minimum": 1,
@@ -929,7 +929,7 @@
               "type": "string",
               "format": "uuid"
             },
-            "description": "The clips to add, 1 to 100. They must be uploaded and not deleted."
+            "description": "The clips to add. They must be uploaded and not deleted."
           }
         }
       },
@@ -998,8 +998,9 @@
         "properties": {
           "name": {
             "maxLength": 255,
+            "minLength": 1,
             "type": "string",
-            "description": "The name, e.g. a game or an occasion. Required."
+            "description": "The name, e.g. a game or an occasion."
           },
           "description": {
             "maxLength": 5000,
@@ -1071,11 +1072,13 @@
         "properties": {
           "filename": {
             "maxLength": 255,
+            "minLength": 1,
             "type": "string",
             "description": "Name of the file on the user's device. The title defaults to it."
           },
           "contentType": {
             "maxLength": 255,
+            "minLength": 1,
             "type": "string",
             "description": "MIME type of the file, e.g. `video/mp4`. The upload must send it."
           },
@@ -1187,8 +1190,9 @@
         "properties": {
           "title": {
             "maxLength": 255,
+            "minLength": 1,
             "type": "string",
-            "description": "The new title. Required."
+            "description": "The new title."
           },
           "description": {
             "maxLength": 5000,
@@ -1258,8 +1262,9 @@
         "properties": {
           "name": {
             "maxLength": 255,
+            "minLength": 1,
             "type": "string",
-            "description": "The new name. Required."
+            "description": "The new name."
           },
           "description": {
             "maxLength": 5000,
@@ -1744,7 +1749,7 @@
               "type": "string",
               "format": "uuid"
             },
-            "description": "The clips to remove, 1 to 100."
+            "description": "The clips to remove."
           }
         }
       },

@@ -12,7 +12,7 @@ namespace Curator.Application.Collections;
 /// </summary>
 public static class RemoveClipsFromCollection
 {
-    /// <param name="AssetIds">The clips to remove, 1 to 100.</param>
+    /// <param name="AssetIds">The clips to remove.</param>
     public sealed record Command([Required, Length(1, AddClipsToCollection.MaxClips)] IReadOnlyList<Guid> AssetIds);
 
     /// <param name="Id">The collection.</param>

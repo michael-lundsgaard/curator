@@ -8,9 +8,9 @@ using Microsoft.OpenApi;
 namespace Curator.Api.OpenApi;
 
 /// <summary>
-/// Writes the limits of <c>[MaxLength]</c>, <c>[Length]</c> and <c>[Range]</c> into the document, so clients know them
-/// before a 400. The generator only reads attributes on properties, but use cases put them on record parameters
-/// (<c>Command([MaxLength(255)] string Title)</c>), which is where model validation reads them.
+/// Writes the limits of <c>[Required]</c>, <c>[MaxLength]</c>, <c>[Length]</c> and <c>[Range]</c> into the document,
+/// so clients know them before a 400. The generator only reads attributes on properties, but use cases put them on
+/// record parameters (<c>Command([MaxLength(255)] string Title)</c>), which is where model validation reads them.
 /// </summary>
 internal sealed class ValidationLimitsSchemaTransformer : IOpenApiSchemaTransformer
 {
@@ -35,6 +35,11 @@ internal sealed class ValidationLimitsSchemaTransformer : IOpenApiSchemaTransfor
                     break;
                 case LengthAttribute length:
                     SetLength(schema, isArray, min: length.MinimumLength, max: length.MaximumLength);
+                    break;
+                // The schema's "required" only means the key is there; [Required] also rejects an empty string.
+                case RequiredAttribute { AllowEmptyStrings: false }
+                    when schema.Type?.HasFlag(JsonSchemaType.String) == true:
+                    schema.MinLength ??= 1;
                     break;
                 case RangeAttribute range:
                     schema.Minimum = Convert.ToString(range.Minimum, CultureInfo.InvariantCulture);
