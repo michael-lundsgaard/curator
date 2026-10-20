@@ -27,9 +27,9 @@ Built step by step. Each step is small and shippable. Order may change.
   - [x] Edit title, description and `recorded_at` (`PATCH /assets/{id}`, uploader or admin). The body
         replaces all three fields, not JSON Merge Patch: the edit form sends them all, and telling a missing
         field from `null` would need an `Optional<T>` with its own JSON converter, OpenAPI transformer and
-        validation. `null` clears a field; a missing one is a `400` (it used to clear too), so a field left out
-        by mistake can't wipe it, and the OpenAPI document's `required` is what the API enforces. Optional fields
-        of create requests have a default instead (`description`, `parentId`, `recordedAt`)
+        validation. `null` clears a field and a missing one is a `400`, so a field left out by mistake can't
+        wipe it, and the OpenAPI document's `required` is what the API enforces. Optional fields of create
+        requests have a default instead (`description`, `parentId`, `recordedAt`)
   - [x] Delete (`DELETE /assets/{id}`, uploader or admin, soft delete). Returns `200` with `id` and
         `deletedAt`; deleting again is `404`, since deleted assets are filtered out. Files stay in R2 until
         storage cleanup removes them
@@ -71,18 +71,11 @@ Built step by step. Each step is small and shippable. Order may change.
       screens settle their open questions and may show gaps the mocks missed. Agent tooling is added the same
       way, at the step that needs it:
   - [x] OpenAPI document committed as [`apps/api/openapi.json`](../apps/api/openapi.json), so API changes show
-        up as a diff. A test fails when it's out of date and only updates it on request (`UPDATE_OPENAPI=1`), so
-        a stale file keeps failing until it's committed. Writing it on every `dotnet build`
-        (`Microsoft.Extensions.ApiDescription.Server`) was tried first, but that runs the whole startup in every
-        build, so nothing there could need a database (no migrations on start), and it slowed every build. The
-        `/dev` endpoints are in their own document (`dev`), so they never reach the app's client. Making the
-        document right for a generated client took more than writing it: distinct schema names
-        (`EditAssetRequest`; every `Command` had collapsed into one), operation IDs (`EditAsset`), enums typed as
-        strings, numbers as numbers (JSON bodies no longer accept `"5"`), camelCase query parameters, errors as
-        `application/problem+json`, JSON-only bodies, and the `[MaxLength]`/`[Range]` limits, which the generator
-        doesn't read from record parameters. Upgrading
-        `Microsoft.AspNetCore.OpenApi` to 10.0.13 fixed none of these, so they're transformers in
-        `Curator.Api/OpenApi/`. Every field is documented, with short summaries and the details in `<remarks>`
+        up as a diff and the app's client is generated from it. A test fails when it's out of date and only
+        writes it on request (`UPDATE_OPENAPI=1`). Not written on every build
+        (`Microsoft.Extensions.ApiDescription.Server`): that runs the app's whole startup in every build, so
+        startup could never need a database. The `/dev` endpoints have their own document, so they never reach
+        the client. The document is shaped for a generated client by transformers in `Curator.Api/OpenApi/`
   - [ ] Generated API client from that file: choose between hey-api/openapi-ts (used by asset-vault) and
         openapi-typescript with openapi-fetch
   - [ ] App shell: sidebar and top bar, theme tokens with light and dark (system default, switch in the top
