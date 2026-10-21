@@ -90,6 +90,8 @@ npm run check:api      # fails when the committed schema.d.ts is out of date
 
 - Call the API through `api` in `src/api/client.ts`, not a hand-written `fetch`; it adds the access token. See
   `docs/decisions/0009-generated-api-client.md`.
+- A `.env` file holds secrets only: it's git-ignored and closed to the agent. Public configuration is committed as
+  code or `appsettings.json` (the app's Supabase URL and publishable key are in `src/auth/config.ts`).
 - Auth: `auth` in `src/auth/client.ts` is Supabase's `AuthClient` (`supabase.auth` in Supabase's docs). Pages that
   need a signed-in user go in `src/routes/_authenticated/`. See `docs/decisions/0012-sign-in-in-the-app.md`.
 

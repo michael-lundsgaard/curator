@@ -439,9 +439,6 @@ dist-ssr/
 
 # Local env files (.env.local, .env.development.local) hold secrets
 *.local
-# The app's .env holds only public values (VITE_ variables end up in the browser), so it's committed
-!apps/app/.env
-
 .idea/
 .DS_Store
 *.sw?

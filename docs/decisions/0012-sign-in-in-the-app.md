@@ -18,8 +18,11 @@ off: users join by invitation.
   the database, storage, realtime and functions, which the app never uses (the API is the only database client).
   `AuthClient` has the same methods as `supabase.auth`, so the Supabase docs still apply: `supabase.auth.x(...)` is
   `auth.x(...)` (`src/auth/client.ts`). The app's auth chunk is 48 kB gzipped against 81 kB with supabase-js.
-- The Supabase URL and the publishable key are in a committed `apps/app/.env`. Both are public: the browser gets
-  them anyway, and the key only identifies the project.
+- The Supabase URL and the publishable key are constants in `src/auth/config.ts`, like `Supabase:Url` in the API's
+  `appsettings.json`. Both are public: the browser gets them anyway, and the key only identifies the project. Not
+  in a Vite `.env`: in this repo a `.env` file holds secrets, is git-ignored and is closed to the agent
+  (`.claude/settings.json`), with no exceptions to remember. If the hosted app ever needs other values than local
+  development, Vite's `.env.production` is the way back.
 - The session is in `localStorage` and auth-js refreshes it. `src/api/client.ts` adds `Authorization: Bearer` to
   every API call, and a `401` from the API signs the user out.
 

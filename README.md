@@ -43,8 +43,8 @@ npm install
 npm run dev                   # http://localhost:5173, /api is proxied to the API on :5238
 ```
 
-The app signs in with Supabase Auth. Put the project's publishable key (_Project Settings → API Keys_) in
-`apps/app/.env`; it's public, so the file is committed. Once per Supabase project, under _Authentication_:
+The app signs in with Supabase Auth. The project's URL and publishable key (_Project Settings → API Keys_) are in
+`apps/app/src/auth/config.ts`; both are public. Once per Supabase project, under _Authentication_:
 
 - _URL Configuration_: Site URL `http://localhost:5173`, and `http://localhost:5173/**` under Redirect URLs, so a
   reset link can return to `/reset-password?step=new`. Add the hosted app's origin when it's deployed.
