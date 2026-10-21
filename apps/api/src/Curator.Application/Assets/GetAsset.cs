@@ -20,20 +20,15 @@ public static class GetAsset
 
     public sealed record Query(Guid AssetId);
 
-    /// <param name="Id">The asset.</param>
     /// <param name="Title">The title: the file name without its extension, until someone edits it.</param>
-    /// <param name="Description">The description, or <c>null</c> for none.</param>
     /// <param name="OriginalFilename">Name of the uploaded file on the uploader's device.</param>
-    /// <param name="ContentType">MIME type of the original.</param>
     /// <param name="Status">
     /// <c>Uploaded</c> once the file is in storage. <c>Processing</c>, <c>Ready</c> and <c>Failed</c> are for video
     /// processing, which doesn't exist yet. <c>Pending</c> until the upload is completed, which only its uploader
     /// sees.
     /// </param>
-    /// <param name="UploadedBy">Who uploaded the clip.</param>
     /// <param name="RecordedAt">When the clip was captured, if known.</param>
     /// <param name="CreatedAt">When the clip was uploaded.</param>
-    /// <param name="UpdatedAt">When the clip last changed.</param>
     /// <param name="DurationMs">Length in milliseconds. <c>null</c> until processing has read it.</param>
     /// <param name="Width">Width in pixels. <c>null</c> until processing has read it.</param>
     /// <param name="Height">Height in pixels. <c>null</c> until processing has read it.</param>
@@ -42,7 +37,6 @@ public static class GetAsset
     /// <c>null</c> while the upload is pending.
     /// </param>
     /// <param name="ThumbnailUrl">Signed URL of the thumbnail. <c>null</c> until processing has created one.</param>
-    /// <param name="UrlsExpireAt">When the signed URLs stop working.</param>
     public sealed record Response(
         Guid Id,
         string Title,

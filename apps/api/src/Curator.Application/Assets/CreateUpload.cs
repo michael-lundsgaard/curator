@@ -30,7 +30,6 @@ public static class CreateUpload
         [Range(1, MaxSizeBytes)] long SizeBytes,
         DateTimeOffset? RecordedAt = null);
 
-    /// <param name="AssetId">The new asset.</param>
     /// <param name="UploadUrl">Upload the file here with <c>PUT</c> and the same <c>Content-Type</c>.</param>
     /// <param name="UploadUrlExpiresAt">Start the upload before this.</param>
     public sealed record Response(Guid AssetId, string UploadUrl, DateTimeOffset UploadUrlExpiresAt);

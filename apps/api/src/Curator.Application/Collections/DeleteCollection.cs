@@ -13,7 +13,6 @@ public static class DeleteCollection
 {
     public sealed record Command(Guid CollectionId);
 
-    /// <param name="Id">The collection that was deleted.</param>
     /// <param name="DeletedCount">How many collections were deleted: this one and its sub-collections.</param>
     public sealed record Response(Guid Id, int DeletedCount);
 

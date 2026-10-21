@@ -233,10 +233,7 @@ export interface components {
             assetIds: string[];
         };
         AddClipsToCollectionResponse: {
-            /**
-             * Format: uuid
-             * @description The collection.
-             */
+            /** Format: uuid */
             id: string;
             /**
              * Format: int32
@@ -249,10 +246,7 @@ export interface components {
         /** @enum {string} */
         AssetStatus: "Pending" | "Uploaded" | "Processing" | "Ready" | "Failed";
         CompleteUploadResponse: {
-            /**
-             * Format: uuid
-             * @description The asset.
-             */
+            /** Format: uuid */
             assetId: string;
             /** @description Its status: `Uploaded`, or later if it was already completed. */
             status: components["schemas"]["AssetStatus"];
@@ -269,24 +263,16 @@ export interface components {
             parentId?: null | string;
         };
         CreateCollectionResponse: {
-            /**
-             * Format: uuid
-             * @description The new collection.
-             */
+            /** Format: uuid */
             id: string;
             /**
              * Format: uuid
              * @description The collection it was created inside, or `null` at the top level.
              */
             parentId: null | string;
-            /** @description The name. */
             name: string;
-            /** @description The description, or `null` for none. */
             description: null | string;
-            /**
-             * Format: date-time
-             * @description When the collection was created: now.
-             */
+            /** Format: date-time */
             createdAt: string;
         };
         CreateUploadRequest: {
@@ -306,10 +292,7 @@ export interface components {
             recordedAt?: null | string;
         };
         CreateUploadResponse: {
-            /**
-             * Format: uuid
-             * @description The new asset.
-             */
+            /** Format: uuid */
             assetId: string;
             /** @description Upload the file here with `PUT` and the same `Content-Type`. */
             uploadUrl: string;
@@ -321,31 +304,18 @@ export interface components {
         };
         /** @description Who created a collection, as shown next to it. */
         Creator: {
-            /**
-             * Format: uuid
-             * @description The creator's profile.
-             */
+            /** Format: uuid */
             id: string;
-            /** @description The creator's name. */
             displayName: string;
         };
         DeleteAssetResponse: {
-            /**
-             * Format: uuid
-             * @description The asset that was deleted.
-             */
+            /** Format: uuid */
             id: string;
-            /**
-             * Format: date-time
-             * @description When the clip was deleted: now.
-             */
+            /** Format: date-time */
             deletedAt: string;
         };
         DeleteCollectionResponse: {
-            /**
-             * Format: uuid
-             * @description The collection that was deleted.
-             */
+            /** Format: uuid */
             id: string;
             /**
              * Format: int32
@@ -354,9 +324,7 @@ export interface components {
             deletedCount: number;
         };
         EditAssetRequest: {
-            /** @description The new title. */
             title: string;
-            /** @description The new description, or `null` for none. */
             description: null | string;
             /**
              * Format: date-time
@@ -365,65 +333,41 @@ export interface components {
             recordedAt: null | string;
         };
         EditAssetResponse: {
-            /**
-             * Format: uuid
-             * @description The asset.
-             */
+            /** Format: uuid */
             id: string;
-            /** @description The new title. */
             title: string;
-            /** @description The new description, or `null` for none. */
             description: null | string;
             /**
              * Format: date-time
              * @description When the clip was captured, or `null` if unknown.
              */
             recordedAt: null | string;
-            /**
-             * Format: date-time
-             * @description When the clip last changed: now.
-             */
+            /** Format: date-time */
             updatedAt: string;
         };
         EditCollectionRequest: {
-            /** @description The new name. */
             name: string;
-            /** @description The new description, or `null` for none. */
             description: null | string;
         };
         EditCollectionResponse: {
-            /**
-             * Format: uuid
-             * @description The collection.
-             */
+            /** Format: uuid */
             id: string;
-            /** @description The new name. */
             name: string;
-            /** @description The new description, or `null` for none. */
             description: null | string;
-            /**
-             * Format: date-time
-             * @description When the collection last changed: now.
-             */
+            /** Format: date-time */
             updatedAt: string;
         };
         GetAssetResponse: {
-            /**
-             * Format: uuid
-             * @description The asset.
-             */
+            /** Format: uuid */
             id: string;
             /** @description The title: the file name without its extension, until someone edits it. */
             title: string;
-            /** @description The description, or `null` for none. */
             description: null | string;
             /** @description Name of the uploaded file on the uploader's device. */
             originalFilename: string;
-            /** @description MIME type of the original. */
             contentType: string;
             /** @description `Uploaded` once the file is in storage. `Processing`, `Ready` and `Failed` are for video processing, which doesn't exist yet. `Pending` until the upload is completed, which only its uploader sees. */
             status: components["schemas"]["AssetStatus"];
-            /** @description Who uploaded the clip. */
             uploadedBy: components["schemas"]["Uploader"];
             /**
              * Format: date-time
@@ -435,10 +379,7 @@ export interface components {
              * @description When the clip was uploaded.
              */
             createdAt: string;
-            /**
-             * Format: date-time
-             * @description When the clip last changed.
-             */
+            /** Format: date-time */
             updatedAt: string;
             /**
              * Format: int64
@@ -459,33 +400,21 @@ export interface components {
             playbackUrl: null | string;
             /** @description Signed URL of the thumbnail. `null` until processing has created one. */
             thumbnailUrl: null | string;
-            /**
-             * Format: date-time
-             * @description When the signed URLs stop working.
-             */
+            /** Format: date-time */
             urlsExpireAt: string;
         };
         GetCollectionResponse: {
-            /**
-             * Format: uuid
-             * @description The collection.
-             */
+            /** Format: uuid */
             id: string;
             /**
              * Format: uuid
              * @description The collection this one is inside, or `null` at the top level.
              */
             parentId: null | string;
-            /** @description The name. */
             name: string;
-            /** @description What the collection is for, or `null` for none. */
             description: null | string;
-            /** @description Who created the collection. */
             createdBy: components["schemas"]["Creator"];
-            /**
-             * Format: date-time
-             * @description When the collection was created.
-             */
+            /** Format: date-time */
             createdAt: string;
             /**
              * Format: date-time
@@ -494,18 +423,13 @@ export interface components {
             updatedAt: string;
         };
         ListAssetsItem: {
-            /**
-             * Format: uuid
-             * @description The asset.
-             */
+            /** Format: uuid */
             id: string;
             /** @description The title: the file name without its extension, until someone edits it. */
             title: string;
-            /** @description The description, or `null` for none. */
             description: null | string;
             /** @description `Uploaded` once the file is in storage. `Processing`, `Ready` and `Failed` are for video processing, which doesn't exist yet. Uploads that haven't completed aren't listed. */
             status: components["schemas"]["AssetStatus"];
-            /** @description Who uploaded the clip. */
             uploadedBy: components["schemas"]["Uploader"];
             /**
              * Format: date-time
@@ -534,23 +458,18 @@ export interface components {
             height: null | number;
         };
         ListAssetsResponse: {
-            /** @description The assets on this page. */
             items: components["schemas"]["ListAssetsItem"][];
             /** @description Pass as `cursor` to get the next page. `null` on the last page. */
             nextCursor: null | string;
         };
         ListCollectionsItem: {
-            /**
-             * Format: uuid
-             * @description The collection.
-             */
+            /** Format: uuid */
             id: string;
             /**
              * Format: uuid
              * @description The collection this one is inside, or `null` at the top level.
              */
             parentId: null | string;
-            /** @description The name. */
             name: string;
             /**
              * Format: int32
@@ -570,20 +489,14 @@ export interface components {
             parentId: null | string;
         };
         MoveCollectionResponse: {
-            /**
-             * Format: uuid
-             * @description The collection.
-             */
+            /** Format: uuid */
             id: string;
             /**
              * Format: uuid
              * @description The collection it is now inside, or `null` at the top level.
              */
             parentId: null | string;
-            /**
-             * Format: date-time
-             * @description When the collection last changed: now.
-             */
+            /** Format: date-time */
             updatedAt: string;
         };
         ProblemDetails: {
@@ -608,14 +521,10 @@ export interface components {
         /** @enum {string} */
         ProfileRole: "Member" | "Admin";
         RemoveClipsFromCollectionRequest: {
-            /** @description The clips to remove. */
             assetIds: string[];
         };
         RemoveClipsFromCollectionResponse: {
-            /**
-             * Format: uuid
-             * @description The collection.
-             */
+            /** Format: uuid */
             id: string;
             /**
              * Format: int32
@@ -627,12 +536,8 @@ export interface components {
         SortOrder: "Asc" | "Desc";
         /** @description Who uploaded a clip, as shown next to it. */
         Uploader: {
-            /**
-             * Format: uuid
-             * @description The uploader's profile.
-             */
+            /** Format: uuid */
             id: string;
-            /** @description The uploader's name. */
             displayName: string;
         };
         ValidationProblemDetails: {

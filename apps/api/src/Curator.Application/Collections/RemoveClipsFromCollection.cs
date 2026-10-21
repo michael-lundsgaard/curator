@@ -12,10 +12,8 @@ namespace Curator.Application.Collections;
 /// </summary>
 public static class RemoveClipsFromCollection
 {
-    /// <param name="AssetIds">The clips to remove.</param>
     public sealed record Command([Required, Length(1, AddClipsToCollection.MaxClips)] IReadOnlyList<Guid> AssetIds);
 
-    /// <param name="Id">The collection.</param>
     /// <param name="RemovedCount">How many clips were removed, not counting those that weren't in it.</param>
     public sealed record Response(Guid Id, int RemovedCount);
 

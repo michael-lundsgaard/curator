@@ -15,7 +15,6 @@ public static class CompleteUpload
 {
     public sealed record Command(Guid AssetId);
 
-    /// <param name="AssetId">The asset.</param>
     /// <param name="Status">Its status: <c>Uploaded</c>, or later if it was already completed.</param>
     public sealed record Response(Guid AssetId, AssetStatus Status);
 

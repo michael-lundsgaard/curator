@@ -66,18 +66,14 @@ public static class ListAssets
         [Range(1, MaxLimit)] int Limit = DefaultLimit,
         [MaxLength(1000)] string? Cursor = null);
 
-    /// <param name="Items">The assets on this page.</param>
     /// <param name="NextCursor">Pass as <c>cursor</c> to get the next page. <c>null</c> on the last page.</param>
     public sealed record Response(IReadOnlyList<Item> Items, string? NextCursor);
 
-    /// <param name="Id">The asset.</param>
     /// <param name="Title">The title: the file name without its extension, until someone edits it.</param>
-    /// <param name="Description">The description, or <c>null</c> for none.</param>
     /// <param name="Status">
     /// <c>Uploaded</c> once the file is in storage. <c>Processing</c>, <c>Ready</c> and <c>Failed</c> are for video
     /// processing, which doesn't exist yet. Uploads that haven't completed aren't listed.
     /// </param>
-    /// <param name="UploadedBy">Who uploaded the clip.</param>
     /// <param name="RecordedAt">When the clip was captured, if known.</param>
     /// <param name="CreatedAt">When the clip was uploaded.</param>
     /// <param name="DurationMs">Length in milliseconds. <c>null</c> until processing has read it.</param>

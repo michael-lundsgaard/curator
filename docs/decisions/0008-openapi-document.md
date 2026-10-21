@@ -2,6 +2,8 @@
 
 - **Status:** Accepted
 - **Date:** 2026-10-20
+- **Revised:** 2026-10-21: dropped the tests of how the generator words the document, and the rule that every
+  field is described (see "Revised" under Alternatives).
 
 ## Context
 
@@ -25,6 +27,10 @@ differ. It only writes the file when asked (`UPDATE_OPENAPI=1`), so a stale file
 updates and commits it. `/verify` runs the tests before every commit, and CI will run them too, so a stale file
 can't slip through either way.
 
+This snapshot is also what checks the transformers below: any change to the document shows up as a diff to
+review. Apart from it, tests only check rules the app's client relies on (every operation has an ID, enums by
+name, camelCase query parameters, `/dev` stays out), not how the generator words things.
+
 **The development endpoints have their own document** (`/openapi/dev.json`, also listed in Scalar), so `/dev`
 never reaches the committed file or the app's client, even though the tests run in Development.
 
@@ -46,8 +52,8 @@ Some fixes are in the API's behaviour instead, so the document describes it trut
 required in request bodies (`RespectRequiredConstructorParameters`).
 
 **Documentation conventions** (in CLAUDE.md): a short `<summary>` per action, the details in `<remarks>`, the
-use case as route name for the operation ID, and a `<param>` for every field of the request and response records,
-saying what the schema can't. Tests check that every property and every non-path parameter has a description.
+use case as route name for the operation ID, and a `<param>` on a field of a request or response record only when
+it says what the name and type can't: what `null` means, a default, a unit, a rule. Nothing enforces it.
 
 ## Alternatives considered
 
@@ -65,6 +71,19 @@ saying what the schema can't. Tests check that every property and every non-path
 - **Removing `null` from enums only where they're optional.** The generator shares one schema per enum, so it's
   all or nothing. The only nullable enum is the optional `order` query parameter; a nullable enum in a body
   throws, which fails the document tests, so it can't be documented wrongly by accident.
+
+**Revised (2026-10-21).** After a review, these were dropped or kept:
+
+- **Dropped: a description on every field and query parameter**, enforced by tests. It produced descriptions
+  like "The new title." that only repeated the name.
+- **Dropped: tests of the generator's output** (schema names, content types, limits, one-line descriptions, the
+  bearer scheme). The snapshot already fails on any of these changing.
+- **Kept: validation limits in the document.** The generated client is types only and ignores them today, but
+  they're part of the contract the app's forms need (a title's `maxLength`), and without them the app would
+  hard-code the numbers.
+- **Kept: joining description lines.** Normalizing line breaks in the snapshot test would make the file the same
+  on every OS too, but leaves the 120-column wrapping of the XML comments, and the indentation next to a `$ref`,
+  in every description.
 
 ## Consequences
 

@@ -907,7 +907,6 @@
         "properties": {
           "id": {
             "type": "string",
-            "description": "The collection.",
             "format": "uuid"
           },
           "addedCount": {
@@ -944,7 +943,6 @@
         "properties": {
           "assetId": {
             "type": "string",
-            "description": "The asset.",
             "format": "uuid"
           },
           "status": {
@@ -995,7 +993,6 @@
         "properties": {
           "id": {
             "type": "string",
-            "description": "The new collection.",
             "format": "uuid"
           },
           "parentId": {
@@ -1007,19 +1004,16 @@
             "format": "uuid"
           },
           "name": {
-            "type": "string",
-            "description": "The name."
+            "type": "string"
           },
           "description": {
             "type": [
               "null",
               "string"
-            ],
-            "description": "The description, or `null` for none."
+            ]
           },
           "createdAt": {
             "type": "string",
-            "description": "When the collection was created: now.",
             "format": "date-time"
           }
         }
@@ -1071,7 +1065,6 @@
         "properties": {
           "assetId": {
             "type": "string",
-            "description": "The new asset.",
             "format": "uuid"
           },
           "uploadUrl": {
@@ -1094,12 +1087,10 @@
         "properties": {
           "id": {
             "type": "string",
-            "description": "The creator's profile.",
             "format": "uuid"
           },
           "displayName": {
-            "type": "string",
-            "description": "The creator's name."
+            "type": "string"
           }
         },
         "description": "Who created a collection, as shown next to it."
@@ -1113,12 +1104,10 @@
         "properties": {
           "id": {
             "type": "string",
-            "description": "The asset that was deleted.",
             "format": "uuid"
           },
           "deletedAt": {
             "type": "string",
-            "description": "When the clip was deleted: now.",
             "format": "date-time"
           }
         }
@@ -1132,7 +1121,6 @@
         "properties": {
           "id": {
             "type": "string",
-            "description": "The collection that was deleted.",
             "format": "uuid"
           },
           "deletedCount": {
@@ -1153,16 +1141,14 @@
           "title": {
             "maxLength": 255,
             "minLength": 1,
-            "type": "string",
-            "description": "The new title."
+            "type": "string"
           },
           "description": {
             "maxLength": 5000,
             "type": [
               "null",
               "string"
-            ],
-            "description": "The new description, or `null` for none."
+            ]
           },
           "recordedAt": {
             "type": [
@@ -1186,19 +1172,16 @@
         "properties": {
           "id": {
             "type": "string",
-            "description": "The asset.",
             "format": "uuid"
           },
           "title": {
-            "type": "string",
-            "description": "The new title."
+            "type": "string"
           },
           "description": {
             "type": [
               "null",
               "string"
-            ],
-            "description": "The new description, or `null` for none."
+            ]
           },
           "recordedAt": {
             "type": [
@@ -1210,7 +1193,6 @@
           },
           "updatedAt": {
             "type": "string",
-            "description": "When the clip last changed: now.",
             "format": "date-time"
           }
         }
@@ -1225,16 +1207,14 @@
           "name": {
             "maxLength": 255,
             "minLength": 1,
-            "type": "string",
-            "description": "The new name."
+            "type": "string"
           },
           "description": {
             "maxLength": 5000,
             "type": [
               "null",
               "string"
-            ],
-            "description": "The new description, or `null` for none."
+            ]
           }
         }
       },
@@ -1249,23 +1229,19 @@
         "properties": {
           "id": {
             "type": "string",
-            "description": "The collection.",
             "format": "uuid"
           },
           "name": {
-            "type": "string",
-            "description": "The new name."
+            "type": "string"
           },
           "description": {
             "type": [
               "null",
               "string"
-            ],
-            "description": "The new description, or `null` for none."
+            ]
           },
           "updatedAt": {
             "type": "string",
-            "description": "When the collection last changed: now.",
             "format": "date-time"
           }
         }
@@ -1293,7 +1269,6 @@
         "properties": {
           "id": {
             "type": "string",
-            "description": "The asset.",
             "format": "uuid"
           },
           "title": {
@@ -1304,23 +1279,20 @@
             "type": [
               "null",
               "string"
-            ],
-            "description": "The description, or `null` for none."
+            ]
           },
           "originalFilename": {
             "type": "string",
             "description": "Name of the uploaded file on the uploader's device."
           },
           "contentType": {
-            "type": "string",
-            "description": "MIME type of the original."
+            "type": "string"
           },
           "status": {
             "description": "`Uploaded` once the file is in storage. `Processing`, `Ready` and `Failed` are for video processing, which doesn't exist yet. `Pending` until the upload is completed, which only its uploader sees.",
             "$ref": "#/components/schemas/AssetStatus"
           },
           "uploadedBy": {
-            "description": "Who uploaded the clip.",
             "$ref": "#/components/schemas/Uploader"
           },
           "recordedAt": {
@@ -1338,7 +1310,6 @@
           },
           "updatedAt": {
             "type": "string",
-            "description": "When the clip last changed.",
             "format": "date-time"
           },
           "durationMs": {
@@ -1381,7 +1352,6 @@
           },
           "urlsExpireAt": {
             "type": "string",
-            "description": "When the signed URLs stop working.",
             "format": "date-time"
           }
         }
@@ -1400,7 +1370,6 @@
         "properties": {
           "id": {
             "type": "string",
-            "description": "The collection.",
             "format": "uuid"
           },
           "parentId": {
@@ -1412,23 +1381,19 @@
             "format": "uuid"
           },
           "name": {
-            "type": "string",
-            "description": "The name."
+            "type": "string"
           },
           "description": {
             "type": [
               "null",
               "string"
-            ],
-            "description": "What the collection is for, or `null` for none."
+            ]
           },
           "createdBy": {
-            "description": "Who created the collection.",
             "$ref": "#/components/schemas/Creator"
           },
           "createdAt": {
             "type": "string",
-            "description": "When the collection was created.",
             "format": "date-time"
           },
           "updatedAt": {
@@ -1455,7 +1420,6 @@
         "properties": {
           "id": {
             "type": "string",
-            "description": "The asset.",
             "format": "uuid"
           },
           "title": {
@@ -1466,15 +1430,13 @@
             "type": [
               "null",
               "string"
-            ],
-            "description": "The description, or `null` for none."
+            ]
           },
           "status": {
             "description": "`Uploaded` once the file is in storage. `Processing`, `Ready` and `Failed` are for video processing, which doesn't exist yet. Uploads that haven't completed aren't listed.",
             "$ref": "#/components/schemas/AssetStatus"
           },
           "uploadedBy": {
-            "description": "Who uploaded the clip.",
             "$ref": "#/components/schemas/Uploader"
           },
           "recordedAt": {
@@ -1527,8 +1489,7 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/ListAssetsItem"
-            },
-            "description": "The assets on this page."
+            }
           },
           "nextCursor": {
             "type": [
@@ -1550,7 +1511,6 @@
         "properties": {
           "id": {
             "type": "string",
-            "description": "The collection.",
             "format": "uuid"
           },
           "parentId": {
@@ -1562,8 +1522,7 @@
             "format": "uuid"
           },
           "name": {
-            "type": "string",
-            "description": "The name."
+            "type": "string"
           },
           "clipCount": {
             "type": "integer",
@@ -1613,7 +1572,6 @@
         "properties": {
           "id": {
             "type": "string",
-            "description": "The collection.",
             "format": "uuid"
           },
           "parentId": {
@@ -1626,7 +1584,6 @@
           },
           "updatedAt": {
             "type": "string",
-            "description": "When the collection last changed: now.",
             "format": "date-time"
           }
         }
@@ -1710,8 +1667,7 @@
             "items": {
               "type": "string",
               "format": "uuid"
-            },
-            "description": "The clips to remove."
+            }
           }
         }
       },
@@ -1724,7 +1680,6 @@
         "properties": {
           "id": {
             "type": "string",
-            "description": "The collection.",
             "format": "uuid"
           },
           "removedCount": {
@@ -1750,12 +1705,10 @@
         "properties": {
           "id": {
             "type": "string",
-            "description": "The uploader's profile.",
             "format": "uuid"
           },
           "displayName": {
-            "type": "string",
-            "description": "The uploader's name."
+            "type": "string"
           }
         },
         "description": "Who uploaded a clip, as shown next to it."

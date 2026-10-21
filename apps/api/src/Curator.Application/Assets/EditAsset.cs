@@ -15,19 +15,13 @@ public static class EditAsset
     public const int MaxTitleLength = 255;
     public const int MaxDescriptionLength = 5000;
 
-    /// <param name="Title">The new title.</param>
-    /// <param name="Description">The new description, or <c>null</c> for none.</param>
     /// <param name="RecordedAt">When the clip was captured, or <c>null</c> if unknown.</param>
     public sealed record Command(
         [Required, MaxLength(MaxTitleLength)] string Title,
         [MaxLength(MaxDescriptionLength)] string? Description,
         DateTimeOffset? RecordedAt);
 
-    /// <param name="Id">The asset.</param>
-    /// <param name="Title">The new title.</param>
-    /// <param name="Description">The new description, or <c>null</c> for none.</param>
     /// <param name="RecordedAt">When the clip was captured, or <c>null</c> if unknown.</param>
-    /// <param name="UpdatedAt">When the clip last changed: now.</param>
     public sealed record Response(
         Guid Id,
         string Title,

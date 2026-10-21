@@ -14,9 +14,7 @@ public static class ListCollections
     /// <param name="Items">Every collection, sorted by name ignoring case.</param>
     public sealed record Response(IReadOnlyList<Item> Items);
 
-    /// <param name="Id">The collection.</param>
     /// <param name="ParentId">The collection this one is inside, or <c>null</c> at the top level.</param>
-    /// <param name="Name">The name.</param>
     /// <param name="ClipCount">
     /// How many clips were added to this collection itself, not counting its sub-collections' or deleted ones.
     /// </param>
