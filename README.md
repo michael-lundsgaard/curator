@@ -43,6 +43,17 @@ npm install
 npm run dev                   # http://localhost:5173, /api is proxied to the API on :5238
 ```
 
+The app signs in with Supabase Auth. Put the project's publishable key (_Project Settings → API Keys_) in
+`apps/app/.env`; it's public, so the file is committed. Once per Supabase project, under _Authentication_:
+
+- _URL Configuration_: Site URL `http://localhost:5173`, and `http://localhost:5173/**` under Redirect URLs, so a
+  reset link can return to `/reset-password?step=new`. Add the hosted app's origin when it's deployed.
+- _Sign In / Providers → Email_: minimum password length 8 (the app asks for 8), and sign-ups off (users are
+  invited).
+
+Supabase's built-in email only sends to the project team's own addresses, a few an hour, which is enough to try a
+password reset.
+
 Uploads go to a Cloudflare R2 bucket (`curator-dev` in Development, set in `appsettings.Development.json`).
 Create an R2 API token with _Object Read & Write_ on that bucket only, and store its S3 keys as user
 secrets (not the `cfat_` token value):
@@ -153,6 +164,23 @@ Project context lives in [CLAUDE.md](CLAUDE.md), and shared settings and skills 
 it and take screenshots to compare with the mocks. Claude Code asks once whether to enable it. It drives the
 installed Edge (so there's no browser to download), and starts through `cmd /c npx`, the form Claude Code needs
 on Windows.
+
+To see the pages behind sign-in, Claude signs in as a test user of its own:
+
+1. In Supabase, _Authentication → Users → Add user → Create new user_, with an address you receive mail for
+   (`you+claude@example.com`) and _Auto Confirm User_ ticked. It's a Member; give it a password nobody else uses.
+2. Put its login in `.claude/test-user.local` (git-ignored):
+
+   ```text
+   E2E_EMAIL=you+claude@example.com
+   E2E_PASSWORD=...
+   ```
+
+3. Restart the MCP server (`/mcp`) after creating or changing the file.
+
+The MCP server reads the file (`--secrets`) and fills in a value wherever Claude types its name, and hides it in
+what it sends back, so the password never reaches Claude. `.claude/settings.json` also keeps Claude from reading
+`.env` files.
 
 ## License
 

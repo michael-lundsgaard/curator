@@ -1,8 +1,9 @@
 import { Link } from "@tanstack/react-router";
 import { Upload } from "lucide-react";
+import { AccountMenu } from "./AccountMenu";
 import { ThemeSwitch } from "./ThemeSwitch";
 
-// Search comes at the Library step and the account menu at sign-in.
+// Search comes at the Library step.
 export function TopBar() {
   return (
     <header className="flex flex-wrap items-center justify-end gap-3 border-b border-line px-4 py-4 md:px-8">
@@ -14,6 +15,7 @@ export function TopBar() {
         Upload
       </Link>
       <ThemeSwitch />
+      <AccountMenu />
     </header>
   );
 }

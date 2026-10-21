@@ -9,86 +9,154 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from "./routes/__root"
-import { Route as IndexRouteImport } from "./routes/index"
-import { Route as LibraryRouteImport } from "./routes/library"
-import { Route as UploadRouteImport } from "./routes/upload"
+import { Route as AuthenticatedRouteImport } from "./routes/_authenticated"
+import { Route as ResetPasswordRouteImport } from "./routes/reset-password"
+import { Route as SignInRouteImport } from "./routes/sign-in"
+import { Route as AuthenticatedIndexRouteImport } from "./routes/_authenticated/index"
+import { Route as AuthenticatedLibraryRouteImport } from "./routes/_authenticated/library"
+import { Route as AuthenticatedUploadRouteImport } from "./routes/_authenticated/upload"
 
-const IndexRoute = IndexRouteImport.update({
+const AuthenticatedRoute = AuthenticatedRouteImport.update({
+  id: "/_authenticated",
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: "/reset-password",
+  path: "/reset-password",
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SignInRoute = SignInRouteImport.update({
+  id: "/sign-in",
+  path: "/sign-in",
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
   id: "/",
   path: "/",
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AuthenticatedRoute,
 } as any)
-const LibraryRoute = LibraryRouteImport.update({
+const AuthenticatedLibraryRoute = AuthenticatedLibraryRouteImport.update({
   id: "/library",
   path: "/library",
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AuthenticatedRoute,
 } as any)
-const UploadRoute = UploadRouteImport.update({
+const AuthenticatedUploadRoute = AuthenticatedUploadRouteImport.update({
   id: "/upload",
   path: "/upload",
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AuthenticatedRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
-  "/": typeof IndexRoute
-  "/library": typeof LibraryRoute
-  "/upload": typeof UploadRoute
+  "/": typeof AuthenticatedIndexRoute
+  "/reset-password": typeof ResetPasswordRoute
+  "/sign-in": typeof SignInRoute
+  "/library": typeof AuthenticatedLibraryRoute
+  "/upload": typeof AuthenticatedUploadRoute
 }
 export interface FileRoutesByTo {
-  "/": typeof IndexRoute
-  "/library": typeof LibraryRoute
-  "/upload": typeof UploadRoute
+  "/reset-password": typeof ResetPasswordRoute
+  "/sign-in": typeof SignInRoute
+  "/library": typeof AuthenticatedLibraryRoute
+  "/upload": typeof AuthenticatedUploadRoute
+  "/": typeof AuthenticatedIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  "/": typeof IndexRoute
-  "/library": typeof LibraryRoute
-  "/upload": typeof UploadRoute
+  "/_authenticated": typeof AuthenticatedRouteWithChildren
+  "/reset-password": typeof ResetPasswordRoute
+  "/sign-in": typeof SignInRoute
+  "/_authenticated/library": typeof AuthenticatedLibraryRoute
+  "/_authenticated/upload": typeof AuthenticatedUploadRoute
+  "/_authenticated/": typeof AuthenticatedIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: "/" | "/library" | "/upload"
+  fullPaths: "/" | "/reset-password" | "/sign-in" | "/library" | "/upload"
   fileRoutesByTo: FileRoutesByTo
-  to: "/" | "/library" | "/upload"
-  id: "__root__" | "/" | "/library" | "/upload"
+  to: "/reset-password" | "/sign-in" | "/library" | "/upload" | "/"
+  id:
+    | "__root__"
+    | "/_authenticated"
+    | "/reset-password"
+    | "/sign-in"
+    | "/_authenticated/library"
+    | "/_authenticated/upload"
+    | "/_authenticated/"
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
-  LibraryRoute: typeof LibraryRoute
-  UploadRoute: typeof UploadRoute
+  AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
+  ResetPasswordRoute: typeof ResetPasswordRoute
+  SignInRoute: typeof SignInRoute
 }
 
 declare module "@tanstack/react-router" {
   interface FileRoutesByPath {
-    "/": {
-      id: "/"
+    "/_authenticated": {
+      id: "/_authenticated"
+      path: ""
+      fullPath: "/"
+      preLoaderRoute: typeof AuthenticatedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    "/reset-password": {
+      id: "/reset-password"
+      path: "/reset-password"
+      fullPath: "/reset-password"
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    "/sign-in": {
+      id: "/sign-in"
+      path: "/sign-in"
+      fullPath: "/sign-in"
+      preLoaderRoute: typeof SignInRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    "/_authenticated/": {
+      id: "/_authenticated/"
       path: "/"
       fullPath: "/"
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AuthenticatedIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
-    "/library": {
-      id: "/library"
+    "/_authenticated/library": {
+      id: "/_authenticated/library"
       path: "/library"
       fullPath: "/library"
-      preLoaderRoute: typeof LibraryRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AuthenticatedLibraryRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
-    "/upload": {
-      id: "/upload"
+    "/_authenticated/upload": {
+      id: "/_authenticated/upload"
       path: "/upload"
       fullPath: "/upload"
-      preLoaderRoute: typeof UploadRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AuthenticatedUploadRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
   }
 }
 
+interface AuthenticatedRouteChildren {
+  AuthenticatedLibraryRoute: typeof AuthenticatedLibraryRoute
+  AuthenticatedUploadRoute: typeof AuthenticatedUploadRoute
+  AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
+}
+
+const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedLibraryRoute: AuthenticatedLibraryRoute,
+  AuthenticatedUploadRoute: AuthenticatedUploadRoute,
+  AuthenticatedIndexRoute: AuthenticatedIndexRoute,
+}
+
+const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
+  AuthenticatedRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
-  LibraryRoute: LibraryRoute,
-  UploadRoute: UploadRoute,
+  AuthenticatedRoute: AuthenticatedRouteWithChildren,
+  ResetPasswordRoute: ResetPasswordRoute,
+  SignInRoute: SignInRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

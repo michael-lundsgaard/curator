@@ -13,6 +13,7 @@
     "check:api": "npm run generate:api && git diff --exit-code -- src/api/schema.d.ts"
   },
   "dependencies": {
+    "@supabase/auth-js": "^2.118.0",
     "@tanstack/react-router": "^1.170.45",
     "lucide-react": "^1.60.0",
     "openapi-fetch": "^0.17.0",

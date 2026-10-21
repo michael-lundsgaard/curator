@@ -2,7 +2,16 @@
   "mcpServers": {
     "playwright": {
       "command": "cmd",
-      "args": ["/c", "npx", "-y", "@playwright/mcp@0.0.83", "--browser", "msedge"]
+      "args": [
+        "/c",
+        "npx",
+        "-y",
+        "@playwright/mcp@0.0.83",
+        "--browser",
+        "msedge",
+        "--secrets",
+        ".claude/test-user.local"
+      ]
     }
   }
 }

@@ -32,7 +32,8 @@ apps/
       Curator.IntegrationTests  WebApplicationFactory<Program> tests against the API
   app/            React app (Vite, TypeScript)
     src/api/      generated API types (schema.d.ts) and the openapi-fetch client
-    src/routes/   TanStack Router file-based routes (__root.tsx is the shell); routeTree.gen.ts is generated
+    src/auth/     Supabase auth client, and the frame of the sign-in and reset-password pages
+    src/routes/   TanStack Router file-based routes (_authenticated.tsx is the shell and sign-in guard); routeTree.gen.ts is generated
     src/shell/    sidebar, top bar, theme switch
 ```
 
@@ -52,7 +53,8 @@ dotnet ef database update --project src/Curator.Infrastructure --startup-project
 ```
 
 - Local Postgres: `docker compose up -d` from the repo root (`compose.yaml`). Integration tests use
-  Testcontainers, so Docker must be running for `dotnet test`.
+  Testcontainers, so Docker must be running for `dotnet test`. To look at local data (read only, unless asked):
+  `docker compose exec postgres psql -U curator -d curator -c "SELECT * FROM profiles"`.
 
 - Storage: Cloudflare R2 (`R2` settings; keys in user secrets, see README). Tests never call R2: presigning
   is computed locally with made-up keys in `CuratorApiFactory`, and `TestFileStorage` answers "is the object
@@ -82,10 +84,14 @@ npm run check:api      # fails when the committed schema.d.ts is out of date
   colors or `dark:` variants: the tokens switch with the theme. See `docs/decisions/0010-tailwind-css.md`.
 - Routing: `Link` and `navigate` from TanStack Router, typed against the routes. See
   `docs/decisions/0011-tanstack-router.md`.
-- To look at the app, use the Playwright MCP (`.mcp.json`) against `npm run dev`, in both themes.
+- To look at the app, use the Playwright MCP (`.mcp.json`) against `npm run dev`, in both themes. Sign in as the
+  test user: type `E2E_EMAIL` and `E2E_PASSWORD` in the sign-in form, and the MCP fills in the values from
+  `.claude/test-user.local` (`--secrets`; never read that file). The test user is a Member.
 
-- Call the API through `api` in `src/api/client.ts`, not a hand-written `fetch`. See
+- Call the API through `api` in `src/api/client.ts`, not a hand-written `fetch`; it adds the access token. See
   `docs/decisions/0009-generated-api-client.md`.
+- Auth: `auth` in `src/auth/client.ts` is Supabase's `AuthClient` (`supabase.auth` in Supabase's docs). Pages that
+  need a signed-in user go in `src/routes/_authenticated/`. See `docs/decisions/0012-sign-in-in-the-app.md`.
 
 If the API is already running (debugger/watch), it locks `bin/`. To build or test in that case, pass
 `--artifacts-path <temp dir>` rather than killing the user's process.

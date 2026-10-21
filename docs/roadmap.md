@@ -85,11 +85,14 @@ Built step by step. Each step is small and shippable. Order may change.
         until the app is hosted. The VS Code task `dev` starts the API and the app together
     - Tooling: Playwright MCP (`.mcp.json`), so the agent can open the app, click through it and compare
       screenshots with the mocks in both themes
-  - [ ] Sign in and reset password with supabase-js (add the app's reset URL to Supabase's redirect URLs),
-        then `GET /me`
-    - Tooling: read-only database lookups against the local Docker Postgres (a Postgres MCP or `psql` through
-      `docker compose exec`). Optionally the Supabase MCP for auth users and redirect URLs: read-only, scoped
-      to the dev project
+  - [x] Sign in, sign out and reset password with Supabase's auth-js (supabase-js without the clients the app
+        doesn't use), pages behind a pathless `_authenticated` layout route, `GET /me` for the account menu →
+        [0012](decisions/0012-sign-in-in-the-app.md)
+    - Tooling: read-only database lookups against the local Docker Postgres with `psql` through
+      `docker compose exec` (in CLAUDE.md). The Supabase MCP isn't added: the few auth settings are set once by
+      hand (README). The agent signs in as a test user of its own, a Member, whose login the Playwright MCP fills
+      in from `.claude/test-user.local` (`--secrets`), so the password never reaches the agent. An admin test user
+      comes with the admin screens
   - [ ] Library: grid and list, search, sort, "Load more" with the cursor
     - [ ] API first: list profiles (`GET /profiles`: id and display name) for the "Uploaded by" filter, later
           also the admin members list. Decide whether members see roles

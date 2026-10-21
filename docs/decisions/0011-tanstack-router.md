@@ -40,4 +40,8 @@ navigation.
   commit it with that change.
 - TanStack Query (with openapi-react-query, [0009](0009-generated-api-client.md)) comes from the same family,
   and route loaders can prefetch queries when that's useful.
-- Route files export `Route`, which oxlint's `only-export-components` rule allows for `src/routes`.
+- oxlint's `only-export-components` rule is off for `src/routes`: a route file exports `Route` and may declare its
+  page's components, and `autoCodeSplitting` moves those into a module of their own, which keeps Fast Refresh
+  working.
+- Pages that need a signed-in user sit in the pathless layout `_authenticated.tsx`, see
+  [0012](0012-sign-in-in-the-app.md).

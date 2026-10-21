@@ -10,7 +10,7 @@
     {
       "files": ["src/routes/**"],
       "rules": {
-        "react/only-export-components": ["warn", { "allowExportNames": ["Route"] }]
+        "react/only-export-components": "off"
       }
     }
   ]
