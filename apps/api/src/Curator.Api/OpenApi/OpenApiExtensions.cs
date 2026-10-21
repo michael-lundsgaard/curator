@@ -1,7 +1,5 @@
-using System.Text.Json;
 using Curator.Api.Authentication;
 using Microsoft.AspNetCore.OpenApi;
-using Microsoft.OpenApi;
 using Scalar.AspNetCore;
 
 namespace Curator.Api.OpenApi;
@@ -36,76 +34,25 @@ public static class OpenApiExtensions
                 options.ShouldInclude = description => description.GroupName == DevDocument;
             });
 
+    // Each transformer fixes one thing the generator gets wrong; its comment says what and why (ADR 0008).
     private static void Configure(OpenApiOptions options, string title, string description)
     {
-        options.AddDocumentTransformer<BearerSecuritySchemeTransformer>();
-
         options.AddDocumentTransformer((document, _, _) =>
         {
             document.Info.Title = title;
             document.Info.Description = description;
-
-            // The generator lists the host the document was requested from, which in the committed file would be the
-            // test host (http://localhost/). Scalar uses its own address instead, and the app has its own.
-            document.Servers = [];
             return Task.CompletedTask;
         });
 
+        options.CreateSchemaReferenceId = UseCaseSchemaIds.Create;
+
+        options.AddDocumentTransformer<BearerSecuritySchemeTransformer>();
+        options.AddDocumentTransformer<NoServersTransformer>();
         options.AddDocumentTransformer<OneLineDescriptionsTransformer>();
-
-        options.CreateSchemaReferenceId = info =>
-            (info.Type.DeclaringType is { } useCase ? NestedSchemaId(useCase.Name, info.Type.Name) : null)
-            ?? OpenApiOptions.CreateDefaultSchemaReferenceId(info);
-
         options.AddSchemaTransformer<ValidationLimitsSchemaTransformer>();
-
-        options.AddSchemaTransformer((schema, context, _) =>
-        {
-            // Enums are sent by name (JsonStringEnumConverter), but the generator leaves out their type, so Scalar
-            // shows them empty. It also adds null to an enum used as nullable anywhere, and since every use shares
-            // the enum's schema, it would look nullable everywhere. So null is left out, which is only right for
-            // an optional query parameter (order): a nullable enum in a body throws, which fails the document tests.
-            var type = context.JsonTypeInfo.Type;
-            if ((Nullable.GetUnderlyingType(type) ?? type).IsEnum && schema.Enum is { } values)
-            {
-                if (context.JsonPropertyInfo is { } property && Nullable.GetUnderlyingType(type) is not null)
-                {
-                    throw new InvalidOperationException(
-                        $"{property.DeclaringType.FullName}.{property.Name} is a nullable enum, which the OpenAPI " +
-                        "document would show as not nullable. Give it its own schema, or make it not nullable.");
-                }
-
-                schema.Type = JsonSchemaType.String;
-                schema.Enum = [.. values.Where(value => value is not null)];
-            }
-
-            return Task.CompletedTask;
-        });
-
-        options.AddOperationTransformer((operation, _, _) =>
-        {
-            // Query parameters bind ignoring case, but are named after the query's properties (Cursor). Show them
-            // as clients send them (cursor), like the JSON bodies.
-            foreach (var parameter in operation.Parameters?.OfType<OpenApiParameter>() ?? [])
-            {
-                if (parameter.In == ParameterLocation.Query && parameter.Name is { } name)
-                {
-                    parameter.Name = JsonNamingPolicy.CamelCase.ConvertName(name);
-                }
-            }
-
-            // Errors are ProblemDetails, sent as application/problem+json (RFC 9457).
-            foreach (var (status, response) in operation.Responses ?? [])
-            {
-                if (status.StartsWith('4') && response.Content is { } content
-                    && content.Remove("application/json", out var problem))
-                {
-                    content["application/problem+json"] = problem;
-                }
-            }
-
-            return Task.CompletedTask;
-        });
+        options.AddSchemaTransformer<EnumsByNameTransformer>();
+        options.AddOperationTransformer<CamelCaseQueryParametersTransformer>();
+        options.AddOperationTransformer<ProblemJsonErrorsTransformer>();
     }
 
     /// <summary>The documents as JSON and Scalar's reference of them. Development only.</summary>
@@ -122,14 +69,4 @@ public static class OpenApiExtensions
                 .DisableRequiredPropertiesFirst())
             .AllowAnonymous();
     }
-
-    // Schemas are named by type, and every use case nests a Command, Response or Item (EditAsset.Command), so they
-    // would all share one schema. Prefix the use case, and call a command a request, as clients know it:
-    // EditAssetRequest, EditAssetResponse, ListAssetsItem. Other nested types (ListAssets.AssetSort) keep their name.
-    private static string? NestedSchemaId(string useCase, string type) => type switch
-    {
-        "Command" => useCase + "Request",
-        "Response" or "Item" => useCase + type,
-        _ => null,
-    };
 }
