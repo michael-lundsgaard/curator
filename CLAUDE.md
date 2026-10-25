@@ -31,10 +31,11 @@ apps/
       Curator.UnitTests         Application/Domain tests
       Curator.IntegrationTests  WebApplicationFactory<Program> tests against the API
   app/            React app (Vite, TypeScript)
-    src/api/      generated API types (schema.d.ts) and the openapi-fetch client
+    src/api/      generated API types (schema.d.ts), the openapi-fetch client and its TanStack Query hooks ($api)
     src/auth/     Supabase auth client, and the frame of the sign-in and reset-password pages
     src/routes/   TanStack Router file-based routes (_authenticated.tsx is the shell and sign-in guard); routeTree.gen.ts is generated
-    src/shell/    sidebar, top bar, theme switch
+    src/library/  the library's clip grid and table, and how metadata is formatted
+    src/shell/    sidebar, top bar (with the search box), theme switch
 ```
 
 Dependency rule: Api → Application → Domain; Infrastructure → Application.
@@ -88,7 +89,8 @@ npm run check:api      # fails when the committed schema.d.ts is out of date
   test user: type `E2E_EMAIL` and `E2E_PASSWORD` in the sign-in form, and the MCP fills in the values from
   `.claude/test-user.local` (`--secrets`; never read that file). The test user is a Member.
 
-- Call the API through `api` in `src/api/client.ts`, not a hand-written `fetch`; it adds the access token. See
+- Call the API through `api` in `src/api/client.ts`, not a hand-written `fetch`; it adds the access token. In
+  components, read with `$api.useQuery` / `$api.useInfiniteQuery` (TanStack Query). See
   `docs/decisions/0009-generated-api-client.md`.
 - A `.env` file holds secrets only: it's git-ignored and closed to the agent. Public configuration is committed as
   code or `appsettings.json` (the app's Supabase URL and publishable key are in `src/auth/config.ts`).

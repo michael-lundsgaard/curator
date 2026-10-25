@@ -93,7 +93,12 @@ Built step by step. Each step is small and shippable. Order may change.
       hand (README). The agent signs in as a test user of its own, a Member, whose login the Playwright MCP fills
       in from `.claude/test-user.local` (`--secrets`), so the password never reaches the agent. An admin test user
       comes with the admin screens
-  - [ ] Library: grid and list, search, sort, "Load more" with the cursor
+  - [x] Library: grid and list, search, sort, "Uploaded by", "Load more" with the cursor, through TanStack Query
+        (openapi-react-query). Search, filter and sort live in the URL (`/library?q=…&sort=Title`), so a search can
+        be linked and Back undoes a filter. Grid or list is a preference per device in `localStorage`, like the
+        theme, so a shared link doesn't choose it for the person opening it. The search box is in the top bar and searches from any page, after
+        a pause in typing. Selecting clips to add to a collection comes with Collections, and cards link to a clip
+        with Clip details
     - [x] API first: list profiles (`GET /profiles`: id and display name, sorted by name, not paged) for the
           "Uploaded by" filter, later also the admin members list. Members don't see roles: nothing in the app
           needs them yet, so they're added for admins with the members list

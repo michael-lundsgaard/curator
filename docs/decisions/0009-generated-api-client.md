@@ -52,6 +52,9 @@ What matters here:
 - After an API change: update `openapi.json` (0008), run `npm run generate:api` in `apps/app`, fix any type
   errors, and commit all three together.
 - Dates are ISO strings in the types (`format: date-time` is only a comment). Parse them where they're shown.
+- `$api` in `src/api/client.ts` is the TanStack Query side. For "Load more", `useInfiniteQuery` takes
+  `initialPageParam: null`: openapi-react-query sends `0` as the cursor when it's `undefined`, which the API rejects,
+  while openapi-fetch leaves `null` out of the query string.
 - **TypeScript 6 override.** openapi-typescript 7.13 declares a peer dependency on TypeScript 5, and the Vite
   template uses 6. `package.json` has an `overrides` entry that lets it use the app's TypeScript; it only uses
   TypeScript to print the `.d.ts`, and the output typechecks. Remove the override once openapi-typescript allows
