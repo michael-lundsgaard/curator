@@ -117,6 +117,10 @@ Built step by step. Each step is small and shippable. Order may change.
     - [ ] API first: one's own `Pending` and `Failed` uploads for "needs attention" (`GET /assets` hides
           `Pending`). Retrying needs a new upload URL for the same asset, or the clip is discarded and uploaded
           again
+  - [ ] Maybe: collapse the sidebar to its icons, with a button, remembered per device like the theme. Not
+        hidden on clip details by itself: navigation that comes and goes from page to page confuses. Goes
+        with a better phone navigation: today the sidebar sits above the page on a phone and pushes it down.
+        Instead, a menu button that opens it as a drawer, or a bar at the bottom
 - [ ] Hosting and observability: where the API (and later the processing worker) runs and how it's
       deployed; structured logs with request logging, and somewhere to read logs and errors. Avoid hosts that
       sleep when idle: Render's free tier (used for asset-vault) spins down after 15 minutes without traffic
