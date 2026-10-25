@@ -19,6 +19,13 @@
       }
     },
     {
+      "name": "App (debug)",
+      "type": "msedge",
+      "request": "launch",
+      "url": "http://localhost:5173",
+      "webRoot": "${workspaceFolder}/apps/app"
+    },
+    {
       "name": "Attach to process",
       "type": "coreclr",
       "request": "attach",
