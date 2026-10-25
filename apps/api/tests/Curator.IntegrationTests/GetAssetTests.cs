@@ -22,6 +22,7 @@ public class GetAssetTests(CuratorApiFactory factory)
         Assert.Equal("Funny moment", details.Title);
         Assert.Equal("Funny moment.mp4", details.OriginalFilename);
         Assert.Equal("video/mp4", details.ContentType);
+        Assert.Equal(1024, details.SourceSizeBytes);
         Assert.Equal("Uploaded", details.Status);
         Assert.Equal(new Uploader(userId, "test.user"), details.UploadedBy);
         Assert.Equal(recordedAt, details.RecordedAt);
@@ -156,6 +157,7 @@ public class GetAssetTests(CuratorApiFactory factory)
         string Title,
         string OriginalFilename,
         string ContentType,
+        long SourceSizeBytes,
         string Status,
         Uploader UploadedBy,
         DateTimeOffset? RecordedAt,

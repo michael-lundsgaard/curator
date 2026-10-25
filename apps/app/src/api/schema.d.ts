@@ -386,6 +386,11 @@ export interface components {
             /** @description Name of the uploaded file on the uploader's device. */
             originalFilename: string;
             contentType: string;
+            /**
+             * Format: int64
+             * @description Size of the uploaded file. Kept after processing has replaced it with a playback version.
+             */
+            sourceSizeBytes: number;
             /** @description `Uploaded` once the file is in storage. `Processing`, `Ready` and `Failed` are for video processing, which doesn't exist yet. `Pending` until the upload is completed, which only its uploader sees. */
             status: components["schemas"]["AssetStatus"];
             uploadedBy: components["schemas"]["Uploader"];

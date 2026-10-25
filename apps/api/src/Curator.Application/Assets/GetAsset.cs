@@ -22,6 +22,9 @@ public static class GetAsset
 
     /// <param name="Title">The title: the file name without its extension, until someone edits it.</param>
     /// <param name="OriginalFilename">Name of the uploaded file on the uploader's device.</param>
+    /// <param name="SourceSizeBytes">
+    /// Size of the uploaded file. Kept after processing has replaced it with a playback version.
+    /// </param>
     /// <param name="Status">
     /// <c>Uploaded</c> once the file is in storage. <c>Processing</c>, <c>Ready</c> and <c>Failed</c> are for video
     /// processing, which doesn't exist yet. <c>Pending</c> until the upload is completed, which only its uploader
@@ -43,6 +46,7 @@ public static class GetAsset
         string? Description,
         string OriginalFilename,
         string ContentType,
+        long SourceSizeBytes,
         AssetStatus Status,
         Uploader UploadedBy,
         DateTimeOffset? RecordedAt,
@@ -83,6 +87,7 @@ public static class GetAsset
                 asset.Description,
                 asset.OriginalFilename,
                 asset.ContentType,
+                asset.SourceSizeBytes,
                 asset.Status,
                 new Uploader(asset.UploadedBy, row.UploaderName),
                 asset.RecordedAt,

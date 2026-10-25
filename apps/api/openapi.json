@@ -1275,6 +1275,7 @@
           "description",
           "originalFilename",
           "contentType",
+          "sourceSizeBytes",
           "status",
           "uploadedBy",
           "recordedAt",
@@ -1309,6 +1310,11 @@
           },
           "contentType": {
             "type": "string"
+          },
+          "sourceSizeBytes": {
+            "type": "integer",
+            "description": "Size of the uploaded file. Kept after processing has replaced it with a playback version.",
+            "format": "int64"
           },
           "status": {
             "description": "`Uploaded` once the file is in storage. `Processing`, `Ready` and `Failed` are for video processing, which doesn't exist yet. `Pending` until the upload is completed, which only its uploader sees.",
