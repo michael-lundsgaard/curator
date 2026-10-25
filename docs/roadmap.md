@@ -121,6 +121,11 @@ Built step by step. Each step is small and shippable. Order may change.
         hidden on clip details by itself: navigation that comes and goes from page to page confuses. Goes
         with a better phone navigation: today the sidebar sits above the page on a phone and pushes it down.
         Instead, a menu button that opens it as a drawer, or a bar at the bottom
+- [ ] Browser tests with Playwright Test, once the app's main screens exist, so later features can lean on them
+      (their own dev server and data, fixtures, layout checks such as no sideways scrolling, and screenshots to look
+      at). Until then the agent checks screens by hand with the Playwright MCP. Needs an ADR for test data (a
+      database of its own) and sign-in (a fake session and test-signed tokens instead of Supabase), and keeps R2
+      out
 - [ ] Hosting and observability: where the API (and later the processing worker) runs and how it's
       deployed; structured logs with request logging, and somewhere to read logs and errors. Avoid hosts that
       sleep when idle: Render's free tier (used for asset-vault) spins down after 15 minutes without traffic
