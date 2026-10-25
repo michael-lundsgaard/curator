@@ -15,6 +15,7 @@ import { Route as SignInRouteImport } from "./routes/sign-in"
 import { Route as AuthenticatedIndexRouteImport } from "./routes/_authenticated/index"
 import { Route as AuthenticatedLibraryRouteImport } from "./routes/_authenticated/library"
 import { Route as AuthenticatedUploadRouteImport } from "./routes/_authenticated/upload"
+import { Route as AuthenticatedWatchIdRouteImport } from "./routes/_authenticated/watch.$id"
 
 const AuthenticatedRoute = AuthenticatedRouteImport.update({
   id: "/_authenticated",
@@ -45,6 +46,11 @@ const AuthenticatedUploadRoute = AuthenticatedUploadRouteImport.update({
   path: "/upload",
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedWatchIdRoute = AuthenticatedWatchIdRouteImport.update({
+  id: "/watch/$id",
+  path: "/watch/$id",
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   "/": typeof AuthenticatedIndexRoute
@@ -52,6 +58,7 @@ export interface FileRoutesByFullPath {
   "/sign-in": typeof SignInRoute
   "/library": typeof AuthenticatedLibraryRoute
   "/upload": typeof AuthenticatedUploadRoute
+  "/watch/$id": typeof AuthenticatedWatchIdRoute
 }
 export interface FileRoutesByTo {
   "/reset-password": typeof ResetPasswordRoute
@@ -59,6 +66,7 @@ export interface FileRoutesByTo {
   "/library": typeof AuthenticatedLibraryRoute
   "/upload": typeof AuthenticatedUploadRoute
   "/": typeof AuthenticatedIndexRoute
+  "/watch/$id": typeof AuthenticatedWatchIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -68,12 +76,15 @@ export interface FileRoutesById {
   "/_authenticated/library": typeof AuthenticatedLibraryRoute
   "/_authenticated/upload": typeof AuthenticatedUploadRoute
   "/_authenticated/": typeof AuthenticatedIndexRoute
+  "/_authenticated/watch/$id": typeof AuthenticatedWatchIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: "/" | "/reset-password" | "/sign-in" | "/library" | "/upload"
+  fullPaths:
+    "/" | "/reset-password" | "/sign-in" | "/library" | "/upload" | "/watch/$id"
   fileRoutesByTo: FileRoutesByTo
-  to: "/reset-password" | "/sign-in" | "/library" | "/upload" | "/"
+  to:
+    "/reset-password" | "/sign-in" | "/library" | "/upload" | "/" | "/watch/$id"
   id:
     | "__root__"
     | "/_authenticated"
@@ -82,6 +93,7 @@ export interface FileRouteTypes {
     | "/_authenticated/library"
     | "/_authenticated/upload"
     | "/_authenticated/"
+    | "/_authenticated/watch/$id"
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -134,6 +146,13 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof AuthenticatedUploadRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    "/_authenticated/watch/$id": {
+      id: "/_authenticated/watch/$id"
+      path: "/watch/$id"
+      fullPath: "/watch/$id"
+      preLoaderRoute: typeof AuthenticatedWatchIdRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
   }
 }
 
@@ -141,12 +160,14 @@ interface AuthenticatedRouteChildren {
   AuthenticatedLibraryRoute: typeof AuthenticatedLibraryRoute
   AuthenticatedUploadRoute: typeof AuthenticatedUploadRoute
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
+  AuthenticatedWatchIdRoute: typeof AuthenticatedWatchIdRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedLibraryRoute: AuthenticatedLibraryRoute,
   AuthenticatedUploadRoute: AuthenticatedUploadRoute,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
+  AuthenticatedWatchIdRoute: AuthenticatedWatchIdRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(

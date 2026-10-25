@@ -102,10 +102,15 @@ Built step by step. Each step is small and shippable. Order may change.
     - [x] API first: list profiles (`GET /profiles`: id and display name, sorted by name, not paged) for the
           "Uploaded by" filter, later also the admin members list. Members don't see roles: nothing in the app
           needs them yet, so they're added for admins with the members list
-  - [ ] Clip details: playback, edit, delete
-    - [ ] API first: file size on `GET /assets/{id}` (`source_size_bytes`)
+  - [x] Clip details at `/watch/{id}`: playback, edit, delete. Library cards and rows link to it. Edit and Delete
+        show for the uploader or an admin, the API's rule. A saved edit is merged into the clip, not fetched again,
+        because a fetch signs new URLs and a new URL reloads the video. When the signed URL expires, the page
+        fetches a new one and the video carries on from where it was. "Copy link" from the mock comes with share
+        links
+    - [x] API first: file size on `GET /assets/{id}` (`sourceSizeBytes`)
   - [ ] Collections: sidebar tree, collection page with sub-collections, add and remove clips, create, rename,
-        move and delete
+        move and delete. On clip details, the clip's collections and "Add to collection", as in the mock (the
+        API doesn't list an asset's collections yet)
   - [ ] Upload: bulk queue (create upload, `PUT` to R2, complete), a few files at a time, optionally into a
         collection
   - [ ] Home: recently added, collections, and one's own uploads that need attention

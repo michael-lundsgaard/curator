@@ -8,6 +8,7 @@
 @theme {
   --color-*: initial;
   --color-white: #ffffff;
+  --color-black: #000000;
 
   --color-bg: #f3f4f1;
   --color-surface: #ffffff;

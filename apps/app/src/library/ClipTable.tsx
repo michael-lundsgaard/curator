@@ -1,3 +1,4 @@
+import { Link } from "@tanstack/react-router";
 import type { Clip } from "./ClipGrid";
 import { formatDate, formatDuration, formatResolution } from "./format";
 
@@ -44,7 +45,13 @@ export function ClipTable({
               <td className="px-4 py-2 font-semibold">
                 <div className="flex items-center gap-3">
                   <span className="h-9 w-16 flex-none rounded-md bg-sunken" aria-hidden="true" />
-                  {clip.title}
+                  <Link
+                    to="/watch/$id"
+                    params={{ id: clip.id }}
+                    className="text-text hover:underline"
+                  >
+                    {clip.title}
+                  </Link>
                 </div>
               </td>
               <td className={metaCellClass}>

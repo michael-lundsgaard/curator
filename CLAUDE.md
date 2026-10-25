@@ -35,6 +35,7 @@ apps/
     src/auth/     Supabase auth client, and the frame of the sign-in and reset-password pages
     src/routes/   TanStack Router file-based routes (_authenticated.tsx is the shell and sign-in guard); routeTree.gen.ts is generated
     src/library/  the library's clip grid and table, and how metadata is formatted
+    src/clip/     clip details: the video player and the edit form (the page is routes/_authenticated/watch.$id.tsx)
     src/shell/    sidebar, top bar (with the search box), theme switch
 ```
 
