@@ -41,7 +41,8 @@ export function Player({
           if (Date.now() >= new Date(expiresAt).getTime()) onExpired();
           else setFailed(true);
         }}
-        className="aspect-video w-full rounded-[14px] bg-black"
+        // At most the screen's height less what's above the video, so the controls stay in view on a laptop.
+        className="aspect-video max-h-[calc(100dvh-12rem)] w-full rounded-[14px] bg-black"
       />
       {failed && (
         <p role="alert" className="text-sm text-danger">

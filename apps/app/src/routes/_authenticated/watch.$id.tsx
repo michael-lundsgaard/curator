@@ -86,8 +86,10 @@ function Clip({ clip, onUrlsExpired }: { clip: ClipDetails; onUrlsExpired: () =>
   const canChange = clip.uploadedBy.id === me.id || me.role === "Admin";
 
   return (
-    <div className="flex flex-wrap items-start gap-8">
-      <div className="min-w-0 flex-[999_1_640px]">
+    // Most clips are 720p or 1440p: the details go beside the video only once the video still gets about 850px or
+    // more, else below it, in two columns where they fit.
+    <div className="grid items-start gap-8 2xl:grid-cols-[minmax(0,1fr)_360px]">
+      <div className="min-w-0">
         {clip.playbackUrl ? (
           <Player src={clip.playbackUrl} expiresAt={clip.urlsExpireAt} onExpired={onUrlsExpired} />
         ) : (
@@ -97,7 +99,7 @@ function Clip({ clip, onUrlsExpired }: { clip: ClipDetails; onUrlsExpired: () =>
         )}
       </div>
 
-      <aside className="flex min-w-0 flex-[1_1_340px] flex-col gap-6">
+      <aside className="grid min-w-0 items-start gap-6 lg:grid-cols-2 2xl:grid-cols-1">
         {editing ? (
           <EditDetails clip={clip} onDone={() => setEditing(false)} />
         ) : (

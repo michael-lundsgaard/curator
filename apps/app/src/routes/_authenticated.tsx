@@ -18,12 +18,13 @@ export const Route = createFileRoute("/_authenticated")({
     return data;
   },
   staleTime: Infinity,
+  // No maximum width: a page that shouldn't stretch (a form, text) caps its own, see docs/design.md.
   component: () => (
     <div className="flex min-h-screen flex-col md:flex-row">
       <Sidebar />
       <div className="flex min-w-0 flex-1 flex-col">
         <TopBar />
-        <main className="w-full max-w-300 p-4 md:p-8">
+        <main className="w-full p-4 md:p-8">
           <Outlet />
         </main>
       </div>

@@ -15,7 +15,8 @@ export function ClipGrid({
   uploaderName: (clip: Clip) => string;
 }) {
   return (
-    <ul className="grid grid-cols-[repeat(auto-fill,minmax(220px,1fr))] gap-x-6 gap-y-7">
+    // As many columns as fit. Wider cards on a big screen, so the stills don't shrink to stamps in ten columns.
+    <ul className="grid grid-cols-[repeat(auto-fill,minmax(220px,1fr))] gap-x-6 gap-y-7 2xl:grid-cols-[repeat(auto-fill,minmax(280px,1fr))]">
       {clips.map((clip) => (
         <li key={clip.id}>
           <Link

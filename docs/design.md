@@ -60,3 +60,14 @@ cost a second click or the room of three buttons for something rarely changed.
 In the app, the tokens are Tailwind theme variables (`--color-surface` makes `bg-surface`, `text-surface`, …) in
 `apps/app/src/index.css`, with the dark values under `[data-theme="dark"]`. See
 [0010](decisions/0010-tailwind-css.md).
+
+## Screen sizes
+
+Desktop first: the app is designed for screens from 1280px (a 720p monitor) to 2560px wide (a 1440p monitor at 100%
+scaling). Phones (about 375–430px) are supported too: every page works there without scrolling sideways, and a
+screen is adapted where the desktop layout doesn't fit (like the navigation, see the roadmap). Tablets get what
+falls in between. The breakpoints are Tailwind's defaults (`sm` 640, `md` 768, `lg` 1024, `xl` 1280, `2xl` 1536px).
+From `md` the sidebar sits beside the page; on smaller screens it sits above it.
+
+Pages use the width they're given, with no maximum in the shell: the library adds columns, and clip details gives
+the video the room. A page or part that shouldn't stretch caps its own width, such as a form or a block of text.
