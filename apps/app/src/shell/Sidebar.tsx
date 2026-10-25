@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import type { ReactNode } from "react";
-import { House, LayoutGrid, Upload } from "lucide-react";
+import { Folder, House, LayoutGrid, Upload } from "lucide-react";
+import { flatten, useCollectionTree } from "../collections/tree";
 import { Logo } from "./Logo";
 
 export function Sidebar() {
@@ -25,6 +26,7 @@ export function Sidebar() {
           Upload
         </NavItem>
       </div>
+      <Collections />
     </nav>
   );
 }
@@ -49,5 +51,42 @@ function NavItem({
       {icon}
       {children}
     </Link>
+  );
+}
+
+// The whole tree, every level open. On a phone, where the sidebar sits above the page, it scrolls in a box of its
+// own instead of pushing the page down, until the phone navigation is reworked (see the roadmap).
+function Collections() {
+  const tree = useCollectionTree();
+
+  return (
+    <div className="flex flex-col gap-0.5">
+      <h2 className="px-2.5 pb-1.5 font-mono text-xs font-normal tracking-[0.08em] text-meta uppercase">
+        Collections
+      </h2>
+      {tree.isError ? (
+        <p className="px-2.5 text-sm text-danger">Couldn't load the collections.</p>
+      ) : tree.data?.items.length === 0 ? (
+        <p className="px-2.5 text-sm text-meta">None yet.</p>
+      ) : (
+        <ul className="flex max-h-64 flex-col gap-0.5 overflow-y-auto md:max-h-none md:overflow-visible">
+          {flatten(tree.data?.items ?? []).map(({ item, depth }) => (
+            <li key={item.id}>
+              <Link
+                to="/collections/$id"
+                params={{ id: item.id }}
+                // 18px more per level, so the tree reads at a glance; the depth is at most 5.
+                style={{ paddingLeft: 10 + depth * 18 }}
+                className="flex h-9 items-center gap-2 rounded-lg pr-2.5 text-sm text-text hover:bg-sunken aria-[current=page]:bg-accent-soft aria-[current=page]:font-semibold aria-[current=page]:text-link"
+              >
+                <Folder size={16} aria-hidden="true" className="flex-none" />
+                <span className="min-w-0 flex-1 truncate">{item.name}</span>
+                <span className="font-mono text-xs font-normal text-meta">{item.clipCount}</span>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
   );
 }

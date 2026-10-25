@@ -34,7 +34,9 @@ apps/
     src/api/      generated API types (schema.d.ts), the openapi-fetch client and its TanStack Query hooks ($api)
     src/auth/     Supabase auth client, and the frame of the sign-in and reset-password pages
     src/routes/   TanStack Router file-based routes (_authenticated.tsx is the shell and sign-in guard); routeTree.gen.ts is generated
-    src/library/  the library's clip grid and table, and how metadata is formatted
+    src/library/  clip listings (grid, table, sort and view controls, "Load more"), shared by the library and
+                  collection pages, and how metadata is formatted
+    src/collections/  the collection tree from GET /collections (the page is routes/_authenticated/collections.$id.tsx)
     src/clip/     clip details: the video player and the edit form (the page is routes/_authenticated/watch.$id.tsx)
     src/shell/    sidebar, top bar (with the search box), theme switch
 ```

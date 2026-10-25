@@ -15,6 +15,7 @@ import { Route as SignInRouteImport } from "./routes/sign-in"
 import { Route as AuthenticatedIndexRouteImport } from "./routes/_authenticated/index"
 import { Route as AuthenticatedLibraryRouteImport } from "./routes/_authenticated/library"
 import { Route as AuthenticatedUploadRouteImport } from "./routes/_authenticated/upload"
+import { Route as AuthenticatedCollectionsIdRouteImport } from "./routes/_authenticated/collections.$id"
 import { Route as AuthenticatedWatchIdRouteImport } from "./routes/_authenticated/watch.$id"
 
 const AuthenticatedRoute = AuthenticatedRouteImport.update({
@@ -46,6 +47,12 @@ const AuthenticatedUploadRoute = AuthenticatedUploadRouteImport.update({
   path: "/upload",
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedCollectionsIdRoute =
+  AuthenticatedCollectionsIdRouteImport.update({
+    id: "/collections/$id",
+    path: "/collections/$id",
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedWatchIdRoute = AuthenticatedWatchIdRouteImport.update({
   id: "/watch/$id",
   path: "/watch/$id",
@@ -58,6 +65,7 @@ export interface FileRoutesByFullPath {
   "/sign-in": typeof SignInRoute
   "/library": typeof AuthenticatedLibraryRoute
   "/upload": typeof AuthenticatedUploadRoute
+  "/collections/$id": typeof AuthenticatedCollectionsIdRoute
   "/watch/$id": typeof AuthenticatedWatchIdRoute
 }
 export interface FileRoutesByTo {
@@ -66,6 +74,7 @@ export interface FileRoutesByTo {
   "/library": typeof AuthenticatedLibraryRoute
   "/upload": typeof AuthenticatedUploadRoute
   "/": typeof AuthenticatedIndexRoute
+  "/collections/$id": typeof AuthenticatedCollectionsIdRoute
   "/watch/$id": typeof AuthenticatedWatchIdRoute
 }
 export interface FileRoutesById {
@@ -76,15 +85,28 @@ export interface FileRoutesById {
   "/_authenticated/library": typeof AuthenticatedLibraryRoute
   "/_authenticated/upload": typeof AuthenticatedUploadRoute
   "/_authenticated/": typeof AuthenticatedIndexRoute
+  "/_authenticated/collections/$id": typeof AuthenticatedCollectionsIdRoute
   "/_authenticated/watch/$id": typeof AuthenticatedWatchIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    "/" | "/reset-password" | "/sign-in" | "/library" | "/upload" | "/watch/$id"
+    | "/"
+    | "/reset-password"
+    | "/sign-in"
+    | "/library"
+    | "/upload"
+    | "/collections/$id"
+    | "/watch/$id"
   fileRoutesByTo: FileRoutesByTo
   to:
-    "/reset-password" | "/sign-in" | "/library" | "/upload" | "/" | "/watch/$id"
+    | "/reset-password"
+    | "/sign-in"
+    | "/library"
+    | "/upload"
+    | "/"
+    | "/collections/$id"
+    | "/watch/$id"
   id:
     | "__root__"
     | "/_authenticated"
@@ -93,6 +115,7 @@ export interface FileRouteTypes {
     | "/_authenticated/library"
     | "/_authenticated/upload"
     | "/_authenticated/"
+    | "/_authenticated/collections/$id"
     | "/_authenticated/watch/$id"
   fileRoutesById: FileRoutesById
 }
@@ -146,6 +169,13 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof AuthenticatedUploadRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    "/_authenticated/collections/$id": {
+      id: "/_authenticated/collections/$id"
+      path: "/collections/$id"
+      fullPath: "/collections/$id"
+      preLoaderRoute: typeof AuthenticatedCollectionsIdRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     "/_authenticated/watch/$id": {
       id: "/_authenticated/watch/$id"
       path: "/watch/$id"
@@ -160,6 +190,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedLibraryRoute: typeof AuthenticatedLibraryRoute
   AuthenticatedUploadRoute: typeof AuthenticatedUploadRoute
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
+  AuthenticatedCollectionsIdRoute: typeof AuthenticatedCollectionsIdRoute
   AuthenticatedWatchIdRoute: typeof AuthenticatedWatchIdRoute
 }
 
@@ -167,6 +198,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedLibraryRoute: AuthenticatedLibraryRoute,
   AuthenticatedUploadRoute: AuthenticatedUploadRoute,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
+  AuthenticatedCollectionsIdRoute: AuthenticatedCollectionsIdRoute,
   AuthenticatedWatchIdRoute: AuthenticatedWatchIdRoute,
 }
 

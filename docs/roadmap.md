@@ -108,9 +108,18 @@ Built step by step. Each step is small and shippable. Order may change.
         fetches a new one and the video carries on from where it was. "Copy link" from the mock comes with share
         links
     - [x] API first: file size on `GET /assets/{id}` (`sourceSizeBytes`)
-  - [ ] Collections: sidebar tree, collection page with sub-collections, add and remove clips, create, rename,
-        move and delete. On clip details, the clip's collections and "Add to collection", as in the mock (the
-        API doesn't list an asset's collections yet)
+  - [ ] Collections, in four parts:
+    - [x] Sidebar tree and collection page (`/collections/{id}`) with the library's filters, in the URL. On a
+          collection's page the top bar's search searches that collection, as in the mock. The clip count is the
+          collection's own clips only. A total with its sub-collections, and the mock's "In" column (which
+          sub-collection a clip is in), need the API to return them, so they wait until they're missed
+    - [ ] Create (sidebar and "New sub-collection"), rename and describe, move, and delete with a count of the
+          sub-collections it takes along
+      - [ ] First, as a refactor of its own: shared UI pieces in `src/ui/` (buttons, the "Couldn't load … Try
+            again" alert), now copied between pages, before the forms add more
+    - [ ] Select clips in the library and a collection: "Add to collection" and "Remove from …"
+    - [ ] Clip details: the clip's collections and "Add to collection", as in the mock
+      - [ ] API first: an asset's collections (the API doesn't list them yet)
   - [ ] Upload: bulk queue (create upload, `PUT` to R2, complete), a few files at a time, optionally into a
         collection
   - [ ] Home: recently added, collections, and one's own uploads that need attention
