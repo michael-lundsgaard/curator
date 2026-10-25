@@ -94,8 +94,9 @@ Built step by step. Each step is small and shippable. Order may change.
       in from `.claude/test-user.local` (`--secrets`), so the password never reaches the agent. An admin test user
       comes with the admin screens
   - [ ] Library: grid and list, search, sort, "Load more" with the cursor
-    - [ ] API first: list profiles (`GET /profiles`: id and display name) for the "Uploaded by" filter, later
-          also the admin members list. Decide whether members see roles
+    - [x] API first: list profiles (`GET /profiles`: id and display name, sorted by name, not paged) for the
+          "Uploaded by" filter, later also the admin members list. Members don't see roles: nothing in the app
+          needs them yet, so they're added for admins with the members list
   - [ ] Clip details: playback, edit, delete
     - [ ] API first: file size on `GET /assets/{id}` (`source_size_bytes`)
   - [ ] Collections: sidebar tree, collection page with sub-collections, add and remove clips, create, rename,

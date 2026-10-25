@@ -1,5 +1,6 @@
 using Curator.Application.Assets;
 using Curator.Application.Collections;
+using Curator.Application.Profiles;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
@@ -26,6 +27,8 @@ public static class DependencyInjection
         services.AddScoped<DeleteCollection.Handler>();
         services.AddScoped<AddClipsToCollection.Handler>();
         services.AddScoped<RemoveClipsFromCollection.Handler>();
+
+        services.AddScoped<ListProfiles.Handler>();
 
         return services;
     }

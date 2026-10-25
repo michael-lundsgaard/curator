@@ -32,6 +32,7 @@ who may change what. The Supabase project signs tokens with an **ECC (P-256)** k
 - Parallel first requests are safe: a unique violation on insert falls back to reading the existing row.
 - `display_name` defaults to the part of the email before `@`. Editing it comes later.
 - `GET /me` returns the signed-in user's profile (`id`, `displayName`, `role`).
+- `GET /profiles` lists everyone's `id` and `displayName`, without roles (added with the app's Library).
 
 ### Roles and permissions
 

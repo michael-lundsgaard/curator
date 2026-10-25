@@ -24,6 +24,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/profiles": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List profiles
+         * @description Lists everyone who has signed in, sorted by display name. Filter clips by one with `uploadedBy` on `GET /assets`.
+         */
+        get: operations["ListProfiles"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/collections": {
         parameters: {
             query?: never;
@@ -481,6 +501,15 @@ export interface components {
             /** @description Every collection, sorted by name ignoring case. */
             items: components["schemas"]["ListCollectionsItem"][];
         };
+        ListProfilesItem: {
+            /** Format: uuid */
+            id: string;
+            displayName: string;
+        };
+        ListProfilesResponse: {
+            /** @description Every profile, sorted by display name ignoring case. */
+            items: components["schemas"]["ListProfilesItem"][];
+        };
         MoveCollectionRequest: {
             /**
              * Format: uuid
@@ -576,6 +605,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ProfileResponse"];
+                };
+            };
+        };
+    };
+    ListProfiles: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ListProfilesResponse"];
                 };
             };
         };

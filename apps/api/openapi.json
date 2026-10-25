@@ -28,6 +28,28 @@
         }
       }
     },
+    "/profiles": {
+      "get": {
+        "tags": [
+          "Profiles"
+        ],
+        "summary": "List profiles",
+        "description": "Lists everyone who has signed in, sorted by display name. Filter clips by one with `uploadedBy` on `GET /assets`.",
+        "operationId": "ListProfiles",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListProfilesResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/collections": {
       "get": {
         "tags": [
@@ -1546,6 +1568,37 @@
           }
         }
       },
+      "ListProfilesItem": {
+        "required": [
+          "id",
+          "displayName"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "displayName": {
+            "type": "string"
+          }
+        }
+      },
+      "ListProfilesResponse": {
+        "required": [
+          "items"
+        ],
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ListProfilesItem"
+            },
+            "description": "Every profile, sorted by display name ignoring case."
+          }
+        }
+      },
       "MoveCollectionRequest": {
         "required": [
           "parentId"
@@ -1776,6 +1829,9 @@
   "tags": [
     {
       "name": "Me"
+    },
+    {
+      "name": "Profiles"
     },
     {
       "name": "Collections"
