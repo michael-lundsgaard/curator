@@ -12,15 +12,15 @@ import {
   formatSize,
   formatTime,
 } from "../../library/format";
+import { LoadError } from "../../ui/alerts";
+import { Button } from "../../ui/Button";
+import { EmptyState } from "../../ui/EmptyState";
 
 export const Route = createFileRoute("/_authenticated/watch/$id")({
   component: Watch,
 });
 
 const authenticated = getRouteApi("/_authenticated");
-
-const buttonClass =
-  "flex h-10 cursor-pointer items-center rounded-lg border border-line bg-surface px-3.5 text-sm font-semibold hover:bg-sunken disabled:cursor-default disabled:opacity-60";
 
 function Watch() {
   const { id } = Route.useParams();
@@ -52,24 +52,11 @@ function Watch() {
         <p className="text-[15px] text-meta">Loading clip…</p>
       ) : clip.isError ? (
         clip.error.status === 404 ? (
-          <div className="flex flex-col items-center gap-3 rounded-[14px] border border-dashed border-line px-6 py-16 text-center">
-            <span className="text-lg font-semibold">This clip doesn't exist</span>
+          <EmptyState title="This clip doesn't exist">
             <span className="text-[15px] text-meta">It may have been deleted.</span>
-          </div>
+          </EmptyState>
         ) : (
-          <div
-            role="alert"
-            className="flex flex-wrap items-center gap-3 rounded-[10px] bg-danger-soft px-4 py-3 text-danger"
-          >
-            <span className="flex-1 text-[15px] font-semibold">Couldn't load the clip.</span>
-            <button
-              type="button"
-              onClick={() => void clip.refetch()}
-              className="cursor-pointer font-semibold underline"
-            >
-              Try again
-            </button>
-          </div>
+          <LoadError onRetry={() => void clip.refetch()}>Couldn't load the clip.</LoadError>
         )
       ) : (
         <Clip clip={clip.data} onUrlsExpired={() => void clip.refetch()} />
@@ -116,23 +103,17 @@ function Clip({ clip, onUrlsExpired }: { clip: ClipDetails; onUrlsExpired: () =>
             </div>
             {canChange && (
               <div className="flex flex-wrap gap-2.5">
-                <button
-                  type="button"
+                <Button
                   onClick={() => {
                     setConfirmingDelete(false);
                     setEditing(true);
                   }}
-                  className={buttonClass}
                 >
                   Edit details
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setConfirmingDelete(true)}
-                  className="flex h-10 cursor-pointer items-center rounded-lg px-3.5 text-sm font-semibold text-danger hover:bg-danger-soft"
-                >
+                </Button>
+                <Button variant="quiet-danger" onClick={() => setConfirmingDelete(true)}>
                   Delete
-                </button>
+                </Button>
               </div>
             )}
             {confirmingDelete && (
@@ -200,17 +181,14 @@ function ConfirmDelete({ clip, onCancel }: { clip: ClipDetails; onCancel: () => 
         </span>
       )}
       <div className="flex gap-2.5">
-        <button
-          type="button"
+        <Button
+          variant="danger"
           onClick={() => remove.mutate({ params: { path: { id: clip.id } } })}
           disabled={remove.isPending}
-          className="flex h-10 cursor-pointer items-center rounded-lg bg-danger px-3.5 text-sm font-semibold text-bg disabled:cursor-default disabled:opacity-60"
         >
           {remove.isPending ? "Deleting…" : "Delete clip"}
-        </button>
-        <button type="button" onClick={onCancel} className={buttonClass}>
-          Keep it
-        </button>
+        </Button>
+        <Button onClick={onCancel}>Keep it</Button>
       </div>
     </div>
   );

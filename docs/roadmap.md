@@ -115,8 +115,8 @@ Built step by step. Each step is small and shippable. Order may change.
           sub-collection a clip is in), need the API to return them, so they wait until they're missed
     - [ ] Create (sidebar and "New sub-collection"), rename and describe, move, and delete with a count of the
           sub-collections it takes along
-      - [ ] First, as a refactor of its own: shared UI pieces in `src/ui/` (buttons, the "Couldn't load … Try
-            again" alert), now copied between pages, before the forms add more
+      - [x] First, as a refactor of its own: shared UI pieces in `src/ui/` (buttons, the "Couldn't load … Try
+            again" alert, the empty state, text fields), now copied between pages, before the forms add more
     - [ ] Select clips in the library and a collection: "Add to collection" and "Remove from …"
     - [ ] Clip details: the clip's collections and "Add to collection", as in the mock
       - [ ] API first: an asset's collections (the API doesn't list them yet)

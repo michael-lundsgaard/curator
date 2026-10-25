@@ -39,6 +39,7 @@ apps/
     src/collections/  the collection tree from GET /collections (the page is routes/_authenticated/collections.$id.tsx)
     src/clip/     clip details: the video player and the edit form (the page is routes/_authenticated/watch.$id.tsx)
     src/shell/    sidebar, top bar (with the search box), theme switch
+    src/ui/       pieces shared by the pages: Button (buttonClass for a Link), text fields, alerts, the empty state
 ```
 
 Dependency rule: Api → Application → Domain; Infrastructure → Application.

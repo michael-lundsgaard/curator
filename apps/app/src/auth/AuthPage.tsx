@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import type { ComponentProps, ReactNode } from "react";
+import type { ReactNode } from "react";
 import { Logo } from "../shell/Logo";
 import { ThemeSwitch } from "../shell/ThemeSwitch";
 
@@ -24,39 +24,3 @@ export function AuthPage({ children }: { children: ReactNode }) {
 
 export const cardClass =
   "flex w-full max-w-105 flex-col gap-5 rounded-2xl border border-line bg-surface p-6 sm:p-9";
-
-export const primaryButtonClass =
-  "flex h-12 cursor-pointer items-center justify-center rounded-[10px] bg-accent text-base font-semibold text-white hover:bg-accent-hover disabled:cursor-default disabled:opacity-60";
-
-export function Field({
-  id,
-  label,
-  aside,
-  ...input
-}: { id: string; label: string; aside?: ReactNode } & ComponentProps<"input">) {
-  return (
-    <div className="flex flex-col gap-1.5">
-      <div className="flex items-baseline justify-between">
-        <label htmlFor={id} className="text-sm font-semibold">
-          {label}
-        </label>
-        {aside}
-      </div>
-      <input
-        id={id}
-        name={id}
-        required
-        className="h-11 rounded-[10px] border border-line bg-bg px-3 text-[15px] placeholder:text-meta"
-        {...input}
-      />
-    </div>
-  );
-}
-
-export function FormError({ children }: { children: ReactNode }) {
-  return (
-    <p role="alert" className="rounded-[10px] bg-danger-soft px-3 py-2.5 text-sm text-danger">
-      {children}
-    </p>
-  );
-}

@@ -1,8 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { buttonClass, ClipListing, EmptyState } from "../../library/ClipListing";
+import { ClipListing } from "../../library/ClipListing";
 import { SortSelect, UploadedBySelect, ViewSwitch } from "../../library/controls";
 import { parseClipSearch } from "../../library/search";
 import { useClipView } from "../../library/view";
+import { buttonClass } from "../../ui/buttonClass";
+import { EmptyState } from "../../ui/EmptyState";
 
 // How the clips are shown (grid or list) is a preference, see view.ts; what's shown is in the URL, see search.ts.
 export const Route = createFileRoute("/_authenticated/library")({
@@ -63,7 +65,7 @@ function Library() {
               <Link
                 to="/library"
                 search={{ sort: search.sort, order: search.order }}
-                className={buttonClass}
+                className={buttonClass({ size: "lg" })}
               >
                 Show all clips
               </Link>
@@ -73,7 +75,7 @@ function Library() {
               <span className="text-[15px] text-meta">
                 Upload a few, and they show up here for everyone.
               </span>
-              <Link to="/upload" className={buttonClass}>
+              <Link to="/upload" className={buttonClass({ size: "lg" })}>
                 Upload clips
               </Link>
             </EmptyState>

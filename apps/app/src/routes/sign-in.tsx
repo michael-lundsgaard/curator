@@ -1,8 +1,11 @@
 import { createFileRoute, Link, redirect, useNavigate } from "@tanstack/react-router";
 import { useState, type FormEvent } from "react";
-import { AuthPage, cardClass, Field, FormError, primaryButtonClass } from "../auth/AuthPage";
+import { AuthPage, cardClass } from "../auth/AuthPage";
 import { auth } from "../auth/client";
 import { authErrorMessage } from "../auth/errors";
+import { FormError } from "../ui/alerts";
+import { Button } from "../ui/Button";
+import { TextField } from "../ui/fields";
 
 type SignInSearch = { redirect?: string };
 
@@ -61,17 +64,19 @@ function SignIn() {
           <p className="text-[15px] text-meta">Welcome back.</p>
         </div>
         {error && <FormError>{error}</FormError>}
-        <Field
+        <TextField
           id="email"
           label="Email"
           type="email"
+          required
           autoComplete="email"
           placeholder="you@example.com"
         />
-        <Field
+        <TextField
           id="password"
           label="Password"
           type="password"
+          required
           autoComplete="current-password"
           aside={
             <Link
@@ -82,9 +87,9 @@ function SignIn() {
             </Link>
           }
         />
-        <button type="submit" disabled={pending} className={primaryButtonClass}>
+        <Button type="submit" variant="primary" size="xl" disabled={pending}>
           {pending ? "Signing in…" : "Sign in"}
-        </button>
+        </Button>
         <p className="border-t border-line pt-4 text-sm leading-normal text-meta">
           Curator is invite only. Ask an admin to invite you.
         </p>

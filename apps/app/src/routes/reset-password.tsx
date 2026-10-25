@@ -1,9 +1,13 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { Mail } from "lucide-react";
 import { useState, type FormEvent } from "react";
-import { AuthPage, cardClass, Field, FormError, primaryButtonClass } from "../auth/AuthPage";
+import { AuthPage, cardClass } from "../auth/AuthPage";
 import { auth } from "../auth/client";
 import { authErrorMessage } from "../auth/errors";
+import { FormError } from "../ui/alerts";
+import { Button } from "../ui/Button";
+import { buttonClass } from "../ui/buttonClass";
+import { TextField } from "../ui/fields";
 
 type ResetPasswordSearch = { step?: "new" };
 
@@ -70,16 +74,17 @@ function RequestLink({ onSent }: { onSent: () => void }) {
         Enter the email you sign in with. We'll send you a link to choose a new password.
       </Heading>
       {error && <FormError>{error}</FormError>}
-      <Field
+      <TextField
         id="email"
         label="Email"
         type="email"
+        required
         autoComplete="email"
         placeholder="you@example.com"
       />
-      <button type="submit" disabled={pending} className={primaryButtonClass}>
+      <Button type="submit" variant="primary" size="xl" disabled={pending}>
         {pending ? "Sending…" : "Send reset link"}
-      </button>
+      </Button>
       <BackToSignIn />
     </form>
   );
@@ -136,23 +141,25 @@ function NewPassword() {
       {/* 8 is also Supabase's minimum (Authentication → Sign In / Providers → Email). */}
       <Heading title="Choose a new password">At least 8 characters.</Heading>
       {error && <FormError>{error}</FormError>}
-      <Field
+      <TextField
         id="new-password"
         label="New password"
         type="password"
+        required
         autoComplete="new-password"
         minLength={8}
       />
-      <Field
+      <TextField
         id="confirm-password"
         label="Repeat new password"
         type="password"
+        required
         autoComplete="new-password"
         minLength={8}
       />
-      <button type="submit" disabled={pending} className={primaryButtonClass}>
+      <Button type="submit" variant="primary" size="xl" disabled={pending}>
         {pending ? "Saving…" : "Save and sign in"}
-      </button>
+      </Button>
     </form>
   );
 }
@@ -163,7 +170,7 @@ function LinkExpired() {
       <Heading title="This link has expired">
         Reset links work once, for one hour. Request a new one and use the latest email.
       </Heading>
-      <Link to="/reset-password" className={primaryButtonClass}>
+      <Link to="/reset-password" className={buttonClass({ variant: "primary", size: "xl" })}>
         Request a new link
       </Link>
       <BackToSignIn />

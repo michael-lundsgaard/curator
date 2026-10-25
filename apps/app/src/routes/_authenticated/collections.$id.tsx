@@ -9,10 +9,13 @@ import {
   useCollectionTree,
   type CollectionItem,
 } from "../../collections/tree";
-import { buttonClass, ClipListing, EmptyState } from "../../library/ClipListing";
+import { ClipListing } from "../../library/ClipListing";
 import { SortSelect, UploadedBySelect, ViewSwitch } from "../../library/controls";
 import { parseClipSearch, type ClipSearch } from "../../library/search";
 import { useClipView } from "../../library/view";
+import { LoadError } from "../../ui/alerts";
+import { buttonClass } from "../../ui/buttonClass";
+import { EmptyState } from "../../ui/EmptyState";
 
 // The library's search, filter and sort (the top bar's search box searches the collection here), and whether
 // sub-collections' clips are included, all in the URL.
@@ -51,19 +54,7 @@ function CollectionPage() {
         <span className="text-[15px] text-meta">It may have been deleted.</span>
       </EmptyState>
     ) : (
-      <div
-        role="alert"
-        className="flex flex-wrap items-center gap-3 rounded-[10px] bg-danger-soft px-4 py-3 text-danger"
-      >
-        <span className="flex-1 text-[15px] font-semibold">Couldn't load the collection.</span>
-        <button
-          type="button"
-          onClick={() => void collection.refetch()}
-          className="cursor-pointer font-semibold underline"
-        >
-          Try again
-        </button>
-      </div>
+      <LoadError onRetry={() => void collection.refetch()}>Couldn't load the collection.</LoadError>
     );
   }
 
@@ -165,12 +156,16 @@ function CollectionPage() {
                 <Link
                   from={Route.fullPath}
                   search={(prev) => ({ ...prev, q: undefined, uploadedBy: undefined })}
-                  className={buttonClass}
+                  className={buttonClass({ size: "lg" })}
                 >
                   Show all clips in {name ?? "this collection"}
                 </Link>
                 {search.q && (
-                  <Link to="/library" search={{ q: search.q }} className={buttonClass}>
+                  <Link
+                    to="/library"
+                    search={{ q: search.q }}
+                    className={buttonClass({ size: "lg" })}
+                  >
                     Search the whole library
                   </Link>
                 )}
@@ -184,7 +179,7 @@ function CollectionPage() {
                 <Link
                   from={Route.fullPath}
                   search={(prev) => ({ ...prev, includeSubCollections: true })}
-                  className={buttonClass}
+                  className={buttonClass({ size: "lg" })}
                 >
                   Show clips in sub-collections
                 </Link>
