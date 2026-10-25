@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
-import type { ReactNode } from "react";
-import { Folder, House, LayoutGrid, Upload } from "lucide-react";
+import { useState, type ReactNode } from "react";
+import { Folder, House, LayoutGrid, Plus, Upload } from "lucide-react";
+import { NewCollection } from "../collections/NewCollection";
 import { flatten, useCollectionTree } from "../collections/tree";
 import { Logo } from "./Logo";
 
@@ -58,12 +59,25 @@ function NavItem({
 // own instead of pushing the page down, until the phone navigation is reworked (see the roadmap).
 function Collections() {
   const tree = useCollectionTree();
+  const [creating, setCreating] = useState(false);
 
   return (
     <div className="flex flex-col gap-0.5">
-      <h2 className="px-2.5 pb-1.5 font-mono text-xs font-normal tracking-[0.08em] text-meta uppercase">
-        Collections
-      </h2>
+      <div className="flex items-center justify-between pb-0.5 pl-2.5">
+        <h2 className="font-mono text-xs font-normal tracking-[0.08em] text-meta uppercase">
+          Collections
+        </h2>
+        <button
+          type="button"
+          onClick={() => setCreating(true)}
+          aria-label="New collection"
+          title="New collection"
+          className="flex size-8 cursor-pointer items-center justify-center rounded-lg text-meta hover:bg-sunken hover:text-text"
+        >
+          <Plus size={16} aria-hidden="true" />
+        </button>
+      </div>
+      {creating && <NewCollection parent={null} onClose={() => setCreating(false)} />}
       {tree.isError ? (
         <p className="px-2.5 text-sm text-danger">Couldn't load the collections.</p>
       ) : tree.data?.items.length === 0 ? (

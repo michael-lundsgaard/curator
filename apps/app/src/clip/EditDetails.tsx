@@ -22,7 +22,7 @@ export function EditDetails({ clip, onDone }: { clip: ClipDetails; onDone: () =>
       const { queryKey } = $api.queryOptions("get", "/assets/{id}", {
         params: { path: { id: clip.id } },
       });
-      queryClient.setQueryData(queryKey, (old) => old && { ...old, ...edited });
+      queryClient.setQueryData<ClipDetails>(queryKey, (old) => old && { ...old, ...edited });
       void queryClient.invalidateQueries({ queryKey: ["get", "/assets"] });
       onDone();
     },

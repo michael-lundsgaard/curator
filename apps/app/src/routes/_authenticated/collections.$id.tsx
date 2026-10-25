@@ -1,11 +1,18 @@
 import { createFileRoute, getRouteApi, Link } from "@tanstack/react-router";
-import { Folder } from "lucide-react";
-import { Fragment } from "react";
+import { Ellipsis, Folder, FolderInput, FolderPlus, Pencil, Trash2 } from "lucide-react";
+import { Fragment, useState } from "react";
 import { $api } from "../../api/client";
-import type { components } from "../../api/schema";
+import { DeleteCollection } from "../../collections/DeleteCollection";
+import { EditCollection, type Collection } from "../../collections/EditCollection";
+import { MoveCollection } from "../../collections/MoveCollection";
+import { NewCollection } from "../../collections/NewCollection";
 import {
   ancestorsOf,
   childrenOf,
+  flatten,
+  insideCount,
+  levelOf,
+  maxDepth,
   useCollectionTree,
   type CollectionItem,
 } from "../../collections/tree";
@@ -16,6 +23,7 @@ import { useClipView } from "../../library/view";
 import { LoadError } from "../../ui/alerts";
 import { buttonClass } from "../../ui/buttonClass";
 import { EmptyState } from "../../ui/EmptyState";
+import { Menu, MenuDivider, MenuItem } from "../../ui/Menu";
 
 // The library's search, filter and sort (the top bar's search box searches the collection here), and whether
 // sub-collections' clips are included, all in the URL.
@@ -30,8 +38,6 @@ export const Route = createFileRoute("/_authenticated/collections/$id")({
 });
 
 const authenticated = getRouteApi("/_authenticated");
-
-type Collection = components["schemas"]["GetCollectionResponse"];
 
 // The collection and its clips load at the same time: the clips need only the id in the URL. The sub-collections
 // and clip counts come from the tree the sidebar already has.
@@ -239,18 +245,84 @@ function Header({
         </span>
       </nav>
 
-      <div className="flex flex-col gap-2">
-        <h1 className="text-[34px] font-extrabold tracking-[-0.02em] break-words">
-          {collection.name}
-        </h1>
-        {collection.description && (
-          <p className="max-w-160 text-base leading-normal whitespace-pre-line text-meta">
-            {collection.description}
-          </p>
-        )}
-        <span className="font-mono text-xs text-meta">{meta.join(" · ")}</span>
-        {search.q && <p className="text-[15px] text-meta">Clips matching “{search.q}”</p>}
+      <div className="flex items-start justify-between gap-4">
+        <div className="flex min-w-0 flex-col gap-2">
+          <h1 className="text-[34px] font-extrabold tracking-[-0.02em] break-words">
+            {collection.name}
+          </h1>
+          {collection.description && (
+            <p className="max-w-160 text-base leading-normal whitespace-pre-line text-meta">
+              {collection.description}
+            </p>
+          )}
+          <span className="font-mono text-xs text-meta">{meta.join(" · ")}</span>
+          {search.q && <p className="text-[15px] text-meta">Clips matching “{search.q}”</p>}
+        </div>
+        <Actions collection={collection} items={items} />
       </div>
+    </>
+  );
+}
+
+// The "…" menu and the dialogs it opens. Anyone can add a sub-collection; renaming, moving and deleting are for the
+// creator or an admin, the API's rule (Collection.CanBeEditedBy), so others don't see them.
+function Actions({ collection, items }: { collection: Collection; items: CollectionItem[] }) {
+  const me = authenticated.useLoaderData();
+  const [dialog, setDialog] = useState<"new" | "edit" | "move" | "delete" | null>(null);
+  const canChange = collection.createdBy.id === me.id || me.role === "Admin";
+  const roomInside = levelOf(items, collection.id) < maxDepth;
+  const inside = flatten(items, collection.id).length;
+  const close = () => setDialog(null);
+
+  return (
+    <>
+      <Menu
+        label="Collection actions"
+        button={<Ellipsis size={18} aria-hidden="true" />}
+        buttonClassName="flex size-10 cursor-pointer items-center justify-center rounded-lg border border-line bg-surface text-text hover:bg-sunken"
+      >
+        {canChange && (
+          <MenuItem onClick={() => setDialog("edit")} icon={<Pencil size={18} />}>
+            Edit
+          </MenuItem>
+        )}
+        <MenuItem
+          onClick={() => setDialog("new")}
+          icon={<FolderPlus size={18} />}
+          disabled={!roomInside}
+          hint={roomInside ? undefined : `Collections go ${maxDepth} levels deep.`}
+        >
+          New sub-collection
+        </MenuItem>
+        {canChange && (
+          <>
+            <MenuItem onClick={() => setDialog("move")} icon={<FolderInput size={18} />}>
+              Move to…
+            </MenuItem>
+            <MenuDivider />
+            <MenuItem
+              onClick={() => setDialog("delete")}
+              icon={<Trash2 size={18} />}
+              danger
+              hint={
+                inside > 0
+                  ? `Also deletes ${insideCount(inside)}. Clips stay in the library.`
+                  : "Clips stay in the library."
+              }
+            >
+              Delete collection
+            </MenuItem>
+          </>
+        )}
+      </Menu>
+      {dialog === "new" && <NewCollection parent={collection} onClose={close} />}
+      {dialog === "edit" && <EditCollection collection={collection} onClose={close} />}
+      {dialog === "move" && (
+        <MoveCollection collection={collection} items={items} onClose={close} />
+      )}
+      {dialog === "delete" && (
+        <DeleteCollection collection={collection} items={items} onClose={close} />
+      )}
     </>
   );
 }

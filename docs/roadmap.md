@@ -113,8 +113,11 @@ Built step by step. Each step is small and shippable. Order may change.
           collection's page the top bar's search searches that collection, as in the mock. The clip count is the
           collection's own clips only. A total with its sub-collections, and the mock's "In" column (which
           sub-collection a clip is in), need the API to return them, so they wait until they're missed
-    - [ ] Create (sidebar and "New sub-collection"), rename and describe, move, and delete with a count of the
-          sub-collections it takes along
+    - [x] Create (sidebar and "New sub-collection"), rename and describe, move, and delete with a count of the
+          sub-collections it takes along. From the sidebar's "+" and the collection page's "…" menu, in dialogs
+          (native `<dialog>`), since the sidebar has no room for a form. Edit, move and delete show for the creator
+          or an admin, the API's rule. The app follows the API's depth rule: "New sub-collection" is greyed out at the
+          fifth level, and the move dialog greys out where the collection with its sub-collections doesn't fit
       - [x] First, as a refactor of its own: shared UI pieces in `src/ui/` (buttons, the "Couldn't load … Try
             again" alert, the empty state, text fields), now copied between pages, before the forms add more
     - [ ] Select clips in the library and a collection: "Add to collection" and "Remove from …"
