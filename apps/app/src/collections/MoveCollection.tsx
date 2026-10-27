@@ -1,6 +1,6 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { Folder, Layers } from "lucide-react";
-import { useState, type FormEvent, type ReactNode } from "react";
+import { useState, type FormEvent } from "react";
 import { $api } from "../api/client";
 import { problemMessage } from "../api/problem";
 import { FormError } from "../ui/alerts";
@@ -8,6 +8,7 @@ import { Button } from "../ui/Button";
 import { Dialog } from "../ui/Dialog";
 import type { Collection } from "./EditCollection";
 import { flatten, heightOf, maxDepth, type CollectionItem } from "./tree";
+import { TreeOption, TreeOptions } from "./TreeOption";
 
 // Where to move a collection: the top level or another collection, picked from the tree. Its own sub-collections
 // aren't listed, and collections too deep for it with its sub-collections are greyed out, the API's rules, so a move
@@ -52,17 +53,18 @@ export function MoveCollection({
       <form onSubmit={save} className="flex flex-col gap-4">
         <fieldset className="flex flex-col gap-2">
           <legend className="pb-2 text-sm font-semibold">Move into</legend>
-          <div className="flex max-h-80 flex-col gap-0.5 overflow-y-auto rounded-[10px] border border-line p-1.5">
-            <Target
+          {/* The collections indented under "Top level". */}
+          <TreeOptions>
+            <TreeOption
               checked={parentId === null}
               onChange={() => setParentId(null)}
               depth={0}
               icon={<Layers size={16} />}
             >
               Top level
-            </Target>
+            </TreeOption>
             {targets.map(({ item, depth, fits }) => (
-              <Target
+              <TreeOption
                 key={item.id}
                 checked={parentId === item.id}
                 onChange={() => setParentId(item.id)}
@@ -71,9 +73,9 @@ export function MoveCollection({
                 icon={<Folder size={16} />}
               >
                 {item.name}
-              </Target>
+              </TreeOption>
             ))}
-          </div>
+          </TreeOptions>
           {targets.some(({ fits }) => !fits) && (
             <span className="text-[13px] text-meta">
               Collections go {maxDepth} levels deep, so the greyed out ones have no room for it
@@ -101,42 +103,5 @@ export function MoveCollection({
         </div>
       </form>
     </Dialog>
-  );
-}
-
-function Target({
-  checked,
-  onChange,
-  depth,
-  disabled = false,
-  icon,
-  children,
-}: {
-  checked: boolean;
-  onChange: () => void;
-  depth: number;
-  disabled?: boolean;
-  icon: ReactNode;
-  children: ReactNode;
-}) {
-  return (
-    <label
-      // Indented like the sidebar, under "Top level".
-      style={{ paddingLeft: 10 + depth * 18 }}
-      className="flex min-h-10 cursor-pointer items-center gap-2 rounded-lg pr-2.5 text-sm hover:bg-sunken has-checked:bg-accent-soft has-checked:font-semibold has-checked:text-link has-disabled:cursor-default has-disabled:text-meta has-disabled:hover:bg-transparent"
-    >
-      <input
-        type="radio"
-        name="parent"
-        checked={checked}
-        onChange={onChange}
-        disabled={disabled}
-        className="size-4 flex-none accent-accent"
-      />
-      <span className="flex-none" aria-hidden="true">
-        {icon}
-      </span>
-      <span className="min-w-0 truncate">{children}</span>
-    </label>
   );
 }

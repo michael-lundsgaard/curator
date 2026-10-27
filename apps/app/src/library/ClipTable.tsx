@@ -10,15 +10,39 @@ const metaCellClass = "px-4 py-2 font-mono text-[13px] whitespace-nowrap text-me
 export function ClipTable({
   clips,
   uploaderName,
+  selected,
+  onToggle,
+  onToggleAll,
 }: {
   clips: Clip[];
   uploaderName: (clip: Clip) => string;
+  selected: Set<string>;
+  onToggle: (id: string) => void;
+  onToggleAll: () => void;
 }) {
+  const selectedCount = clips.filter((clip) => selected.has(clip.id)).length;
+
   return (
     <div className="overflow-x-auto rounded-xl border border-line bg-surface">
-      <table className="w-full min-w-190 border-collapse text-sm">
+      <table className="w-full min-w-200 border-collapse text-sm">
         <thead>
           <tr className="text-left font-mono text-xs tracking-[0.06em] text-meta uppercase">
+            <th scope="col" className="w-12 p-0">
+              <label className="flex h-11 cursor-pointer items-center justify-end pr-1">
+                <input
+                  type="checkbox"
+                  checked={selectedCount === clips.length}
+                  // Half checked when some are: the browser has no attribute for it, only the property.
+                  ref={(input) => {
+                    if (input)
+                      input.indeterminate = selectedCount > 0 && selectedCount < clips.length;
+                  }}
+                  onChange={onToggleAll}
+                  aria-label="Select all clips shown"
+                  className="size-4.5 cursor-pointer accent-accent"
+                />
+              </label>
+            </th>
             <th scope="col" className={headerClass}>
               Title
             </th>
@@ -41,7 +65,22 @@ export function ClipTable({
         </thead>
         <tbody>
           {clips.map((clip) => (
-            <tr key={clip.id} className="border-t border-line hover:bg-sunken">
+            <tr
+              key={clip.id}
+              className={`border-t border-line ${selected.has(clip.id) ? "bg-accent-soft" : "hover:bg-sunken"}`}
+            >
+              <td className="p-0">
+                {/* The whole cell, so the checkbox is easy to hit. */}
+                <label className="flex h-13 cursor-pointer items-center justify-end pr-1">
+                  <input
+                    type="checkbox"
+                    checked={selected.has(clip.id)}
+                    onChange={() => onToggle(clip.id)}
+                    aria-label={`Select ${clip.title}`}
+                    className="size-4.5 cursor-pointer accent-accent"
+                  />
+                </label>
+              </td>
               <td className="px-4 py-2 font-semibold">
                 <div className="flex items-center gap-3">
                   <span className="h-9 w-16 flex-none rounded-md bg-sunken" aria-hidden="true" />

@@ -120,7 +120,22 @@ Built step by step. Each step is small and shippable. Order may change.
           fifth level, and the move dialog greys out where the collection with its sub-collections doesn't fit
       - [x] First, as a refactor of its own: shared UI pieces in `src/ui/` (buttons, the "Couldn't load … Try
             again" alert, the empty state, text fields), now copied between pages, before the forms add more
-    - [ ] Select clips in the library and a collection: "Add to collection" and "Remove from …"
+    - [x] Select clips in the library and a collection: "Add to collection" and "Remove from …". A selection belongs
+          to its search and filters: changing them clears it, so no clip is selected out of sight. The bar with the
+          actions stays at the top of the screen while scrolling. In the grid, a round check shows on hover (always on
+          a touch screen), and once a clip is selected a click on a card selects it instead of opening it, as in a
+          photo app, so a near-miss doesn't open the clip. "Select all" (the list's header checkbox, and in the bar)
+          selects the clips loaded so far; every clip a search finds would need the API to add by search. The grid
+          stays for browsing: whether it earns its place is judged once processing gives it thumbnails. The collection is picked in a dialog with the tree,
+          like moving one, instead of the mock's pop-up list: room for a long tree, a place for errors, and it works on
+          a phone. More than 100 clips (the API's limit per request) are sent 100 at a time; both endpoints skip clips
+          already done, so a failure halfway is simply tried again
+    - [ ] With sub-collections' clips shown, "Remove from …" removes from the collection and its sub-collections
+          (today it only removes the collection's own clips, so often nothing). Adding needs no change: the clips go
+          into the picked collection wherever they came from. A notice says success only when something changed, and
+          is neutral otherwise ("The clip was already in Screams."). Which sub-collection each clip is in (the mock's
+          "In" column) waits until it's missed
+      - [ ] API first: `includeSubCollections` on `POST /collections/{id}/assets/remove`, like `GET /assets`
     - [ ] Clip details: the clip's collections and "Add to collection", as in the mock
       - [ ] API first: an asset's collections (the API doesn't list them yet)
   - [ ] Upload: bulk queue (create upload, `PUT` to R2, complete), a few files at a time, optionally into a

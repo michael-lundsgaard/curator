@@ -1,4 +1,8 @@
-// How the library shows metadata: "12 Jul 2026", "14:32", "2:27", "1920×1080", "96 MB".
+// How the library shows metadata: "12 Jul 2026", "14:32", "2:27", "1920×1080", "96 MB", "3 clips".
+
+export function plural(count: number, noun: string) {
+  return `${count} ${noun}${count === 1 ? "" : "s"}`;
+}
 
 // Not Intl's en-GB format, which writes September as "Sept": every month is three letters here.
 const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];

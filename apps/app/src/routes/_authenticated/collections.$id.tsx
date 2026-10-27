@@ -18,6 +18,7 @@ import {
 } from "../../collections/tree";
 import { ClipListing } from "../../library/ClipListing";
 import { SortSelect, UploadedBySelect, ViewSwitch } from "../../library/controls";
+import { plural } from "../../library/format";
 import { parseClipSearch, type ClipSearch } from "../../library/search";
 import { useClipView } from "../../library/view";
 import { LoadError } from "../../ui/alerts";
@@ -148,6 +149,7 @@ function CollectionPage() {
           order: search.order,
         }}
         view={view}
+        collection={{ id, name: name ?? "this collection" }}
         empty={
           search.q !== undefined || search.uploadedBy !== undefined ? (
             <EmptyState
@@ -325,8 +327,4 @@ function Actions({ collection, items }: { collection: Collection; items: Collect
       )}
     </>
   );
-}
-
-function plural(count: number, noun: string) {
-  return `${count} ${noun}${count === 1 ? "" : "s"}`;
 }
