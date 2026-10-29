@@ -82,7 +82,7 @@ npm run dev            # http://localhost:5173, proxies /api to the API on :5238
 npm run typecheck
 npm run lint           # oxlint
 npm run generate:api   # src/api/schema.d.ts from ../api/openapi.json, after every openapi.json change
-npm run check:api      # fails when the committed schema.d.ts is out of date
+npm run check:api      # fails when schema.d.ts is out of date with openapi.json (writes nothing)
 ```
 
 - `npm run dev` and `npm run build` regenerate `src/routeTree.gen.ts` when a route file is added, renamed or

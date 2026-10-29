@@ -10,7 +10,7 @@
     "lint": "oxlint",
     "preview": "vite preview",
     "generate:api": "openapi-typescript ../api/openapi.json -o src/api/schema.d.ts",
-    "check:api": "npm run generate:api && git diff --exit-code -- src/api/schema.d.ts"
+    "check:api": "openapi-typescript ../api/openapi.json -o src/api/schema.d.ts --check"
   },
   "dependencies": {
     "@supabase/auth-js": "^2.118.0",

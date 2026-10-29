@@ -24,8 +24,9 @@ What matters here:
 - `npm run generate:api` writes `src/api/schema.d.ts` (`paths`, `components`, `operations`) from
   `../api/openapi.json`. It's committed, so an API change and its effect on the app's types land in the same
   commit. Prettier skips it, as it does `openapi.json`, so the generator's output stays byte for byte.
-- `npm run check:api` regenerates the file and fails when it differs from the committed one, the app-side twin of
-  `OpenApiDocumentTests`.
+- `npm run check:api` generates the types in memory (`openapi-typescript --check`) and fails when they differ from
+  the file, the app-side twin of `OpenApiDocumentTests`. It compares with the file on disk, not with git, so it also
+  passes on uncommitted work whose types are up to date.
 - `src/api/client.ts` creates one client, `createClient<paths>({ baseUrl: "/api" })`. Calls name the method and
   path, and TypeScript checks the parameters, body and response against the document:
   `api.GET("/assets/{id}", { params: { path: { id } } })`. A body missing a required field, or a value outside an

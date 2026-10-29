@@ -36,8 +36,8 @@ with `--artifacts-path` pointing at a temp/scratchpad directory and drop `--no-b
 
 From `apps/app` (run `npm ci` first if `node_modules` is missing):
 
-4. `npm run check:api`. It regenerates `src/api/schema.d.ts` and fails when that changed it, so on a failure the
-   file is already updated: show the diff, and it belongs in the commit with the `openapi.json` change.
+4. `npm run check:api`. It fails when `src/api/schema.d.ts` doesn't match `openapi.json`, and writes nothing. On a
+   failure, run `npm run generate:api` and show the diff: it belongs in the commit with the `openapi.json` change.
 5. `npm run lint`
 6. `npm run build` (typechecks, then bundles)
 
