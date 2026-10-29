@@ -138,8 +138,9 @@ public class CollectionsController : ControllerBase
 
     /// <summary>Remove clips from a collection</summary>
     /// <remarks>
-    /// Removes up to 100 clips from a collection. Anyone can remove clips from any collection. Clips that aren't in it
-    /// are skipped, and the clips stay in the library. A <c>POST</c>, because a body on <c>DELETE</c> is often dropped.
+    /// Removes up to 100 clips from a collection, and with <c>includeSubCollections</c> from its sub-collections too.
+    /// Anyone can remove clips from any collection. Clips that aren't in it are skipped, and the clips stay in the
+    /// library. A <c>POST</c>, because a body on <c>DELETE</c> is often dropped.
     /// </remarks>
     [HttpPost("{id:guid}/assets/remove", Name = "RemoveClipsFromCollection")]
     [ProducesResponseType<RemoveClipsFromCollection.Response>(StatusCodes.Status200OK)]

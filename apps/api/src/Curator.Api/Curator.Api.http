@@ -179,13 +179,15 @@ Authorization: Bearer {{token}}
 
 ###
 
-# Take up to 100 clips out of the collection. Clips not in it are skipped; all stay in the library.
+# Take up to 100 clips out of the collection and its sub-collections. Clips not in them are skipped; all stay in the
+# library. Drop includeSubCollections for only the collection's own clips.
 POST {{host}}/collections/{{createCollection.response.body.id}}/assets/remove
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-  "assetIds": ["{{listAssets.response.body.$.items[0].id}}"]
+  "assetIds": ["{{listAssets.response.body.$.items[0].id}}"],
+  "includeSubCollections": true
 }
 
 ###

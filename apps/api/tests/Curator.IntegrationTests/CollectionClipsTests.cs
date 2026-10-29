@@ -107,6 +107,50 @@ public class CollectionClipsTests(CuratorApiFactory factory)
         Assert.Equal(3, await db.Assets.CountAsync(a => a.Id == first.Id || a.Id == second.Id || a.Id == kept.Id));
     }
 
+    [Fact]
+    public async Task Remove_WithSubCollections_TakesClipsOutAtEveryLevel_CountingEachClipOnce()
+    {
+        var (client, userId) = await CreateUserAsync();
+        var parent = await CreateCollectionAsync(client, "Screams");
+        var child = await CreateCollectionAsync(client, "Loud", parent);
+        var grandchild = await CreateCollectionAsync(client, "Louder", child);
+        var other = await CreateCollectionAsync(client, "Laughs");
+        var inSeveral = await SaveAssetAsync(userId);
+        var deepDown = await SaveAssetAsync(userId);
+        await AddAsync(client, parent, inSeveral.Id);
+        await AddAsync(client, child, inSeveral.Id);
+        await AddAsync(client, grandchild, deepDown.Id);
+        await AddAsync(client, other, inSeveral.Id, deepDown.Id);
+
+        var response = await client.PostAsJsonAsync(
+            $"/collections/{parent}/assets/remove",
+            new { assetIds = new[] { inSeveral.Id, deepDown.Id }, includeSubCollections = true });
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Equal(new Removed(parent, 2), await response.Content.ReadFromJsonAsync<Removed>());
+        await using var db = factory.CreateDbContext();
+        Assert.False(await db.CollectionAssets.AnyAsync(ca =>
+            ca.CollectionId == parent || ca.CollectionId == child || ca.CollectionId == grandchild));
+        Assert.Equal(2, await db.CollectionAssets.CountAsync(ca => ca.CollectionId == other));
+    }
+
+    [Fact]
+    public async Task Remove_WithoutSubCollections_LeavesTheirClips()
+    {
+        var (client, userId) = await CreateUserAsync();
+        var parent = await CreateCollectionAsync(client, "Screams");
+        var child = await CreateCollectionAsync(client, "Loud", parent);
+        var clip = await SaveAssetAsync(userId);
+        await AddAsync(client, child, clip.Id);
+
+        var response = await client.PostAsJsonAsync(
+            $"/collections/{parent}/assets/remove", new { assetIds = new[] { clip.Id } });
+
+        Assert.Equal(new Removed(parent, 0), await response.Content.ReadFromJsonAsync<Removed>());
+        await using var db = factory.CreateDbContext();
+        Assert.True(await db.CollectionAssets.AnyAsync(ca => ca.CollectionId == child && ca.AssetId == clip.Id));
+    }
+
     [Theory]
     [InlineData(0)]
     [InlineData(101)]

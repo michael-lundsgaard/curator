@@ -147,7 +147,7 @@ export interface paths {
         put?: never;
         /**
          * Remove clips from a collection
-         * @description Removes up to 100 clips from a collection. Anyone can remove clips from any collection. Clips that aren't in it are skipped, and the clips stay in the library. A `POST`, because a body on `DELETE` is often dropped.
+         * @description Removes up to 100 clips from a collection, and with `includeSubCollections` from its sub-collections too. Anyone can remove clips from any collection. Clips that aren't in it are skipped, and the clips stay in the library. A `POST`, because a body on `DELETE` is often dropped.
          */
         post: operations["RemoveClipsFromCollection"];
         delete?: never;
@@ -556,13 +556,18 @@ export interface components {
         ProfileRole: "Member" | "Admin";
         RemoveClipsFromCollectionRequest: {
             assetIds: string[];
+            /**
+             * @description Also remove the clips from its sub-collections, at every level, as listed by `GET /assets` with `includeSubCollections`.
+             * @default false
+             */
+            includeSubCollections: boolean;
         };
         RemoveClipsFromCollectionResponse: {
             /** Format: uuid */
             id: string;
             /**
              * Format: int32
-             * @description How many clips were removed, not counting those that weren't in it.
+             * @description How many clips were removed, not counting those that weren't in it. A clip removed from several sub-collections counts once.
              */
             removedCount: number;
         };
