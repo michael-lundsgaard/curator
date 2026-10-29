@@ -27,11 +27,16 @@ export function addClips(collectionId: string, assetIds: string[]) {
   });
 }
 
-export function removeClips(collectionId: string, assetIds: string[]) {
+// With `includeSubCollections`, also from its sub-collections, for a collection's page that shows their clips.
+export function removeClips(
+  collectionId: string,
+  assetIds: string[],
+  includeSubCollections = false,
+) {
   return inBatches(assetIds, async (batch) => {
     const { data, error } = await api.POST("/collections/{id}/assets/remove", {
       params: { path: { id: collectionId } },
-      body: { assetIds: batch },
+      body: { assetIds: batch, includeSubCollections },
     });
     if (error) throw error;
     return data.removedCount;

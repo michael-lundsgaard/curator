@@ -130,12 +130,17 @@ Built step by step. Each step is small and shippable. Order may change.
           like moving one, instead of the mock's pop-up list: room for a long tree, a place for errors, and it works on
           a phone. More than 100 clips (the API's limit per request) are sent 100 at a time; both endpoints skip clips
           already done, so a failure halfway is simply tried again
-    - [ ] With sub-collections' clips shown, "Remove from …" removes from the collection and its sub-collections
-          (today it only removes the collection's own clips, so often nothing). Adding needs no change: the clips go
-          into the picked collection wherever they came from. A notice says success only when something changed, and
+    - [x] With sub-collections' clips shown, "Remove from …" removes from the collection and its sub-collections
+          (before, it only removed the collection's own clips, so often nothing). The button says "Remove from
+          collection", since the name is the heading right above it. With sub-collections' clips shown it asks first:
+          afterwards nothing shows which sub-collection each clip was in, so it's hard to undo, unlike removing from the
+          collection alone. The question says "sub-collections" without naming them, since the app doesn't know which
+          ones the selected clips are in. Adding needs no change: the clips go into the picked collection wherever they
+          came from. A notice says success only when something changed, and
           is neutral otherwise ("The clip was already in Screams."). Which sub-collection each clip is in (the mock's
           "In" column) waits until it's missed
-      - [ ] API first: `includeSubCollections` on `POST /collections/{id}/assets/remove`, like `GET /assets`
+      - [x] API first: `includeSubCollections` on `POST /collections/{id}/assets/remove`, like `GET /assets`.
+            `removedCount` counts clips, so a clip taken out of several sub-collections counts once
     - [ ] Clip details: the clip's collections and "Add to collection", as in the mock
       - [ ] API first: an asset's collections (the API doesn't list them yet)
   - [ ] Upload: bulk queue (create upload, `PUT` to R2, complete), a few files at a time, optionally into a

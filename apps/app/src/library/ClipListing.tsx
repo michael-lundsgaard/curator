@@ -39,7 +39,7 @@ export function ClipListing({
   const queryKey = JSON.stringify(query);
   const [selection, setSelection] = useState({ queryKey, ids: noneSelected });
   const selected = selection.queryKey === queryKey ? selection.ids : noneSelected;
-  const [done, setDone] = useState<ReactNode>(null);
+  const [done, setDone] = useState<{ message: ReactNode; changed: boolean } | null>(null);
 
   const toggle = (id: string) => {
     const ids = new Set(selected);
@@ -87,15 +87,19 @@ export function ClipListing({
               assetIds={[...selected]}
               collection={collection}
               includeSubCollections={query.includeSubCollections}
-              onDone={(message) => {
+              onDone={(message, changed) => {
                 clear();
-                setDone(message);
+                setDone({ message, changed });
               }}
               onSelectAll={allSelected ? undefined : selectAll}
               onClear={clear}
             />
           ) : (
-            <Done onDismiss={() => setDone(null)}>{done}</Done>
+            done && (
+              <Done changed={done.changed} onDismiss={() => setDone(null)}>
+                {done.message}
+              </Done>
+            )
           )}
         </div>
       )}

@@ -1,21 +1,31 @@
-import { Check, X } from "lucide-react";
+import { Check, Info, X } from "lucide-react";
 import type { ReactNode } from "react";
 
-// What an action did, until it's dismissed: "Added 3 clips to Summer 2026."
-export function Done({ children, onDismiss }: { children: ReactNode; onDismiss: () => void }) {
+// What an action did, until it's dismissed: "Added 3 clips to Summer 2026." In plain colors when it changed nothing
+// ("The clip was already in Screams."), so it doesn't read as a success.
+export function Done({
+  children,
+  changed = true,
+  onDismiss,
+}: {
+  children: ReactNode;
+  changed?: boolean;
+  onDismiss: () => void;
+}) {
+  const Icon = changed ? Check : Info;
   return (
     <div
       role="status"
-      className="flex items-center gap-2.5 rounded-[10px] bg-ok-soft py-1.5 pr-1.5 pl-4 text-[15px] font-semibold text-ok"
+      className={`flex items-center gap-2.5 rounded-[10px] py-1.5 pr-1.5 pl-4 text-[15px] font-semibold ${changed ? "bg-ok-soft text-ok" : "bg-sunken text-text"}`}
     >
-      <Check size={18} aria-hidden="true" className="flex-none" />
+      <Icon size={18} aria-hidden="true" className="flex-none" />
       <span className="min-w-0 flex-1 break-words">{children}</span>
       <button
         type="button"
         onClick={onDismiss}
         aria-label="Dismiss"
         title="Dismiss"
-        className="flex size-9 flex-none cursor-pointer items-center justify-center rounded-lg hover:bg-ok/10"
+        className={`flex size-9 flex-none cursor-pointer items-center justify-center rounded-lg ${changed ? "hover:bg-ok/10" : "hover:bg-text/10"}`}
       >
         <X size={16} aria-hidden="true" />
       </button>
